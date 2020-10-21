@@ -1,0 +1,41 @@
+{
+	"name": "tkeron",
+	"version": "1.3.1",
+	"description": "Micro framework for developing web user interfaces with typescript.",
+	"bin": "dist/index.mjs",
+	"scripts": {
+		"build": "tsc && cp dist/dotJs.js dist/dotJs.mjs && node dist/dotJs.mjs",
+		"start": "node dist/index.mjs"
+	},
+	"author": "",
+	"license": "MIT",
+	"dependencies": {
+		"axios": "^0.19.2",
+		"body-parser": "^1.19.0",
+		"express": "^4.17.1"
+	},
+	"devDependencies": {
+		"@types/axios": "^0.14.0",
+		"@types/express": "^4.17.8",
+		"@types/node": "^14.6.4"
+	},
+	"keywords": [
+		"cli",
+		"front-end",
+		"frontend",
+		"typescript",
+		"web components",
+		"microframework"
+	],
+	"com_tkeron": {
+		"lib_version": "1.3.0",
+		"lib_sha256": "90850894fb3e190cbff0d6f09ec48b13a8129038f7de7596a1485a62b493d9f4"
+	},
+	"engines": {
+		"node": ">=14.9.0"
+	},
+	"repository": {
+		"url": "git@github.com:tkeron/tkeron.git"
+	},
+	"type": "module"
+}
