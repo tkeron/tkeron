@@ -14,10 +14,11 @@ body {
   align-items: center;
   flex-direction: row;
   flex-wrap: wrap;
-  background: #513;
+  background: #3132b4;
   color: #fff;
   box-sizing: border-box;
   font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  font-size: 14px;
   min-height: 100vh;
   width: 100%;
   max-width: 320px;

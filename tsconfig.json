@@ -4,7 +4,7 @@
         "outDir": "dist",
         "sourceMap": false,
         "strict": true,
-        "target": "ESNext",
+        "target": "ES2017",
         "esModuleInterop": true,
         "moduleResolution": "Node",
         "declaration": false

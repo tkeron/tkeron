@@ -8,7 +8,7 @@ import { clear as runClear, doc as clearDoc } from "./cache";
 
 import { getArg } from "./getArg";
 import { fromBase64 } from "./base64";
-import getVersion from "./getVersion";
+import getVersion, { getPkg } from "./getVersion";
 import { version as tkver } from "./tkeron";
 import { log } from "./log";
 import { run, doc as runDoc } from "./run";
@@ -53,6 +53,7 @@ const bundle: string | undefined = getArg("bundle");
         return;
     }
 
+    const tscver = getPkg()?.dependencies?.typescript?.match(/[\d\.]+/);
     const version: string = getVersion();
     const tk = fromBase64("ICAgX19fX19fXyAgXyAgX18gIF9fX19fICBfX19fICAgIF9fXyAgIF8gICBfCiAgfF9fICAgX198fCB8LyAvIHwgIF9fX3x8ICAgIFwgIC8gICBcIHwgXCB8IHwKICAgICB8IHwgICB8ICAgLyAgfCAgX198IHwgIF4gLyB8ICBeICB8fCAgXHwgfAogICAgIHwgfCAgIHwgfFwgXCB8IHxfX18gfCB8XCBcIHwgIHYgIHx8IHxcICB8CiAgICAgfF98ICAgfF98IFxfXHxfX19fX3x8X3wgXF9cIFxfX18vIHxffCBcX3w=");
 
@@ -60,6 +61,7 @@ const bundle: string | undefined = getArg("bundle");
 
    Tkeron CLI version ${version}
    Tkeron Library version ${tkver}
+   Typescript version ${tscver}
    
    ${help ? "" : "Type 'tkeron help' to show commands.\n"}`);
 

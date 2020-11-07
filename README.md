@@ -6,13 +6,6 @@ It is actually a CLI with some commands.
 
 Also a typescript library to create web components: **tkeron.ts**.
 
-**Requirements**
-
-Requires global typescript compiler
-```bash
-npm i -g typescript
-```
-
 **How to use**
 * Install tkeron globally
 ```bash
@@ -24,25 +17,7 @@ npm i -g tkeron
 tkeron init example
 ```
 
-* This will create the following structure in your directory:
-
-```txt
-| your_dir
-    | front                 <-- source directory
-        | index.css         <-- this styles will be added to the head of the html file
-        | index.html        <-- the input html file
-        | index.b.ts        <-- render in the backend
-        | index.ts          <-- render/logic in the frontend
-        | resources.ts      <-- resources file
-        | tkeron.ts         <-- tkeron library
-        | comps             <-- component directory
-            | anim.ts       <-- render an img element, in this case from the backend
-            | frontComp.ts  <-- component that will be rendered on the client
-            | backComp.ts   <-- component to be rendered in the backend,
-                                included in the body of the html file
-    | static                <-- resources directory
-        | skcustker.git     <-- animated logo of tkeron
-```
+This will create a project example code in the "front" directory.
 
 
 * To build the html file run this: 
@@ -50,34 +25,17 @@ tkeron init example
 tkeron build
 ```
 
-* This will create a compiled html file with all the javascript and css code, and the resources used in the code from the static directory
+This will create a compiled html file with all the javascript and css code, and the resources used in the code from the static directory.
 
-```txt
-| your_dir
-    | front                 
-        | index.css         
-        | index.html        
-        | index.b.ts        
-        | index.ts          
-        | resources.ts      
-        | tkeron.ts         
-        | comps             
-            | logo.ts       
-            | frontComp.ts  
-            | backComp.ts   
-    | static                
-        | skcustker.git     
-    | web                   <-- output directory
-        | skcustker.git     <-- resource used from the code
-        | index.html        <-- output html
-```
-The source directory "front", has a html file, which could have its corresponding css file, ts file or b.ts file.
+The source directory "front", has a html file, which could have its corresponding .css file, .ts file, .b.ts file and/or .dm.ts file.
 
 Also contain a file to easily manage resources.
 
-The ts file has the javascript code that will be injected in the html final file.
+The .ts file has the javascript code that will be injected in the html final file.
 
-The b.ts file, has an default export Array of tkeron Components, all which will be rendered in the body tag of the html final file.
+The .b.ts file, has an default export Array of tkeron Components, all which will be rendered in the body tag of the html final file.
+
+The .dm.ts file will create a deferred module.
 
 The css file, is a normal style file that will be rendered in a style tag in the head of the html final file.
 
@@ -143,7 +101,6 @@ You can run .ts files using tkeron:
 tkeron myFile.ts
 ```
 
-
 ----------
 
-# Feel free to open issues! This project is in progress.
+

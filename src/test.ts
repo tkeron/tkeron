@@ -348,7 +348,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 `;
         const res = await run(fle);
-        return res === exp;
+        return res?.match(exp) ? true : false;
     });
 
 

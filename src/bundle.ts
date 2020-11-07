@@ -5,6 +5,8 @@ import { getArg } from "./getArg";
 import { getImports } from "./imports";
 import { exec } from "./exec";
 import { log } from "./log";
+import { tscpath } from "./tscpath";
+import { isDir } from "./isDir";
 
 
 export const runBundle = async () => {
@@ -22,6 +24,8 @@ export const runBundle = async () => {
         const exclude = c.match(/^\_{2}/);
         if (exclude) return p;
         const fp = join(src, c);
+        if (isDir(fp)) return p;
+        if (!fp.match(/\.ts$/)) return p;
         let f = fs.readFileSync(fp, { encoding: "utf-8" });
         const include = f.match(/\/{2}\_{2}(.*)\_{2}/g)?.map(_ => _.slice(4, _.length - 2));
         if (include) {
@@ -46,16 +50,19 @@ export const runBundle = async () => {
 
     fs.writeFileSync(pre, res, { encoding: "utf-8" });
 
-    await exec(`tsc --allowJs true --esModuleInterop true --moduleResolution node  --module ESNext --target ESNext --outDir ${out} ${pre}`)
+    await exec(`node ${tscpath} --allowJs true --esModuleInterop true --moduleResolution node  --module ESNext --target es2017 --outDir ${out} ${pre}`)
         .then(log)
         .catch(log);
+        
     fs.unlinkSync(pre);
 
 
 };
 
 export const doc = `
-    bundle [OPTIONS]      Join ts files in a directory and output a single js file.
+    bundle [OPTIONS]      Joins flat .ts files into a directory and generates a single js file. 
+                          Files should be considered part of a single .ts file,
+                          not "import" or "export".
         OPTIONS
         --src <path>      Source directory with ts files. "src" by default.
         --out <path>      Output directory, "out" by default.

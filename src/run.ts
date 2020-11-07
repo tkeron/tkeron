@@ -9,6 +9,11 @@ import { log } from "./log";
 import { getCode } from "./getCode";
 import { getFilesRecursive } from "./getFilesRecursive";
 import { strictRightCoincidence } from "./stringCompare";
+import { tscpath } from "./tscpath";
+import { fileURLToPath } from 'url';
+import { copyDir } from "./copyDir";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const getPaths = (outDir: string, file: string) => {
     const cur = getFilesRecursive(outDir, "*");
@@ -31,10 +36,11 @@ export const run = async (file: string) => {
     const od = getArg("--outDir");
     const silence = getArg("silence");
     const outDir = od ? od : join(os.tmpdir(), `tk_${rnds(10)}_${filen}`);
+
     if (!fs.existsSync(file)) return undefined;
-    await exec(`tsc --module ESNext --strict true --target ESNext --skipLibCheck --esModuleInterop true --moduleResolution Classic --outDir ${outDir} ${file}`)
+    await exec(`node ${tscpath} --module ESNext --strict true --target es2017 --skipLibCheck --esModuleInterop true --moduleResolution Node --outDir ${outDir} ${file}`)
         .catch((_err) => {
-            throw Error(`Error in TSC command\nMake sure you have TSC installed globally...\n` + JSON.stringify(_err));
+            throw Error(`¡Error!` + JSON.stringify(_err));
         });
     ts2mjs(outDir);
     const paths = getPaths(outDir, file);
@@ -44,6 +50,10 @@ export const run = async (file: string) => {
     let odfc = fs.readFileSync(paths.filePath, { encoding: "utf-8" });
     odfc = `import "./renderBack.mjs";\n${odfc}`;
     fs.writeFileSync(paths.filePath, odfc, { encoding: "utf-8" });
+
+    const nmod = join(__dirname, "../node_modules");
+    copyDir(nmod, join(outDir, "node_modules"));
+
     const res = await exec(`node ${paths.filePath}`);
     if (!silence) log(res);
     return res;

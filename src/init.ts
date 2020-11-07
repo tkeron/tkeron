@@ -18,6 +18,7 @@ export const runInit = async () => {
         fs.writeFileSync("tkeron.json", JSON.stringify(opts), { encoding: "utf-8" });
     }
     if (!fs.existsSync(opts.sourceDir)) fs.mkdirSync(opts.sourceDir, { recursive: true });
+    if (!fs.existsSync(opts.staticDir)) fs.mkdirSync(opts.staticDir, { recursive: true });
 
     if (example) {
         (async () => {

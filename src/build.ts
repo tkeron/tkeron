@@ -16,6 +16,7 @@ import { log } from "./log";
 import { rnds } from "./rnd";
 import { winPath } from "./winPath";
 import { toBrowserModule } from "./toBrowserModule";
+import { tscpath } from "./tscpath";
 
 
 const tmpp = join(os.tmpdir(), "tkeron-" + rnds(10));
@@ -31,9 +32,9 @@ const buildFile = async (fileName: string, sourceDir: string): Promise<string | 
     const fromFile = join(sourceDir, `/${fileName}.ts`);
     if (!fs.existsSync(fromFile)) return undefined;
     const outfile = join(tmpp, `/tkeron-${fileName}-Bundle.js`);
-    await exec(`tsc --module AMD --strict true --target ES5 --skipLibCheck --esModuleInterop true --moduleResolution Classic --outFile ${outfile} ${fromFile}`)
+    await exec(`node ${tscpath} --module AMD --strict true --target ES5 --skipLibCheck --esModuleInterop true --moduleResolution Classic --outFile ${outfile} ${fromFile}`)
         .catch((_err) => {
-            throw Error(`Error in TSC command\nMake sure you have TSC installed globally.\n` + JSON.stringify(_err));
+            throw Error(`¡Error!` + JSON.stringify(_err));
         });
     const fini = `import fs from "fs";
     const modules = [];
@@ -160,7 +161,7 @@ const renderBack = async (dirs: tkeronOpts, files: string[]): Promise<any> => {
         "outDir": "${tmppfront}",
         "sourceMap": false,
         "strict": true,
-        "target": "ESNext",
+        "target": "es2017",
         "esModuleInterop": true,
         "moduleResolution": "Node",
         "declaration": false,
@@ -169,9 +170,9 @@ const renderBack = async (dirs: tkeronOpts, files: string[]): Promise<any> => {
     "compileOnSave": true,
 }`, { encoding: "utf-8" });
     const srcdir = join(dirs.sourceDir);
-    await exec(`tsc -p ${srcdir}`)
+    await exec(`node ${tscpath} -p ${srcdir}`)
         .catch((_err) => {
-            throw Error(`Error in TSC command\nMake sure you have TSC installed globally..\n` + JSON.stringify(_err));
+            throw Error(`¡Error!` + JSON.stringify(_err));
         });
 
     fs.unlinkSync(tscj);

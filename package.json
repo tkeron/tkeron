@@ -1,6 +1,6 @@
 {
 	"name": "tkeron",
-	"version": "1.3.1",
+	"version": "1.4.0",
 	"description": "Micro framework for developing web user interfaces with typescript.",
 	"bin": "dist/index.mjs",
 	"scripts": {
@@ -12,7 +12,8 @@
 	"dependencies": {
 		"axios": "^0.19.2",
 		"body-parser": "^1.19.0",
-		"express": "^4.17.1"
+		"express": "^4.17.1",
+		"typescript": "^4.0.5"
 	},
 	"devDependencies": {
 		"@types/axios": "^0.14.0",
@@ -32,7 +33,7 @@
 		"lib_sha256": "90850894fb3e190cbff0d6f09ec48b13a8129038f7de7596a1485a62b493d9f4"
 	},
 	"engines": {
-		"node": ">=14.9.0"
+		"node": ">=14.15.0"
 	},
 	"repository": {
 		"url": "git@github.com:tkeron/tkeron.git"
