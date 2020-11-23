@@ -1,4 +1,5 @@
 import fs from "fs";
+import { join } from "path";
 
 
 const getFilesRecursive = (dir: string, extension = ".js"): string[] => {
@@ -52,5 +53,20 @@ fls.forEach(f => {
     fs.writeFileSync(f2, file, { encoding: "utf-8" });
 });
 
-const tklib = fs.readFileSync("./src/tkeron.ts", { encoding: "utf-8" });
-fs.writeFileSync("./dist/tkeron.ts", tklib, { encoding: "utf-8" });
+
+// const tklib = fs.readFileSync("./src/tkeron.ts", { encoding: "utf-8" });
+// fs.writeFileSync("./dist/tkeron.ts", tklib, { encoding: "utf-8" });
+
+export const libFiles = [
+    "tkeron.ts",
+    "channel.ts"
+];
+
+libFiles.forEach(f => {
+    const srcpath = join("./src", f);
+    const dstpath = join("./dist", f);
+    const tklib = fs.readFileSync(srcpath, { encoding: "utf-8" });
+    fs.writeFileSync(dstpath, tklib, { encoding: "utf-8" });
+});
+
+

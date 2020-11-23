@@ -1,7 +1,7 @@
 import { tkeron as t } from "./tkeron";
 import { front } from "./comps/frontComp";
 import { resources } from "./resources";
-import {anim} from "./comps/anim";
+
 
 front().appendIn("body");
 
@@ -13,4 +13,5 @@ t({ type: "img" }).css(`
     .appendIn("body");
 
 
-anim().appendIn("body");
+
+    

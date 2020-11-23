@@ -7,6 +7,7 @@ import { prompt } from "./prompt";
 import { createResourcesFile } from "./resources";
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { libFiles } from "./dotJs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -20,6 +21,16 @@ export const runInit = async () => {
     if (!fs.existsSync(opts.sourceDir)) fs.mkdirSync(opts.sourceDir, { recursive: true });
     if (!fs.existsSync(opts.staticDir)) fs.mkdirSync(opts.staticDir, { recursive: true });
 
+    const putFiles = () => {
+        libFiles.forEach(f => {
+            const srcpath = join(__dirname, f);
+            const destpath = join(opts.sourceDir, f);
+            const file = fs.readFileSync(srcpath, { encoding: "utf-8" });
+            fs.writeFileSync(destpath, file, { encoding: "utf-8" });
+        });
+        createResourcesFile(opts.sourceDir, opts.staticDir);
+    };
+
     if (example) {
         (async () => {
             const fls = getFilesRecursive(opts.sourceDir, "*");
@@ -31,17 +42,11 @@ export const runInit = async () => {
             copyDir(examplePath, opts.sourceDir);
             const stt = join(__dirname, "../static");
             copyDir(stt, opts.staticDir);
-            const tkeronfile = fs.readFileSync(`${__dirname}/tkeron.ts`, { encoding: "utf-8" });
-            fs.writeFileSync(`${opts.sourceDir}/tkeron.ts`, tkeronfile, { encoding: "utf-8" });
-            createResourcesFile(opts.sourceDir, opts.staticDir);
+            putFiles();
         })();
     }
 
-    if (!example) {
-        const tkeronfile = fs.readFileSync(`${__dirname}/tkeron.ts`, { encoding: "utf-8" });
-        fs.writeFileSync(`${opts.sourceDir}/tkeron.ts`, tkeronfile, { encoding: "utf-8" });
-        createResourcesFile(opts.sourceDir, opts.staticDir);
-    }
+    if (!example) putFiles();
 };
 
 export const doc = `

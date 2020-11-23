@@ -10,7 +10,7 @@ import { log } from "./log";
 import { getArg } from "./getArg";
 import { dirname, join, resolve } from 'path';
 import { fileURLToPath } from 'url';
-import { tkeron } from "./tkeron";
+import { channel } from "./channel";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 let firstTime = true;
@@ -35,11 +35,11 @@ export const runDev = async () => {
             res.sendFile(rcomdate);
             return;
         }
-        const reload = tkeron.channel("reload");
-        reload.onMessage = (m) => {
+        const reload = channel("reload");
+        reload.onMessage((m) => {
             reload.close();
             res.send("reload...");
-        };
+        });
         _req.on("close", (q: any) => {
             reload.close();
         })
@@ -50,7 +50,7 @@ export const runDev = async () => {
         let available = true;
         const wdirs = getRecursiveDirs(dirs.sourceDir);
         wdirs.push(dirs.sourceDir);
-        const reload2 = tkeron.channel("reload");
+        const reload2 = channel("reload");
         const watch = (dir: string) => {
             fs.watch(dir, (event, file) => evnt(async () => {
                 if (file === "tsconfig.json") return;

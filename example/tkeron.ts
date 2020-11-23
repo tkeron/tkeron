@@ -224,41 +224,6 @@ tkeron.css = (name: string, cssText: string) => {
   document.head.appendChild(style);
 };
 
-const Channels: any = {};
 
-interface tkeronChannel {
-  name: string;
-  postMessage(msg?: any): void;
-  close(): void;
-  open(): void;
-  onMessage: (msg: any) => void;
-}
 
-tkeron.channel = (channel: string) => {
-  if (!(channel in Channels)) Channels[channel] = {} as any;
-  const chid = `ch${Object.keys(Channels[channel]).length}`;
-  let closed = 0;
-  const ch: tkeronChannel = {
-    name: channel,
-    open: () => {
-      Channels[channel][chid] = ch;
-      closed = 0;
-    },
-    postMessage: (msg: any) => {
-      if (closed) return;
-      for (const k in Channels[channel]) {
-        if (k === chid) continue;
-        Channels[channel][k].onMessage(msg);
-      }
-    },
-    close: () => {
-      closed = 1;
-      delete Channels[channel][chid];
-    },
-    onMessage: (msg: any) => { },
-  };
-  Channels[channel][chid] = ch;
-  return ch;
-};
-
-export const version = "1.3.1";
+export const version = "1.3.2";
