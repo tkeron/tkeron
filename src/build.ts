@@ -10,18 +10,14 @@ import "./renderBack";
 import { ts2mjs } from "./ts2js";
 import { Component } from "./tkeron";
 import { getCode } from "./getCode";
-import { getRecursiveDirs } from "./getRecursiveDirs";
-import { getFilesRecursive } from "./getFilesRecursive";
 import { log } from "./log";
 import { rnds } from "./rnd";
 import { winPath } from "./winPath";
 import { toBrowserModule } from "./toBrowserModule";
 import { tscpath } from "./tscpath";
-
+import { cleanResources } from "./resources";
 
 const tmpp = join(os.tmpdir(), "tkeron-" + rnds(10));
-
-
 
 const getSourceFiles = (dir: string): string[] => {
     const files = fs.readdirSync(dir, { encoding: "utf-8" });
@@ -32,7 +28,7 @@ const buildFile = async (fileName: string, sourceDir: string): Promise<string | 
     const fromFile = join(sourceDir, `/${fileName}.ts`);
     if (!fs.existsSync(fromFile)) return undefined;
     const outfile = join(tmpp, `/tkeron-${fileName}-Bundle.js`);
-    await exec(`node ${tscpath} --module AMD --strict true --target ES5 --skipLibCheck --esModuleInterop true --moduleResolution Classic --outFile ${outfile} ${fromFile}`)
+    await exec(`node ${tscpath} --module AMD --strict true --lib ES2015,dom  --target ES5 --skipLibCheck --esModuleInterop true --moduleResolution Classic --outFile ${outfile} ${fromFile}`)
         .catch((_err) => {
             throw Error(`¡Error!` + JSON.stringify(_err));
         });
@@ -70,73 +66,6 @@ const buildFile = async (fileName: string, sourceDir: string): Promise<string | 
     const jsResP = join(tmpp, `/tkeron-${fileName}-BundlePost.js`);
     const jsRes = fs.readFileSync(jsResP, { encoding: "utf-8" });
     return jsRes;
-};
-
-export const runBuild = async () => {
-    log("building...");
-    fs.mkdirSync(tmpp, { recursive: true });
-    const gccok = getArg("gcc");
-    const minify = getArg("min");
-
-
-    const hotrestart = getArg("hotrestart");
-    const hotrestartjs = getCode("simpleHotRestart.mjs");
-
-    const opts = getOpts();
-    if (!fs.existsSync(opts.outputDir)) {
-        fs.mkdirSync(opts.outputDir, { recursive: true });
-    }
-    const srcFiles = getSourceFiles(opts.sourceDir);
-
-    const mods = await buildModules(srcFiles, opts);
-
-    const rb = await renderBack(opts, srcFiles);
-
-    for (const i in srcFiles) {
-        const f = srcFiles[i];
-        let js = await buildFile(f, opts.sourceDir).catch(_e => {
-            return undefined;
-        });
-        if (minify && !gccok && js) js = minify_js(js);
-        if (gccok && js) js = await gcc(js);
-        const srcp = join(opts.sourceDir, `/${f}.html`);
-        let html = fs.readFileSync(srcp, { encoding: "utf-8" });
-
-
-        const cssfilename = join(opts.sourceDir, `/${f}.css`);
-        if (fs.existsSync(cssfilename)) {
-            const css = fs.readFileSync(cssfilename, { encoding: "utf-8" });
-            html = html.replace(/\<\/head\>/, `<style>\n${css}\n</style></head>`);
-        }
-        const backCss = rb[f][1];
-        html = backCss ? html.replace(/\<\/head\>/, `${backCss}</head>`) : html;
-
-        if (hotrestart) js = `${hotrestartjs}\n\n${js ? js : ""}`;
-
-        if (js) {
-            js = `(() => {${js}})();`;
-        }
-
-        html = js ? html.replace(/\<\/head\>/, `<script>${js}</script></head>`) : html;
-        html = rb[f] ? html.replace(/\<\/body\>/, `${rb[f][0]}</body>`) : html;
-
-        if (Object.keys(mods).length && typeof mods[f] === "string") {
-            const cb = `?cb=${(new Date()).getTime()}`;
-            html = html.replace(/\<\/head\>/, `<script type="module" defer src="${mods[f]}${cb}"></script>`);
-        }
-
-        if (minify) html = minify_html(html);
-        const outpt = join(opts.outputDir, `/${f}.html`);
-        fs.writeFileSync(outpt, html);
-    }
-
-    fs.rmdirSync(tmpp, { recursive: true });
-
-    const compdate = new Date().getTime();
-    const cpd = join(opts.outputDir, "/compdate.txt");
-    fs.writeFileSync(cpd, `compilation date: ${compdate}`, { encoding: "utf-8" });
-
-    log("site built...");
 };
 
 const buildModules = async (files: string[], opts: tkeronOpts) => {
@@ -216,11 +145,85 @@ const renderBack = async (dirs: tkeronOpts, files: string[]): Promise<any> => {
         const fc = fs.readFileSync(f, { encoding: "utf-8" });
         sttc.forEach(s => {
             if (fc.includes(s)) {
-                files2move[s.replace(/\W/g, "_")] = s;
+                files2move[s.replace(/^\//, "").replace(/\W/g, "_")] = s.replace(/^\//, "");
             }
         });
     });
 
+    return res;
+};
+
+export const runBuild = async () => {
+    log("building...");
+    fs.mkdirSync(tmpp, { recursive: true });
+    const gccok = getArg("gcc");
+    const minify = getArg("min");
+
+    const hotrestart = getArg("hotrestart");
+    const hotrestartjs = getCode("simpleHotRestart.mjs");
+
+    const opts = getOpts();
+    if (!fs.existsSync(opts.outputDir)) {
+        fs.mkdirSync(opts.outputDir, { recursive: true });
+    }
+    const srcFiles = getSourceFiles(opts.sourceDir);
+
+    const mods = await buildModules(srcFiles, opts);
+
+    const rb = await renderBack(opts, srcFiles);
+
+    for (const i in srcFiles) {
+        const f = srcFiles[i];
+        let js = await buildFile(f, opts.sourceDir).catch(_e => {
+            log(`Error building js:\n\n${_e}\n\n`);
+            return undefined;
+        });
+        const srcp = join(opts.sourceDir, `/${f}.html`);
+        let html = fs.readFileSync(srcp, { encoding: "utf-8" });
+
+
+        const cssfilename = join(opts.sourceDir, `/${f}.css`);
+        if (fs.existsSync(cssfilename)) {
+            const css = fs.readFileSync(cssfilename, { encoding: "utf-8" });
+            html = html.replace(/\<\/head\>/, `<style>\n${css}\n</style></head>`);
+        }
+        const backCss = rb[f][1];
+        html = backCss ? html.replace(/\<\/head\>/, `${backCss}</head>`) : html;
+
+        if (hotrestart) js = `${hotrestartjs}\n\n${js ? js : ""}`;
+
+        if (js) {
+            js = `(() => {${js}})();`;
+        }
+
+        if (js) js = await cleanResources(js);
+
+        if (minify && !gccok && js) js = minify_js(js);
+        if (gccok && js) js = await gcc(js);
+
+        html = js ? html.replace(/\<\/head\>/, `<script>${js}</script></head>`) : html;
+        html = rb[f] ? html.replace(/\<\/body\>/, `${rb[f][0]}</body>`) : html;
+
+        if (Object.keys(mods).length && typeof mods[f] === "string") {
+            const cb = `?cb=${(new Date()).getTime()}`;
+            html = html.replace(/\<\/head\>/, `<script type="module" defer src="${mods[f].replace(/^\//, "")}${cb}"></script>`);
+        }
+
+        if (minify) html = minify_html(html);
+        const outpt = join(opts.outputDir, `/${f}.html`);
+        fs.writeFileSync(outpt, html);
+    }
+
+    fs.rmdirSync(tmpp, { recursive: true });
+
+    const compdate = new Date().getTime();
+    const cpd = join(opts.outputDir, "/compdate.txt");
+    fs.writeFileSync(cpd, `compilation date: ${compdate}`, { encoding: "utf-8" });
+
+
+    //move resources
+    //@ts-ignore
+    const files2move = globalThis.tkeron_resources;
     Object.values(files2move).forEach(f => {
         const orig = join(opts.staticDir, (f as string));
         const dest = join(opts.outputDir, (f as string));
@@ -230,9 +233,9 @@ const renderBack = async (dirs: tkeronOpts, files: string[]): Promise<any> => {
         fs.copyFileSync(orig, dest);
     });
 
-    return res;
-};
 
+    log("site built...");
+};
 
 export const doc = `
     build [OPTIONS]       Transpile the code from sourceDir ("front" by 

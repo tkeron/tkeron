@@ -261,4 +261,4 @@ tkeron.channel = (channel: string) => {
   return ch;
 };
 
-export const version = "1.3.0";
+export const version = "1.3.1";

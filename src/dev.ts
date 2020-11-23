@@ -20,9 +20,11 @@ export const runDev = async () => {
     const nowatch = getArg("noWatch");
     const tk = join(__dirname, "./index.mjs");
     if (nowatch) {
-        await exec(`node ${tk} build`);
+        const cres = await exec(`node ${tk} build`);
+        log(cres);
     } else {
-        await exec(`node ${tk} build hotrestart`);
+        const cres = await exec(`node ${tk} build hotrestart`);
+        log(cres);
     }
     const { app, listen } = await start();
     const comdate = join(dirs.outputDir, "/compdate.txt");
