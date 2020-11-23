@@ -1,5 +1,8 @@
 import fs from "fs";
-import { join } from "path";
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
 const getFilesRecursive = (dir: string, extension = ".js"): string[] => {
@@ -34,7 +37,7 @@ const getImports = (txt: string) => {
     return res;
 };
 
-const fls = getFilesRecursive("./dist/");
+const fls = getFilesRecursive(join(__dirname));
 fls.forEach(f => {
     let file = fs.readFileSync(f, { encoding: "utf-8" });
 
@@ -53,18 +56,14 @@ fls.forEach(f => {
     fs.writeFileSync(f2, file, { encoding: "utf-8" });
 });
 
-
-// const tklib = fs.readFileSync("./src/tkeron.ts", { encoding: "utf-8" });
-// fs.writeFileSync("./dist/tkeron.ts", tklib, { encoding: "utf-8" });
-
 export const libFiles = [
     "tkeron.ts",
     "channel.ts"
 ];
 
 libFiles.forEach(f => {
-    const srcpath = join("./src", f);
-    const dstpath = join("./dist", f);
+    const srcpath = join(__dirname, "../src", f);
+    const dstpath = join(__dirname, f);
     const tklib = fs.readFileSync(srcpath, { encoding: "utf-8" });
     fs.writeFileSync(dstpath, tklib, { encoding: "utf-8" });
 });
