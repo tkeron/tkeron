@@ -11,15 +11,12 @@ import { fromBase64 } from "./base64";
 import getVersion, { getPkg } from "./getVersion";
 import { version as tkver } from "./tkeron";
 import { log } from "./log";
-import { run, doc as runDoc } from "./run";
-import { runBundle, doc as bundleDoc } from "./bundle";
 
 const init: string | undefined = getArg("init");
 const build: string | undefined = getArg("build");
 const dev: string | undefined = getArg("dev");
 const clear: string | undefined = getArg("clear");
 const help: string | undefined = getArg("help");
-const bundle: string | undefined = getArg("bundle");
 
 (async () => {
     if (init) {
@@ -36,20 +33,6 @@ const bundle: string | undefined = getArg("bundle");
     }
     if (clear) {
         runClear();
-        return;
-    }
-    if (bundle) {
-        await runBundle();
-        return;
-    }
-
-    if (process.argv.length > 2 && !help) {
-        const file = process.argv[2];
-        if (!fs.existsSync(file)) {
-            log(`file ${file} doesn't exist`);
-            return;
-        }
-        await run(file);
         return;
     }
 
@@ -71,7 +54,5 @@ const bundle: string | undefined = getArg("bundle");
    ${buildDoc}
    ${clearDoc}
    ${devDoc}
-   ${bundleDoc}
-   ${runDoc}
     `);
 })();

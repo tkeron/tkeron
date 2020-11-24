@@ -18,7 +18,7 @@ let firstTime = true;
 export const runDev = async () => {
     const dirs = getOpts();
     const nowatch = getArg("noWatch");
-    const tk = join(__dirname, "./index.mjs");
+    const tk = join(__dirname, "./index.js");
     if (nowatch) {
         const cres = await exec(`node ${tk} build`);
         log(cres);

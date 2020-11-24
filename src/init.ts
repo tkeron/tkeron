@@ -7,7 +7,7 @@ import { prompt } from "./prompt";
 import { createResourcesFile } from "./resources";
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { libFiles } from "./dotJs";
+import { libFiles } from "./libFiles";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

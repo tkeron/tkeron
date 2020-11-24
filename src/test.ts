@@ -14,17 +14,87 @@ import { copyDir } from "./copyDir";
 import { getRecursiveDirs } from "./getRecursiveDirs";
 import { createResourcesFile } from "./resources";
 import { runInit } from "./init";
-import { run } from "./run";
 import { strictRightCoincidence } from "./stringCompare";
 import { runBuild } from "./build";
-import { log } from "./log";
-import { runDev } from "./dev";
-import axios, { AxiosRequestConfig } from "axios";
-import { runBundle } from "./bundle";
+import { channel } from "./channel";
+
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 (async () => {
+
+
+    await test("channel send and receive", async () => {
+        const ch1a = channel("1");
+        const ch1b = channel("1");
+        const res: any[] = [];
+        ch1a.onMessage((msg) => {
+            res.push(`a ${msg}`);
+        });
+        ch1b.postMessage("hi");
+        return (
+            res.length === 1 &&
+            res.join("") === "a hi"
+        );
+    });
+
+    await test("channel not same receiver", async () => {
+        const ch1a = channel("1");
+        const res: any[] = [];
+        ch1a.onMessage((msg) => {
+            res.push({ to: "a", msg });
+        });
+        ch1a.postMessage({ from: "a", message: "ok" });
+        return res.length === 0;
+    });
+
+    await test("channel receive correct n times", async () => {
+        const ch1a = channel("1");
+        const ch1b = channel("1");
+        const res: any[] = [];
+        ch1a.onMessage((msg) => res.push(`a ${msg}`));
+        ch1b.onMessage((msg) => res.push(`b ${msg}`));
+        ch1a.postMessage(1);
+        ch1a.postMessage(2);
+        ch1b.postMessage(3);
+        ch1a.postMessage(4);
+        return (
+            res.length === 4 &&
+            res.filter(m => m.match(/^b/)).length === 3
+        );
+    });
+
+    await test("channel close must not receive", async () => {
+        const ch1a = channel("1");
+        const ch1b = channel("1");
+        const res: any[] = [];
+        ch1a.onMessage((msg) => res.push(`a ${msg}`));
+        ch1b.onMessage((msg) => res.push(`b ${msg}`));
+        ch1a.postMessage(1);
+        ch1b.postMessage(1);
+        const r1 = res.sort().join("|");
+        ch1a.close();
+        ch1a.postMessage(2);
+        ch1b.postMessage(2);
+        const r2 = res.sort().join("|");
+        return r1 === r2;
+    });
+
+    await test("channel reopened must receive", async () => {
+        const ch1a = channel("1");
+        const ch1b = channel("1");
+        const res: any[] = [];
+        ch1a.onMessage((msg) => res.push(`a ${msg}`));
+        ch1b.onMessage((msg) => res.push(`b ${msg}`));
+        ch1a.postMessage(1);
+        ch1b.postMessage(1);
+        const r1 = res.sort().join("|");
+        ch1a.close();
+        ch1a.postMessage(2);
+        ch1b.postMessage(2);
+        const r2 = res.sort().join("|");
+        return r1 === r2;
+    });
 
     await test("getArg", async () => {
         const argv = [
@@ -320,9 +390,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         }, true as any);
     });
 
-
-    log("\nLONGER TEST:\n");
-
     await test("tkeron build", async () => {
         const src = join(__dirname, "../_test/build/front");
         const stt = join(__dirname, "../_test/build/static");
@@ -336,35 +403,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
         const outFiles = getFilesRecursive(out, "*").sort().map(f => f.slice(out.length)).join("");
         return expFiles === outFiles;
     });
-
-    await test("tkeron run ts file", async () => {
-        const fle = join(__dirname, "../_test/runts/test.ts");
-        //@ts-ignore
-        globalThis.argv = ["", "", `silence`];
-        const exp = `<img alt="tkeron animated logo skcustker" src="/skcustker.gif">
-<h1>Welcome to tkeron!</h1>
-<p>Tkeron is a microframework for develop web user interfaces.</p>
-<div>This is a component called like the run file.</div>
-
-`;
-        const res = await run(fle);
-        return res?.match(exp) ? true : false;
-    });
-
-
-    await test("tkeron bundle", async () => {
-        const src = join(__dirname, "../_test/bundle/src");
-        const out = join(__dirname, "../_test/bundle/out");
-        const exp = join(__dirname, "../_test/bundle/exp/out.js");
-        const res = join(__dirname, "../_test/bundle/out/out.js");
-        //@ts-ignore
-        globalThis.argv = ["", "", "bundle", "--src", src, "--out", out];
-        await runBundle();
-        const expc = fs.readFileSync(exp, { encoding: "utf-8" });
-        const resc = fs.readFileSync(res, { encoding: "utf-8" });
-        return expc === resc;
-    });
-
 
 })();
 
