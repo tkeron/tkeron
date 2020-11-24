@@ -160,7 +160,7 @@ export const runBuild = async () => {
     const minify = getArg("min");
 
     const hotrestart = getArg("hotrestart");
-    const hotrestartjs = getCode("simpleHotRestart.mjs");
+    const hotrestartjs = getCode("simpleHotRestart.js");
 
     const opts = getOpts();
     if (!fs.existsSync(opts.outputDir)) {

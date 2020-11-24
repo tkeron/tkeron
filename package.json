@@ -1,6 +1,6 @@
 {
 	"name": "tkeron",
-	"version": "1.4.5",
+	"version": "1.4.6",
 	"description": "Micro framework for developing web user interfaces with typescript.",
 	"bin": "dist/index.js",
 	"scripts": {
