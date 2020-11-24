@@ -92,15 +92,4 @@ tkeron build gcc
 This command will do the same as "tkeron build" but it will compile the javascript code with the Google Closure Compiler, leaving a code compatible with more browsers.
 
 
-----------
-### Run .ts files
-
-You can run .ts files using tkeron:
-
-```bash
-tkeron myFile.ts
-```
-
-----------
-
 
