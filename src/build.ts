@@ -223,15 +223,18 @@ export const runBuild = async () => {
 
     //move resources
     //@ts-ignore
-    const files2move = globalThis.tkeron_resources;
-    Object.values(files2move).forEach(f => {
-        const orig = join(opts.staticDir, (f as string));
-        const dest = join(opts.outputDir, (f as string));
-        const file = basename(dest);
-        const ldir = normalize(dest.slice(0, dest.length - file.length));
-        if (!fs.existsSync(ldir)) fs.mkdirSync(ldir, { recursive: true });
-        fs.copyFileSync(orig, dest);
-    });
+    if (typeof globalThis.tkeron_resources !== "undefined") {
+        //@ts-ignore
+        const files2move = globalThis.tkeron_resources;
+        Object.values(files2move).forEach(f => {
+            const orig = join(opts.staticDir, (f as string));
+            const dest = join(opts.outputDir, (f as string));
+            const file = basename(dest);
+            const ldir = normalize(dest.slice(0, dest.length - file.length));
+            if (!fs.existsSync(ldir)) fs.mkdirSync(ldir, { recursive: true });
+            fs.copyFileSync(orig, dest);
+        });
+    }
 
 
     log("site built...");
