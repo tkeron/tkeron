@@ -35,7 +35,26 @@ export interface Component {
   css(css: string): Component;
 
   on(f: (_com: Component, _el: HTMLElement) => void): Component;
+
+  onRender(fn: () => void): Component;
+  onAppend(fn: () => void): Component;
 }
+
+enum event {
+  render,
+  append
+}
+const handlers: any = {};
+const addHandler = (id: string, event: event, fn: () => void) => {
+  if (typeof handlers[event] === "undefined") handlers[event] = {} as any;
+  if (typeof handlers[event][id] === "undefined") handlers[event][id] = [] as any[];
+  handlers[event][id].push(fn);
+};
+const runHandlers = (id: string, event: event) => {
+  if (typeof handlers[event] === "undefined") return;
+  if (typeof handlers[event][id] === "undefined") return;
+  handlers[event][id].forEach((fn: () => void) => fn());
+};
 
 //@ts-ignore
 const toHexString = (bytes: Uint8Array): string => bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
@@ -107,14 +126,17 @@ export const tkeron = (opt?: tkeronOptions): Component => {
           setTimeout(() => {
             com.renderIn(query);
           }, 0);
+          runHandlers(com.id, event.render);
           return com;
         }
         domel.innerHTML = "";
         domel.appendChild(el);
+        runHandlers(com.id, event.render);
         return com;
       }
       (query as HTMLElement).innerHTML = "";
       (query as HTMLElement).appendChild(el);
+      runHandlers(com.id, event.render);
       return com;
     },
     appendIn: (query: string | HTMLElement) => {
@@ -124,12 +146,15 @@ export const tkeron = (opt?: tkeronOptions): Component => {
           setTimeout(() => {
             com.appendIn(query);
           }, 0);
+          runHandlers(com.id, event.append);
           return com;
         }
         domel.appendChild(el);
+        runHandlers(com.id, event.append);
         return com;
       }
       (query as HTMLElement).appendChild(el);
+      runHandlers(com.id, event.append);
       return com;
     },
     getHTMLElement: (f) => {
@@ -167,6 +192,14 @@ export const tkeron = (opt?: tkeronOptions): Component => {
     },
     on: (f) => {
       f(com, el);
+      return com;
+    },
+    onRender: (fn) => {
+      addHandler(com.id, event.render, fn);
+      return com;
+    },
+    onAppend: (fn) => {
+      addHandler(com.id, event.append, fn);
       return com;
     }
   };
@@ -226,4 +259,4 @@ tkeron.css = (name: string, cssText: string) => {
 
 
 
-export const version = "1.3.2";
+export const version = "1.4.0";

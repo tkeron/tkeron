@@ -1,6 +1,6 @@
 {
 	"name": "tkeron",
-	"version": "1.4.7",
+	"version": "1.4.8",
 	"description": "Micro framework for developing web user interfaces with typescript.",
 	"bin": "dist/index.js",
 	"scripts": {
@@ -30,8 +30,8 @@
 		"microframework"
 	],
 	"com_tkeron": {
-		"lib_version": "1.3.2",
-		"lib_sha256": "12b3878ec0045341e572fbb2c7882aae72ea39bc0403886e63dc2eb60634dc64"
+		"lib_version": "1.4.0",
+		"lib_sha256": "4a053b24232ecaa5cdb1bc25c8d7e50722e5d293d1287d1a537ecfa01f2a416d"
 	},
 	"engines": {
 		"node": ">=14.15.0"
