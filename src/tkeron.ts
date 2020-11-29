@@ -31,6 +31,7 @@ export interface Component {
   removeAttribute(attr: string, value: string): Component;
 
   getElement(): HTMLElement;
+  setElement(el: HTMLElement): Component;
 
   css(css: string): Component;
 
@@ -77,7 +78,7 @@ export const tkeron = (opt?: tkeronOptions): Component => {
   ].some(n => {
     if ("type" in (opt as any)) return (opt as any).type === n;
   });
-  const el = document.createElement(opt.type || "div");
+  let el = document.createElement(opt.type || "div");
   const priv: {
     parent: Component | null,
     childs: Component[]
@@ -185,6 +186,11 @@ export const tkeron = (opt?: tkeronOptions): Component => {
     getElement: () => {
       return el;
     },
+    setElement: (ele: HTMLElement) => {
+      if (!ele) throw Error("Component.setElement: Element must not be null.");
+      el = ele;
+      return com;
+    },
     css: (css: string) => {
       tkeron.css(com.id, `#${com.id} {${css}}`);
       com.addAttribute("id", com.id);
@@ -259,4 +265,4 @@ tkeron.css = (name: string, cssText: string) => {
 
 
 
-export const version = "1.4.0";
+export const version = "1.4.1";
