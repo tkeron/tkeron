@@ -34,6 +34,7 @@ export interface Component {
   setElement(el: HTMLElement): Component;
 
   css(css: string): Component;
+  getCss(): string;
 
   on(f: (_com: Component, _el: HTMLElement) => void): Component;
 
@@ -79,13 +80,12 @@ export const tkeron = (opt?: tkeronOptions): Component => {
     if ("type" in (opt as any)) return (opt as any).type === n;
   });
   let el = document.createElement(opt.type || "div");
-  const priv: {
-    parent: Component | null,
-    childs: Component[]
-  } = {
-    parent: null,
-    childs: []
+  const priv = {
+    parent: {} as Component | null,
+    childs: [] as Component[],
+    css: ""
   };
+  priv.parent = null;
   const com: Component = {
     id: getID(),
     parent: priv.parent,
@@ -192,10 +192,12 @@ export const tkeron = (opt?: tkeronOptions): Component => {
       return com;
     },
     css: (css: string) => {
+      priv.css = css;
       tkeron.css(com.id, `#${com.id} {${css}}`);
       com.addAttribute("id", com.id);
       return com;
     },
+    getCss: () => priv.css,
     on: (f) => {
       f(com, el);
       return com;
@@ -265,4 +267,4 @@ tkeron.css = (name: string, cssText: string) => {
 
 
 
-export const version = "1.4.1";
+export const version = "1.4.2";
