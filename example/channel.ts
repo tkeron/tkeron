@@ -2,10 +2,10 @@ const Channels: any = {};
 
 interface Channel {
     name: string;
-    postMessage(msg: any): void;
+    postMessage(...msg: any[]): void;
     close(): void;
     open(): void;
-    onMessage(fn: (msg: any) => any): void;
+    onMessage(fn: (...msg: any[]) => any): void;
 }
 
 export const channel = (channel: string) => {
@@ -18,23 +18,23 @@ export const channel = (channel: string) => {
             Channels[channel][chid] = ch;
             closed = 0;
         },
-        postMessage: (msg: any) => {
+        postMessage: (...msg: any[]) => {
             if (closed) return;
             for (const k in Channels[channel]) {
                 if (k === chid) continue;
-                Channels[channel][k].onMessageMsg(msg);
+                Channels[channel][k].onMessageMsg(...msg);
             }
         },
         close: () => {
             closed = 1;
-            (ch as any).onMessageMsg = (msg: any) => { };
+            (ch as any).onMessageMsg = (...msg: any[]) => { };
             delete Channels[channel][chid];
         },
-        onMessage: (fn: (msg: any) => {}) => {
+        onMessage: (fn: (...msg: any[]) => {}) => {
             (ch as any).onMessageMsg = fn;
         },
     };
-    (ch as any).onMessageMsg = (msg: any) => { };
+    (ch as any).onMessageMsg = (...msg: any[]) => { };
     Channels[channel][chid] = ch;
     return ch;
 };

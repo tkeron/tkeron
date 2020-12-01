@@ -2,5 +2,6 @@
 
 export const libFiles = [
     "tkeron.ts",
-    "channel.ts"
+    "channel.ts",
+    "utils.ts"
 ];
