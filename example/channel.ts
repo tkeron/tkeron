@@ -1,5 +1,8 @@
 const Channels: any = {};
 
+//@ts-ignore
+globalThis.ch = Channels;
+
 interface Channel {
     name: string;
     postMessage(...msg: any[]): void;
@@ -22,19 +25,18 @@ export const channel = (channel: string) => {
             if (closed) return;
             for (const k in Channels[channel]) {
                 if (k === chid) continue;
-                Channels[channel][k].onMessageMsg(...msg);
+                if ("onMessageMsg" in Channels[channel][k]) Channels[channel][k].onMessageMsg(...msg);
             }
         },
         close: () => {
             closed = 1;
-            (ch as any).onMessageMsg = (...msg: any[]) => { };
+            if ("onMessageMsg" in ch) delete (ch as any).onMessageMsg;
             delete Channels[channel][chid];
         },
         onMessage: (fn: (...msg: any[]) => {}) => {
             (ch as any).onMessageMsg = fn;
         },
     };
-    (ch as any).onMessageMsg = (...msg: any[]) => { };
     Channels[channel][chid] = ch;
     return ch;
 };
