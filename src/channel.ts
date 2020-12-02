@@ -1,8 +1,5 @@
 const Channels: any = {};
 
-//@ts-ignore
-globalThis.ch = Channels;
-
 interface Channel {
     name: string;
     postMessage(...msg: any[]): void;
