@@ -23,6 +23,25 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 (async () => {
 
+    await test("tkeron without define class in the argument", async () => {
+        const com1 = tkeron();
+        const res = com1.classList;
+        const exp: string[] = [];
+        return res && res.length === exp.length;
+    });
+
+    await test("tkeron define class in the first argument", async () => {
+        const com1 = tkeron("class_test");
+        const res = com1.classList.includes("class_test");
+        return res;
+    });
+
+    await test("tkeron define multiple classes as arguments", async () => {
+        const com1 = tkeron("class_test", "class_test2", "class_test3");
+        const classes = com1.classList;
+        const res = !classes.some(c => !["class_test", "class_test2", "class_test3"].includes(c));
+        return res;
+    });
 
     await test("channel send and receive", async () => {
         const ch1a = channel("1");

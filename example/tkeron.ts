@@ -28,7 +28,7 @@ export interface Component {
 
   readonly attributes: any;
   addAttribute(attr: string, value: string): Component;
-  removeAttribute(attr: string, value: string): Component;
+  removeAttribute(attr: string): Component;
 
   getElement(): HTMLElement;
   setElement(el: HTMLElement): Component;
@@ -71,7 +71,11 @@ const getID = (): string => {
   return id;
 };
 
-export const tkeron = (opt?: tkeronOptions): Component => {
+export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Component => {
+  if (typeof opt === "string") {
+    classes.push(opt);
+    opt = undefined;
+  }
   if (!opt) opt = { type: "div" };
   const valueProp: boolean = [
     "input",
@@ -219,7 +223,7 @@ export const tkeron = (opt?: tkeronOptions): Component => {
   });
   Object.defineProperty(com, "value", {
     get() {
-      if ({ valueProp, opt }) {
+      if (valueProp) {
         //@ts-ignore
         return el.value;
       }
@@ -246,6 +250,12 @@ export const tkeron = (opt?: tkeronOptions): Component => {
 
   if (typeof opt.value !== "undefined") com.setValue(opt.value);
 
+  if (classes.length) {
+    classes.forEach(c => {
+      com.addClass(c);
+    });
+  }
+
   return com;
 };
 
@@ -267,4 +277,4 @@ tkeron.css = (name: string, cssText: string) => {
 
 
 
-export const version = "1.4.2";
+export const version = "1.4.3";
