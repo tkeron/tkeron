@@ -74,7 +74,7 @@ const getID = (): string => {
 export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Component => {
   if (typeof opt === "string") {
     classes.push(opt);
-    opt = undefined;
+    opt = { type: "div" };
   }
   if (!opt) opt = { type: "div" };
   const valueProp: boolean = [
@@ -277,4 +277,4 @@ tkeron.css = (name: string, cssText: string) => {
 
 
 
-export const version = "1.4.3";
+export const version = "1.4.4";
