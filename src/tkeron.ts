@@ -40,22 +40,26 @@ export interface Component {
 
   onRender(fn: () => void): Component;
   onAppend(fn: () => void): Component;
+
+  send(...msg: any[]): Component;
+  onMessage(fn: (...msg: any[]) => void): Component;
 }
 
-enum event {
+const enum event {
   render,
-  append
+  append,
+  msg
 }
 const handlers: any = {};
-const addHandler = (id: string, event: event, fn: () => void) => {
+const addHandler = (id: string, event: event, fn: (...args: any[]) => void) => {
   if (typeof handlers[event] === "undefined") handlers[event] = {} as any;
   if (typeof handlers[event][id] === "undefined") handlers[event][id] = [] as any[];
   handlers[event][id].push(fn);
 };
-const runHandlers = (id: string, event: event) => {
+const runHandlers = (id: string, event: event, ...args: any[]) => {
   if (typeof handlers[event] === "undefined") return;
   if (typeof handlers[event][id] === "undefined") return;
-  handlers[event][id].forEach((fn: () => void) => fn());
+  handlers[event][id].forEach((fn: (...args: any[]) => void) => fn(...args));
 };
 
 //@ts-ignore
@@ -213,7 +217,15 @@ export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Comp
     onAppend: (fn) => {
       addHandler(com.id, event.append, fn);
       return com;
-    }
+    },
+    send: (...msg: any[]) => {
+      runHandlers(com.id, event.msg, ...msg);
+      return com;
+    },
+    onMessage: (fn) => {
+      addHandler(com.id, event.msg, fn);
+      return com;
+    },
   };
 
   Object.defineProperty(com, "attributes", {
