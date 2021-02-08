@@ -1,6 +1,6 @@
 {
 	"name": "tkeron",
-	"version": "1.6.1",
+	"version": "1.6.2",
 	"description": "Micro framework for developing web user interfaces with typescript.",
 	"bin": "dist/index.js",
 	"scripts": {
@@ -12,6 +12,7 @@
 	"dependencies": {
 		"axios": "^0.21.1",
 		"body-parser": "^1.19.0",
+		"build": "^0.1.4",
 		"express": "^4.17.1",
 		"tkeron-esnext": "0.0.3",
 		"typescript": "^4.1.2"
