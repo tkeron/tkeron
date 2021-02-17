@@ -60,3 +60,17 @@ export const sha256 = (v: string) => {
         return b;
     }(v), 8 * v.length))
 };
+
+export const serie = (from: number, to: number) => {
+    const result: number[] = [];
+    if (to > from) {
+        for (let i = from; i <= to; i++) {
+            result.push(i);
+        }
+    } else {
+        for (let i = from; i >= to; i--) {
+            result.push(i);
+        }
+    }
+    return result;
+};
