@@ -44,7 +44,7 @@ export const runDev = async () => {
             reload.close();
         })
     });
-    app.use(express.static(dirs.outputDir));
+    app.use(express.static(dirs.outputDir, { extensions: ["html"] }));
     if (!nowatch) {
         const evnt = condenser(300);
         let available = true;
