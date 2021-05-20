@@ -92,4 +92,16 @@ tkeron build gcc
 This command will do the same as "tkeron build" but it will compile the javascript code with the Google Closure Compiler, leaving a code compatible with more browsers.
 
 
+----------
+----------
+
+
+# Next version
+
+Version 2 will have some changes:
+- The "static" directory will no longer exist, neither will the "resources.ts" file. The url will be imported into the code.
+- The files for the web page will have the extension ".page.html", with their respective ".page.ts".
+- The command "tkeron" will also have the alias "tk".
+
+Among other features that will be updated in version 2.
 
