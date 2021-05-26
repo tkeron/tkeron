@@ -1,15 +1,15 @@
 {
     "compilerOptions": {
-        "module": "ESNext",
+        "module": "commonjs",
         "outDir": "dist",
-        "sourceMap": false,
-        "strict": true,
-        "target": "ES2017",
+        "target": "ESNext",
         "esModuleInterop": true,
-        "moduleResolution": "Node",
-        "declaration": false
+        "moduleResolution": "node",
+        "declaration": true,
     },
-    "compileOnSave": true,
+    "exclude": [
+        "node_modules"
+    ],
     "include": [
         "src"
     ]

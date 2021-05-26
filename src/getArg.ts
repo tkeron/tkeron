@@ -1,14 +1,9 @@
 import process from "process";
 
-
-
 export const getArg = (arg: string, argv?: string[]): string | undefined => {
-    //@ts-ignore
-    if (typeof globalThis.argv !== "undefined") argv = globalThis.argv;
     if (!argv) argv = process.argv;
     let i = 0;
-    for (const n in argv) {
-        const s = argv[n];
+    for (const s of argv) {
         const regeq = new RegExp(arg + "=");
         const sregeq = s.match(regeq);
         if (sregeq && "input" in sregeq) {
