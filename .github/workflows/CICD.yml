@@ -1,0 +1,34 @@
+name: CICD
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+      - name: Intall
+        run: npm i
+      - name: Test
+        run: npm test
+  publish:
+    if: ${{ github.repository == 'tkeron/tkeron' }}
+    needs: [test]
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - name: cicd command
+        run: npm run cicd
+      - run: rm -rf src dist/test
+      - uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.NPM_TOKEN }}
