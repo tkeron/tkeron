@@ -11,7 +11,7 @@
 		"build": "tsc",
 		"start": "node dist/index.js",
 		"tk": "tsc && node dist/index.js",
-		"test": "rm -rf dist && tsc && jest --roots dist --runInBand --detectOpenHandles --verbose --coverage --coverageReporters=\"json-summary\"  ",
+		"test": "rm -rf dist && tsc && jest --roots dist --runInBand --detectOpenHandles --coverage --coverageReporters=\"json-summary\"  --verbose ",
 		"coverage": "rm -rf dist && tsc && jest --roots dist --runInBand --detectOpenHandles --verbose --coverage ",
 		"cicd": "node dist/cicd.js"
 	},
