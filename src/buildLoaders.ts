@@ -14,7 +14,7 @@ export const buildLoaders = {
 
 export const getExtModules = () => {
     let content = "";
-    const exts = Object.keys(buildLoaders);
+    const exts = Object.keys(buildLoaders).sort();
     for (const ext of exts) {
         content += `declare module '*${ext}';\n`;
     }
