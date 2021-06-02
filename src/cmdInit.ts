@@ -7,10 +7,10 @@ import { getOptions } from "./getOptions";
 import { libFiles } from "./libFiles.ts";
 
 
-export const cmdInit = async () => {
+export const cmdInit = async (sourceDir?: string) => {
     const options = getOptions();
+    if (!sourceDir) sourceDir = options.sourceDir;
     await writeFile("tkeron.json", JSON.stringify(options, null, 4));
-    const { sourceDir } = options;
     if (!await fileExists(sourceDir)) await mkdir(sourceDir, { recursive: true });
     const tklibs = join(sourceDir, "tklibs");
     if (!await fileExists(tklibs)) await mkdir(tklibs, { recursive: true });

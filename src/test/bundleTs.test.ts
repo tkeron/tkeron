@@ -44,9 +44,9 @@ beforeAll(async () => {
         // const minResult = min(a, b);
         const powResult = pow(a, b);
 
-        console.log(\`a + b = $\{sumResult\}\`);
-        // console.log(\`a - b = $\{minResult\}\`);
-        console.log(\`a ** b = $\{powResult\}\`);
+        console\.log(\`a + b = $\{sumResult\}\`);
+        // console\.log(\`a - b = $\{minResult\}\`);
+        console\.log(\`a ** b = $\{powResult\}\`);
     `;
     writeFile(sumDir, sum, { encoding: "utf-8" });
     writeFile(minDir, min, { encoding: "utf-8" });
@@ -95,7 +95,7 @@ describe("bundleTs", () => {
     });
     it("bundle operations, expecting tree shaking", async () => {
         await bundleTs(operationsDir, operationsOutDir);
-        const expected = "(()=>{var n=(o,m)=>o+m;var s=(o,m)=>o**m;var t=56,r=12,e=n(t,r),u=s(t,r);console.log(`a + b = ${e}`);console.log(`a ** b = ${u}`);})();";
+        const expected = "(()=>{var n=(o,m)=>o+m;var s=(o,m)=>o**m;var t=56,r=12,e=n(t,r),u=s(t,r);console\.log(`a + b = ${e}`);console\.log(`a ** b = ${u}`);})();";
         const result = (await readFile(operationsOutDir, { encoding: "utf-8" })).trim();
         expect(result).toBe(expected);
     });
