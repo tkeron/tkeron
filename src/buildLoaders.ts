@@ -7,9 +7,9 @@ export const buildLoaders = {
     ".ico": "file" as Loader,
     ".webp": "file" as Loader,
     ".svg": "file" as Loader,
-    ".html": "file" as Loader,
     ".js": "file" as Loader,
     ".css": "text" as Loader,
+    ".html": "text" as Loader,
 };
 
 export const getExtModules = () => {
