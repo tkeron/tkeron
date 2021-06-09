@@ -5,10 +5,10 @@ import { buildLoaders, getExtModules } from "../buildLoaders";
 
 describe("buildLoaders", () => {
     it("verify loaders", () => {
-        const expectedKeys = ['.css', '.gif', '.html', '.ico', '.jpg', '.js', '.png', '.svg', '.webp'];
-        const expectedValues = ['file', 'file', 'file', 'file', 'file', 'file', 'file', 'file', 'text'];
-        const keys = Object.keys(buildLoaders).sort();
-        const values = Object.values(buildLoaders).sort();
+        const expectedKeys = ['.jpg', '.png', '.gif', '.ico', '.webp', '.svg', '.js', '.css', '.html'];
+        const expectedValues = ['file', 'file', 'file', 'file', 'file', 'file', 'file', 'text', 'text'];
+        const keys = Object.keys(buildLoaders);
+        const values = Object.values(buildLoaders);
         expect(keys).toMatchObject(expectedKeys);
         expect(values).toMatchObject(expectedValues);
     });
