@@ -5,7 +5,6 @@ import { fileExists } from "./fileExist";
 import { getFilesRecursive } from "./getFilesRecursive";
 import { getOptions } from "./getOptions";
 import { pathToUrlResource } from "./pathToUrlResource";
-import { createModFile } from "./createModFile";
 import { EventEmitter } from "events";
 import { injectCode } from "./injectCode";
 
@@ -39,20 +38,17 @@ export const cmdBuild = async (sourceDir?: string, outDir?: string, hotRestart?:
     if (!outDir) outDir = opts.outputDir;
     outDir = resolve(outDir);
     if (! await fileExists(sourceDir)) {
-        await createModFile(sourceDir);
         emitEvent(buildEvents.failed, sourceDir);
         return;
     }
     let cancel = false;
     events.on("_cancel", () => cancel = true);
     await mkdir(outDir, { recursive: true });
-    await createModFile(sourceDir, false);
     const result = [];
     for (const file0 of getFilesRecursive(sourceDir, { pattern: /\.page\.html$/ })) {
         const file = resolve(file0);
         const tsFile = file.replace(/\.\w*$/, ".ts");
         if (cancel) {
-            await createModFile(sourceDir);
             emitEvent(buildEvents.canceled, result);
             return;
         }
@@ -62,7 +58,6 @@ export const cmdBuild = async (sourceDir?: string, outDir?: string, hotRestart?:
             const path = join(outDir, resource);
             const { errors } = await bundleTs(tsFile, path);
             if (errors.length) {
-                await createModFile(sourceDir);
                 emitEvent(buildEvents.failed, result, errors);
                 throw errors;
             };
@@ -80,7 +75,6 @@ export const cmdBuild = async (sourceDir?: string, outDir?: string, hotRestart?:
         await mkdir(dname, { recursive: true });
         await writeFile(outfile, html, { encoding: "utf-8" });
     }
-    await createModFile(sourceDir);
     const compdate = new Date().getTime().toString();
     const compdateDir = join(outDir, "compdate.txt");
     await writeFile(compdateDir, compdate, { encoding: "utf-8" });
