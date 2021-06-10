@@ -2,6 +2,7 @@ import { writeFile, mkdir, copyFile } from "fs/promises";
 import { join } from "path";
 import { getExtModules } from "./buildLoaders";
 import { createModFile } from "./createModFile";
+import { createTsConfigFile } from "./createTsConfigFile";
 import { fileExists } from "./fileExist";
 import { getOptions } from "./getOptions";
 import { libFiles } from "./libFiles.ts";
@@ -9,8 +10,9 @@ import { libFiles } from "./libFiles.ts";
 
 export const cmdInit = async (sourceDir?: string) => {
     const options = getOptions();
-    if (!sourceDir) sourceDir = options.sourceDir;
+    if (!sourceDir || typeof sourceDir !== "string") sourceDir = options.sourceDir;
     await writeFile("tkeron.json", JSON.stringify(options, null, 4));
+    await createTsConfigFile();
     if (!await fileExists(sourceDir)) await mkdir(sourceDir, { recursive: true });
     const tklibs = join(sourceDir, "tklibs");
     if (!await fileExists(tklibs)) await mkdir(tklibs, { recursive: true });
