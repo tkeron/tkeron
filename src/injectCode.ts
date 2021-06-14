@@ -1,6 +1,9 @@
 
 
 
-export const injectCode = (html: string, code: string) => html.replace(/\<\/head\>/, `<script>${code}</script></head>`);
+export const injectCode = (html: string, code: string, id = "tkeron_script") => {
+
+    return html.replace(/\<\/head\>/, `<script id='${id}'>${code}</script></head>`);
+}
 
 

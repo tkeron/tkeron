@@ -9,7 +9,6 @@ export const bundleTs = async (file: string, outfile: string) => {
     file = normalize(file);
     const exist = await fileExists(file);
     if (!exist) throw `file ${file} doesn't exist`;
-    const outdir = dirname(outfile);
     return await build({
         entryPoints: [file],
         outfile,

@@ -62,9 +62,15 @@ const runHandlers = (id: string, event: event, ...args: any[]) => {
   handlers[event][id].forEach((fn: (...args: any[]) => void) => fn(...args));
 };
 
-//@ts-ignore
-const toHexString = (bytes: Uint8Array): string => bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
-const rnds = (n: number): string => toHexString(crypto.getRandomValues(new Uint8Array(n))).slice(0, n);
+const random = (min: number, max: number) => Math.floor(Math.random() * (max - min)) + min;
+const rnds = (n: number) => {
+  let result = "";
+  for (let i = 0; i < n; i++) {
+    result += String.fromCharCode(random(65, 91));
+  }
+  return result;
+};
+
 const IDs: string[] = [];
 const getID = (): string => {
   const id = "tk_" + rnds(20);
@@ -132,10 +138,9 @@ export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Comp
       if (typeof query === "string") {
         const domel = document.querySelector(query);
         if (!domel) {
-          setTimeout(() => {
+          document.addEventListener("DOMContentLoaded", () => {
             com.renderIn(query);
-          }, 0);
-          runHandlers(com.id, event.render);
+          });
           return com;
         }
         domel.innerHTML = "";
@@ -152,10 +157,9 @@ export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Comp
       if (typeof query === "string") {
         const domel = document.querySelector(query);
         if (!domel) {
-          setTimeout(() => {
+          document.addEventListener("DOMContentLoaded", () => {
             com.appendIn(query);
-          }, 0);
-          runHandlers(com.id, event.append);
+          });
           return com;
         }
         domel.appendChild(el);
@@ -287,4 +291,4 @@ tkeron.css = (name: string, cssText: string) => {
   document.head.appendChild(style);
 };
 
-export const version = "1.4.5";
+export const version = "1.5.0";
