@@ -53,9 +53,6 @@ export const cmdDev = async (sourceDir: string, outDir: string) => {
     });
 
     const watcher = watch(sourceDir, { recursive: true }, async (_event, name) => {
-        const exceptionFiles = [join(sourceDir, "tkeron.ts")];
-        const namePath = join(name);
-        if (exceptionFiles.includes(namePath)) return;
         await build(sourceDir, outDir);
     });
 

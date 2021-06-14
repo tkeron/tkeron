@@ -7,6 +7,8 @@ import { getOptions } from "./getOptions";
 import { pathToUrlResource } from "./pathToUrlResource";
 import { EventEmitter } from "events";
 import { injectCode } from "./injectCode";
+import { processBack } from "./processBack";
+import { buildFront } from "./buildFront";
 
 const events = new EventEmitter();
 const emitEvent = (event: buildEvents | string, detail?: string | any, error?: string | any) =>
@@ -45,35 +47,12 @@ export const cmdBuild = async (sourceDir?: string, outDir?: string, hotRestart?:
     events.on("_cancel", () => cancel = true);
     await mkdir(outDir, { recursive: true });
     const result = [];
+    const backs = await processBack(sourceDir, outDir, hotRestart);
     for (const file0 of getFilesRecursive(sourceDir, { pattern: /\.page\.html$/ })) {
         const file = resolve(file0);
+        if (backs.includes(file)) continue;
         const tsFile = file.replace(/\.\w*$/, ".ts");
-        if (cancel) {
-            emitEvent(buildEvents.canceled, result);
-            return;
-        }
-        let html = await readFile(file, { encoding: "utf-8" });
-        if (await fileExists(tsFile)) {
-            const { resource } = pathToUrlResource(tsFile, sourceDir);
-            const path = join(outDir, resource);
-            const { errors } = await bundleTs(tsFile, path);
-            if (errors.length) {
-                emitEvent(buildEvents.failed, result, errors);
-                throw errors;
-            };
-            const code = await readFile(path, { encoding: "utf-8" });
-            await unlink(path);
-            html = injectCode(html, code);
-            emitEvent(buildEvents.bundled, { code, html });
-        }
-        const outfile = file.replace(sourceDir, outDir).replace(/\.page\.html$/, ".html");
-        const dname = dirname(outfile);
-        if (hotRestart === true) {
-            const code = await readFile(join(__dirname, "simpleHotRestart.js"), { encoding: "utf-8" });
-            html = injectCode(html, code);
-        }
-        await mkdir(dname, { recursive: true });
-        await writeFile(outfile, html, { encoding: "utf-8" });
+        await buildFront({ file, hotRestart, sourceDir, outDir, tsFile });
     }
     const compdate = new Date().getTime().toString();
     const compdateDir = join(outDir, "compdate.txt");
