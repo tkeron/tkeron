@@ -36,7 +36,6 @@ beforeAll(async () => {
         import {min} from "./min";
         import {pow} from "./pow";
 
-
         const a = 56;
         const b = 12;
 
@@ -76,28 +75,24 @@ describe("bundleTs", () => {
         expect(result).toBe(`file ${file} doesn't exist`);
     });
     it("bundle sum function", async () => {
-        await bundleTs(sumDir, sumOutDir);
+        const result = await bundleTs(sumDir, sumOutDir);
         const expected = "(()=>{var n=(e,m)=>e+m;})();";
-        const result = (await readFile(sumOutDir, { encoding: "utf-8" })).trim();
-        expect(result).toBe(expected);
+        expect(result.trim()).toBe(expected);
     });
     it("bundle min function", async () => {
-        await bundleTs(minDir, minOutDir);
+        const result = await bundleTs(minDir, minOutDir);
         const expected = "(()=>{var m=(n,e)=>n-e;})();";
-        const result = (await readFile(minOutDir, { encoding: "utf-8" })).trim();
-        expect(result).toBe(expected);
+        expect(result.trim()).toBe(expected);
     });
     it("bundle pow function", async () => {
-        await bundleTs(powDir, powOutDir);
+        const result = await bundleTs(powDir, powOutDir);
         const expected = "(()=>{var o=(e,n)=>e**n;})();";
-        const result = (await readFile(powOutDir, { encoding: "utf-8" })).trim();
-        expect(result).toBe(expected);
+        expect(result.trim()).toBe(expected);
     });
     it("bundle operations, expecting tree shaking", async () => {
-        await bundleTs(operationsDir, operationsOutDir);
+        const result = await bundleTs(operationsDir, operationsOutDir);
         const expected = "(()=>{var n=(o,m)=>o+m;var s=(o,m)=>o**m;var t=56,r=12,e=n(t,r),u=s(t,r);console\.log(`a + b = ${e}`);console\.log(`a ** b = ${u}`);})();";
-        const result = (await readFile(operationsOutDir, { encoding: "utf-8" })).trim();
-        expect(result).toBe(expected);
+        expect(result.trim()).toBe(expected);
     });
 });
 

@@ -8,7 +8,7 @@ export const createTsConfigFile = async () => {
     "compilerOptions": {
         "experimentalDecorators": true,
         "module": "ESNext",
-        "target": "es2017",
+        "target": "ESNext",
         "esModuleInterop": true,
         "moduleResolution": "Node",
         "declaration": false,

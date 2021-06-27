@@ -8,9 +8,9 @@ import { getOptions } from "./getOptions";
 import { libFiles } from "./libFiles.ts";
 
 
-export const cmdInit = async (sourceDir?: string) => {
-    const options = getOptions();
-    if (!sourceDir || typeof sourceDir !== "string") sourceDir = options.sourceDir;
+export const cmdInit = async (sourceDir?: string, outputDir?: string) => {
+    const options = getOptions({ sourceDir, outputDir });
+    sourceDir = options.sourceDir;
     await writeFile("tkeron.json", JSON.stringify(options, null, 4));
     await createTsConfigFile();
     if (!await fileExists(sourceDir)) await mkdir(sourceDir, { recursive: true });
