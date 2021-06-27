@@ -1,74 +1,29 @@
-import EventEmitter from "events";
 import fastify from "fastify";
 import fastifyStatic from "fastify-static";
 import watch from "node-watch";
-import { resolve, join } from "path";
-import { cmdBuild, cancelBuild, listenBuildEvents, buildEvents } from "./cmdBuild";
+import { resolve } from "path";
+import { build } from "./build";
 import { fileExists } from "./fileExist";
 import { getOptions } from "./getOptions";
 
 
-const events = new EventEmitter();
-
-let building = false;
-let buildPending = false;
-
-let logger = console["log"];
-
-export const setLogger = (loggerFunc: (...pars: any) => void) => logger = loggerFunc;
-
-export const closeDev = () => events.emit("close");
-
-export const closeEvents = () => events.removeAllListeners();
-
-export const build = async (sourceDir: string, outDir: string) => {
-    if (building) {
-        buildPending = true;
-        cancelBuild();
-        return;
-    }
-    logger("building...\n");
-    buildPending = false;
-    building = true;
-    await cmdBuild(sourceDir, outDir, true);
-    building = false;
-    logger("site built\n");
-};
-
-
-export const cmdDev = async (sourceDir: string, outDir: string) => {
-    const opts = getOptions();
-    if (!sourceDir) sourceDir = opts.sourceDir;
-    if (!outDir) outDir = opts.outputDir;
+export const dev = async (sourceDir: string, outputDir: string, port = 5000) => {
+    const opts = getOptions({ outputDir, sourceDir });
+    sourceDir = opts.sourceDir;
+    outputDir = opts.outputDir;
     if (! await fileExists(sourceDir)) throw `source directory doesn't exist`;
-
-    await build(sourceDir, outDir);
-
-
-    listenBuildEvents(async (e) => {
-        const { event } = e;
-        if (event === buildEvents.bundled) return;
-        building = false;
-        if (buildPending) await build(sourceDir, outDir);
+    await build({ sourceDir, outputDir, hotRestart: true });
+    const watcher = watch(sourceDir, { recursive: true }, async (_event, _) => {
+        await build({ sourceDir, outputDir, hotRestart: true });
     });
-
-    const watcher = watch(sourceDir, { recursive: true }, async (_event, name) => {
-        await build(sourceDir, outDir);
-    });
-
     const server = fastify();
-    server.register(fastifyStatic, { root: resolve(outDir), extensions: ["html"] });
-
-    events.on("close", () => {
-        watcher.close();
-        server.close();
-    });
-
+    server.register(fastifyStatic, { root: resolve(outputDir), extensions: ["html"] });
     try {
-        server.listen(5000, () => {
-            logger("linstening on port 5000");
-        });
+        server.listen(port, () => console["log"](`linstening on port ${port}`));
     } catch (_) {
-        logger(_);
+        console["log"](_);
     }
+    return { closeWatcher: () => watcher.close(), closeServer: () => server.close() };
 };
+
+export const cmdDev = async (sourceDir: string, outputDir: string, port = 5000) => { await dev(sourceDir, outputDir, port); }

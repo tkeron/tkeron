@@ -40,8 +40,8 @@ export function* getFilesRecursive(directory: string, options?: getFilesRecursiv
         if (!file.isFile()) continue;
         if (excludePattern && file.name.match(excludePattern)) continue;
         if (useDirectoryBase && !pattern) yield returnNamesOnly ? file.name : pathToUrlResource(join(directory, file.name), topDirectory).url;
-        if (!useDirectoryBase && !pattern) yield returnNamesOnly ? file.name : join(directory, file.name);
         if (useDirectoryBase && pattern && file.name.match(pattern)) yield returnNamesOnly ? file.name : pathToUrlResource(join(directory, file.name), topDirectory).url;
+        if (!useDirectoryBase && !pattern) yield returnNamesOnly ? file.name : join(directory, file.name);
         if (!useDirectoryBase && pattern && file.name.match(pattern)) yield returnNamesOnly ? file.name : join(directory, file.name);
     }
 };

@@ -3,6 +3,7 @@ import { program } from "commander";
 import { fromBase64 } from "./base64";
 import { cmdBuild } from "./cmdBuild";
 import { cmdDev } from "./cmdDev";
+import { cmdGenerate } from "./cmdGenerate";
 import { cmdInit } from "./cmdInit";
 import { getPackageJson } from "./getVersion";
 
@@ -25,15 +26,15 @@ export const main = (command = "tkeron", argv?: string[]) => {
     program.addHelpText("afterAll", "\n\n");
 
     program
-        .command("init")
+        .command("init [sourceDir] [outDir]")
         .aliases(["i"])
         .description("initialize or refresh the project")
         .action(cmdInit);
 
     program
-        .command("dev [sourceDir] [outDir]")
+        .command("dev [sourceDir] [outDir] [port]")
         .aliases(["d"])
-        .description(`start the local develop\nserver and watch for src\ncode changes`)
+        .description(`start the local develop server\nand watch for src code changes`)
         .action(cmdDev);
 
     program
@@ -41,6 +42,13 @@ export const main = (command = "tkeron", argv?: string[]) => {
         .aliases(["b"])
         .description("build the pages in outDir")
         .action(cmdBuild);
+
+    program
+        .command("generate [item] [path]")
+        .aliases(["g"])
+        .description(`create a component or page.\nExample:\n"${command} g c buttons/opaque" will generate\nthe component in @comps/buttons/opaque.ts\nand its css file.`)
+        .action(cmdGenerate)
+        ;
 
 
     program
