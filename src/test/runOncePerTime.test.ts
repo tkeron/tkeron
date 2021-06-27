@@ -9,8 +9,8 @@ describe("runOncePerTime", () => {
             expect(result).toHaveLength(1);
             done();
         }, 20);
-        setTimeout(() => runOnce20ms(() => add(1)), 10);
-        setTimeout(() => runOnce20ms(() => add(1)), 6);
+        setTimeout(() => runOnce20ms(() => add(1)), 5);
+        setTimeout(() => runOnce20ms(() => add(1)), 4);
         setTimeout(() => runOnce20ms(() => add(1)), 3);
     });
 });

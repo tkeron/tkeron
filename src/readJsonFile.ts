@@ -2,7 +2,6 @@ import fs from "fs";
 import { normalize } from "path";
 
 
-
 export const readJsonFile = (filePath: string) => {
     try {
         filePath = normalize(filePath);

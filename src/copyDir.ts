@@ -9,7 +9,7 @@ export const copyDir = async (sourceDir: string, outputDir: string) => {
         const sourcePath = join(sourceDir, file);
         const outPath = join(outputDir, file);
         const dir = dirname(outPath);
-        if (!await fileExists(dir)) await mkdir(dir,{recursive:true});
+        if (!await fileExists(dir)) await mkdir(dir, { recursive: true });
         await copyFile(sourcePath, outPath);
     }
 };
