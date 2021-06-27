@@ -14,7 +14,6 @@ export const bundleTs = async (file: string, outfile: string) => {
         entryPoints: [file],
         outfile,
         bundle: true,
-        // metafile: true,
         minify: true,
         loader: buildLoaders,
     });
