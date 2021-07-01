@@ -3,7 +3,7 @@
 export const writeLogElement = (message: string, document: Document, type: "tkeron_log" | "tkeron_error" = "tkeron_log") => {
     let tkeronBackLogs = document.body.querySelector(".tkeron_back_logs") || document.createElement("div");
     if (!document.body.querySelector(".tkeron_back_logs")) {
-        tkeronBackLogs.classList.add(".tkeron_back_logs");
+        tkeronBackLogs.classList.add("tkeron_back_logs");
         tkeronBackLogs.innerHTML = "TKERON BACK LOGS:";
         if (document.body) document.body.appendChild(tkeronBackLogs);
         else document.addEventListener("load", () => document.body.appendChild(tkeronBackLogs));
