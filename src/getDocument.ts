@@ -33,6 +33,7 @@ export const getDocument = (html: string, options?: getDocumentOptions) => {
         }
     );
     const document = window.document;
+
     if (!ignoreErrors) handleJsDomError(jsDomErrors, document);
     if (!ignoreConsoleLogs) handleLogs(logs, document);
     return { document, window, jsDomErrors };

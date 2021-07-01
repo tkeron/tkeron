@@ -285,4 +285,13 @@ tkeron.css = (name: string, cssText: string) => {
   document.head.appendChild(style);
 };
 
-export const version = "1.5.1";
+export interface scriptOptions {
+  appendIn?:string;
+}
+tkeron.script = (anonFunc: CallableFunction,options?:scriptOptions) => {
+  const {appendIn} = options || {} as scriptOptions;
+  tkeron({ type: "script", value: `(${anonFunc.toString()})();` }).appendIn(appendIn || "body");
+};
+
+
+export const version = "1.6.0";

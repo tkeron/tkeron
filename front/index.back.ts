@@ -1,11 +1,5 @@
 import { tkeron } from "@tkeron";
 
-
-tkeron({ type: "h1", value: "Welcome to tkeron, rendered from backend." })
-    .appendIn("body")
-    .css(`
-        color: blue;
-    `);
-
-
-    
+tkeron({ type: "h1", value: "This element was rendered in the backend" })
+    .css(`color: blue;`)
+    .appendIn("body");
