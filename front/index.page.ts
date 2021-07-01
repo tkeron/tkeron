@@ -1,10 +1,5 @@
 import { tkeron } from "@tkeron";
 
-
-tkeron({ type: "h2", value: "Microframework for building web user interfaces" })
-    .appendIn("body")
-    .css(`
-        color:red;
-    `);
-
-
+tkeron({ type: "h1", value: "This element was rendered on the frontend" })
+    .css(`color: red;`)
+    .appendIn("body");

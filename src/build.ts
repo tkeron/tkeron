@@ -51,10 +51,10 @@ export const build = async (args: buildArguments) => {
                 ok(0);
             });
         });
-        window.close();
         const scriptNode = document.querySelector(`#${scriptId}`);
         if (scriptNode) document.head.removeChild(scriptNode);
         html = serializeDocument(document);
+        window.close();
         const tsFile = htmlFile.replace(htmlPageRegex, ".page.ts");
         const outHtmlFile = file.replace(sourceDir, outputDir).replace(backRegex, ".html");
         const outTsFile = file.replace(sourceDir, outputDir).replace(backRegex, ".js");
