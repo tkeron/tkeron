@@ -25,11 +25,12 @@ export const buildFront = async (options: buildFrontOptions) => {
     }
     if (await fileExists(tsFile)) {
         const tsCode = await bundleTs(tsFile, outTsFile);
-        unlink(outTsFile);
+        await unlink(outTsFile);
         html = injectCode(html, tsCode, scriptId);
     }
     await mkdir(outHtmlDir, { recursive: true });
     await writeFile(outHtmlFile, html, { encoding: "utf-8" });
+
     return html;
 };
 

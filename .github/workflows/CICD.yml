@@ -19,7 +19,7 @@ jobs:
       - name: Test
         run: npm test
   publish:
-    if: ${{ github.repository == 'tkeron/tkeron' }}
+    if: ${{ github.actor == 'tkeron' }}
     needs: [test]
     name: Publish to npm
     runs-on: ubuntu-latest

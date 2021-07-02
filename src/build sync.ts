@@ -9,6 +9,7 @@ import { injectTsFile } from "./injectTsFile";
 import { rnds } from "./rnd";
 import { buildFront } from "./buildFront";
 import { serializeDocument } from "./serializeDocument";
+import { wait } from "./wait";
 
 const backRegex = /\.back\.ts$/;
 const htmlPageRegex = /\.page\.html$/;
@@ -29,7 +30,7 @@ export const build = async (args: buildArguments) => {
     const pagesReady: string[] = [];
     const backFiles = [...getFilesRecursive(sourceDir, { pattern: backRegex })];
 
-    const buildFrontPromises: (Promise<[boolean, string, CallableFunction]>)[] = [];
+    console.time("build");
 
     for (const file of backFiles) {
         const name = basename(file).replace(backRegex, "");
@@ -58,7 +59,14 @@ export const build = async (args: buildArguments) => {
         const tsFile = htmlFile.replace(htmlPageRegex, ".page.ts");
         const outHtmlFile = file.replace(sourceDir, outputDir).replace(backRegex, ".html");
         const outTsFile = file.replace(sourceDir, outputDir).replace(backRegex, ".js");
-        buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile));
+        console["log"](`building ${name}`);
+        let ok = await tryBuildFront(html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile);
+        while (!ok) {
+            await wait();
+            console["log"](`retry building ${name}`);
+            ok = await tryBuildFront(html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile);
+        }
+        console["log"](`${name} built`);
     }
     const htmlFiles = [...getFilesRecursive(sourceDir, { pattern: htmlPageRegex })];
     for (const file of htmlFiles) {
@@ -68,36 +76,34 @@ export const build = async (args: buildArguments) => {
         const outHtmlFile = file.replace(sourceDir, outputDir).replace(htmlPageRegex, ".html");
         const outTsFile = file.replace(sourceDir, outputDir).replace(htmlPageRegex, ".html");
         const tsFile = file.replace(htmlPageRegex, ".page.ts");
-        buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile));
-    }
 
-    const results = await Promise.all(buildFrontPromises);
-    for (const result of results) {
-        const [ok, name, retry] = result;
-        if (ok) continue;
-        console["log"](`\nretry build ${name}...`);
-        await new Promise((done) => setTimeout(done, 300));
-        const [done] = await retry();
-        if (!done) throw `error building ${name}, try build command again...`;
+        console["log"](`building ${name}`);
+        let ok = await tryBuildFront(html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile);
+        while (!ok) {
+            await wait();
+            console["log"](`retry building ${name}`);
+            ok = await tryBuildFront(html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile);
+        }
+        console["log"](`${name} built`);
     }
 
     const compdate = new Date().getTime().toString();
     const compdateDir = join(outputDir, "compdate.txt");
     await writeFile(compdateDir, compdate, { encoding: "utf-8" });
-    
+
+    console.timeEnd("build");
+
     console["log"]("\nall site built");
 };
 
 
-export const tryBuildFront = async (name: string, html: string, outHtmlFile: string, hotRestart: boolean, outTsFile: string, scriptId: string, tsFile: string): Promise<[boolean, string, CallableFunction]> => {
+export const tryBuildFront = async (html: string, outHtmlFile: string, hotRestart: boolean, outTsFile: string, scriptId: string, tsFile: string): Promise<boolean> => {
     return new Promise(async (ok) => {
         try {
             await buildFront({ html, outHtmlFile, hotRestart, outTsFile, scriptId: "tkeron_page_js", tsFile });
-            console["log"](`site ${name} built`);
-            ok([true, name, async () => { }]);
+            ok(true);
         } catch (_) {
-            console["log"](`error building site ${name}: `, _);
-            ok([false, name, () => tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, scriptId, tsFile)]);
+            ok(false);
         }
     });
 };
