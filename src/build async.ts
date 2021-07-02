@@ -31,6 +31,8 @@ export const build = async (args: buildArguments) => {
 
     const buildFrontPromises: (Promise<[boolean, string, CallableFunction]>)[] = [];
 
+    console.time("build");
+
     for (const file of backFiles) {
         const name = basename(file).replace(backRegex, "");
         const htmlFile = file.replace(backRegex, ".page.html");
@@ -85,6 +87,8 @@ export const build = async (args: buildArguments) => {
     const compdateDir = join(outputDir, "compdate.txt");
     await writeFile(compdateDir, compdate, { encoding: "utf-8" });
     
+    console.timeEnd("build");
+
     console["log"]("\nall site built");
 };
 
