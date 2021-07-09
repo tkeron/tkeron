@@ -5,7 +5,8 @@ export const libFiles = [
     "eventEmitter.ts",
     "getType.ts",
     "runOncePerTime.ts",
-    "range.ts"
+    "range.ts",
+    "rnda.ts"
 ];
 
 

@@ -12,11 +12,12 @@ export interface buildFrontOptions {
     outHtmlFile: string;
     hotRestart?: boolean;
     scriptId: string;
+    minify?: boolean;
 }
 
 
 export const buildFront = async (options: buildFrontOptions) => {
-    const { hotRestart, outHtmlFile, scriptId, tsFile, outTsFile } = options;
+    const { hotRestart, outHtmlFile, scriptId, tsFile, outTsFile, minify } = options;
     let { html } = options;
     const outHtmlDir = dirname(outHtmlFile);
     if (hotRestart === true) {
@@ -24,7 +25,7 @@ export const buildFront = async (options: buildFrontOptions) => {
         html = injectCode(html, code, "tkeron_simple_hot_restart");
     }
     if (await fileExists(tsFile)) {
-        const tsCode = await bundleTs(tsFile, outTsFile);
+        const tsCode = await bundleTs(tsFile, outTsFile, minify);
         await unlink(outTsFile);
         html = injectCode(html, tsCode, scriptId);
     }

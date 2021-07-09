@@ -4,7 +4,7 @@ import { build } from "esbuild";
 import { buildLoaders } from "./buildLoaders";
 import { readFile } from "fs/promises";
 
-export const bundleTs = async (file: string, outfile: string) => {
+export const bundleTs = async (file: string, outfile: string, minify = true) => {
     if (!file) throw "file must be defined";
     if (!outfile) throw "outfile must be defined";
     file = normalize(file);
@@ -14,7 +14,7 @@ export const bundleTs = async (file: string, outfile: string) => {
         entryPoints: [file],
         outfile,
         bundle: true,
-        minify: true,
+        minify,
         loader: buildLoaders,
     });
     if (buildResult.errors.length) throw buildResult.errors;

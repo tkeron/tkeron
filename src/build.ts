@@ -19,9 +19,10 @@ export interface buildArguments {
     hotRestart?: boolean;
     ignoreConsoleLogs?: boolean;
     ignoreErrors?: boolean;
+    minify?: boolean;
 }
 
-export const build = async (args: buildArguments) => {
+export const build = async (args: buildArguments, minify = true) => {
     const { hotRestart, ignoreConsoleLogs, ignoreErrors } = args;
     const { outputDir, sourceDir } = getOptions({ sourceDir: args.sourceDir, outputDir: args.outputDir });
     if (! await fileExists(sourceDir)) throw "directory does not exist";
@@ -58,7 +59,7 @@ export const build = async (args: buildArguments) => {
         const tsFile = htmlFile.replace(htmlPageRegex, ".page.ts");
         const outHtmlFile = file.replace(sourceDir, outputDir).replace(backRegex, ".html");
         const outTsFile = file.replace(sourceDir, outputDir).replace(backRegex, ".js");
-        buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile));
+        buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile, minify));
     }
     const htmlFiles = [...getFilesRecursive(sourceDir, { pattern: htmlPageRegex })];
     for (const file of htmlFiles) {
@@ -68,7 +69,7 @@ export const build = async (args: buildArguments) => {
         const outHtmlFile = file.replace(sourceDir, outputDir).replace(htmlPageRegex, ".html");
         const outTsFile = file.replace(sourceDir, outputDir).replace(htmlPageRegex, ".html");
         const tsFile = file.replace(htmlPageRegex, ".page.ts");
-        buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile));
+        buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile, minify));
     }
 
     const results = await Promise.all(buildFrontPromises);
@@ -84,15 +85,15 @@ export const build = async (args: buildArguments) => {
     const compdate = new Date().getTime().toString();
     const compdateDir = join(outputDir, "compdate.txt");
     await writeFile(compdateDir, compdate, { encoding: "utf-8" });
-    
+
     console["log"]("\nall site built");
 };
 
 
-export const tryBuildFront = async (name: string, html: string, outHtmlFile: string, hotRestart: boolean, outTsFile: string, scriptId: string, tsFile: string): Promise<[boolean, string, CallableFunction]> => {
+export const tryBuildFront = async (name: string, html: string, outHtmlFile: string, hotRestart: boolean, outTsFile: string, scriptId: string, tsFile: string, minify = true): Promise<[boolean, string, CallableFunction]> => {
     return new Promise(async (ok) => {
         try {
-            await buildFront({ html, outHtmlFile, hotRestart, outTsFile, scriptId: "tkeron_page_js", tsFile });
+            await buildFront({ html, outHtmlFile, hotRestart, outTsFile, scriptId: "tkeron_page_js", tsFile, minify });
             console["log"](`site ${name} built`);
             ok([true, name, async () => { }]);
         } catch (_) {

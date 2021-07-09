@@ -15,8 +15,8 @@ export const cmdGenerate = async (item: string, path: string) => {
     if (item === "component" || item === "c") {
         const { css, ts } = componentItem(name);
         if (path.slice(0, 2) !== "./") path = join("comps", path);
-        const tsFilePath = join(sourceDir, `${path}.ts`);
-        const cssFilePath = join(sourceDir, `${path}.css`);
+        const tsFilePath = join(sourceDir, path, `${name}.ts`);
+        const cssFilePath = join(sourceDir, path, `${name}.css`);
         const tsDir = dirname(tsFilePath);
         await mkdir(tsDir, { recursive: true });
         await writeFile(tsFilePath, ts, { encoding: "utf-8" });
