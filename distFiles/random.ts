@@ -7,7 +7,7 @@ export function* pseudoRnd(seed = 0, limit = 0) {
         seed ^= seed << 5;
         yield seed;
         if (limit > 0) current++;
-        if (current > limit - 1) break;
+        if (limit > 0 && current >= limit) break;
     }
 }
 
