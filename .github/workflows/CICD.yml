@@ -34,7 +34,7 @@ jobs:
         run: npm run build
       - name: cicd command
         run: npm run cicd
-      - run: rm -rf src dist/test
+      - run: rm -rf src dist/test front web .github
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
