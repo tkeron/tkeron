@@ -42,12 +42,13 @@ tkeron dev
 This command will create a server on port 5000 for the "web" directory and will observe the file change in the "front" directory.
 
 ---
-- to create a page in use this:
+- to create a page use this:
 
 ```bash
 tkeron generate page index
 ```
-or it short version: 
+
+or its short version: 
 
 ```bash
 tk g p index
@@ -59,7 +60,8 @@ tk g p index
 ```bash
 tkeron generate component my/button
 ```
-or it short version: 
+
+or its short version: 
 
 ```bash
 tk g c my/button
