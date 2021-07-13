@@ -2,94 +2,67 @@
 
 Micro framework for developing web user interfaces with typescript.
 
-It is actually a CLI with some commands.
-
-Also a typescript library to create web components: **tkeron.ts**.
+![tkeron example](./assets/tkeron_example.gif)
 
 **How to use**
-* Install tkeron globally
+
+
+---
+- Install tkeron globally
+
 ```bash
 npm i -g tkeron
 ```
-* Enter in your project directory and run:
 
-```bash
-tkeron init example
-```
-
-This will create a project example code in the "front" directory.
-
-
-* To build the html file run this: 
-```bash
-tkeron build
-```
-
-This will create a compiled html file with all the javascript and css code, and the resources used in the code from the static directory.
-
-The source directory "front", has a html file, which could have its corresponding .css file, .ts file, .b.ts file and/or .dm.ts file.
-
-Also contain a file to easily manage resources.
-
-The .ts file has the javascript code that will be injected in the html final file.
-
-The .b.ts file, has an default export Array of tkeron Components, all which will be rendered in the body tag of the html final file.
-
-The .dm.ts file will create a deferred module.
-
-The css file, is a normal style file that will be rendered in a style tag in the head of the html final file.
-
-
-* To run in your browser:
-```bash
-tkeron dev
-```
-This command will create a server on port 8080 for the web directory and will observe the file change in the "front" directory. This watcher is not websocket based at the moment, it is a simple looping search that compares the changes on the current page.
-
-----------
-
-> **The philosophy of tkeron is to be simple and have a performant final code, and to make front-end development less complicated with the use of less configuration and tools.**
-
-----------
-
-
-# Reference
-
-
-----------
-### Init
-
+---
+- Enter in your project directory and run:
 
 ```bash
 tkeron init
 ```
-This command will create/rewrite front/tkeron.ts file.
-The directory "front" is the default src directory.
-Run at the first time when creating the project, and everytime you update tkeron for to use the last version of the library.
 
-```bash
-tkeron init example
-```
-This command will create/rewrite an index.html example file, and its corresponding css, ts and b.ts file.
+This will create a blank project in the "front" directory.
 
-```bash
-tkeron init save
-```
-This command will do the same as "tkeron init", but save the "tkeron.json" file, which is used for the cli as config options.
-
-----------
-### Build
+---
+- To build the html file run this:
 
 ```bash
 tkeron build
 ```
-This command will compile each html file in the front directory, with its corresponding files, to html files in the web directory.
 
+This will transpile the project in the directory "web"
+
+---
+- To run in your browser:
 
 ```bash
-tkeron build gcc
+tkeron dev
 ```
-This command will do the same as "tkeron build" but it will compile the javascript code with the Google Closure Compiler, leaving a code compatible with more browsers.
 
+This command will create a server on port 5000 for the "web" directory and will observe the file change in the "front" directory.
+
+---
+- to create a page in use this:
+
+```bash
+tkeron generate page index
+```
+or it short version: 
+
+```bash
+tk g p index
+```
+
+---
+- to create a component use this:
+
+```bash
+tkeron generate component my/button
+```
+or it short version: 
+
+```bash
+tk g c my/button
+```
 
 
