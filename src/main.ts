@@ -32,7 +32,7 @@ export const main = (command = "tkeron", argv?: string[]) => {
         .action(cmdInit);
 
     program
-        .command("dev [sourceDir] [outDir] [port]")
+        .command("dev [sourceDir] [outDir] [port] [addr]")
         .aliases(["d"])
         .description(`start the local develop server\nand watch for src code changes`)
         .action(cmdDev);

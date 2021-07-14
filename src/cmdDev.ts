@@ -8,7 +8,7 @@ import { fileExists } from "./fileExist";
 import { getOptions } from "./getOptions";
 
 
-export const dev = async (sourceDir: string, outputDir: string, port = 5000) => {
+export const dev = async (sourceDir: string, outputDir: string, port = 5000, addr = "127.0.0.1") => {
     const opts = getOptions({ outputDir, sourceDir });
     sourceDir = opts.sourceDir;
     outputDir = opts.outputDir;
@@ -29,7 +29,6 @@ export const dev = async (sourceDir: string, outputDir: string, port = 5000) => 
         building = false;
     });
     const server = fastify();
-    let lastListener = () => { };
     let firstRequest = true;
     server.get("/compdate.txt", (_request, reply) => {
         if (firstRequest) {
@@ -37,19 +36,16 @@ export const dev = async (sourceDir: string, outputDir: string, port = 5000) => 
             reply.send({ reload: true });
             return;
         }
-        try {
-            events.removeListener("built", lastListener);
-        } catch (_) { }
-        lastListener = () => reply.send({ reload: true });
+        const lastListener = () => reply.send({ reload: true });
         events.once("built", lastListener);
     });
     server.register(fastifyStatic, { root: resolve(outputDir), extensions: ["html"] });
     try {
-        server.listen(port, () => console["log"](`linstening on port ${port}`));
+        server.listen(port, addr, () => console["log"](`linstening on ${addr}:${port}`));
     } catch (_) {
         console["log"](_);
     }
     return { closeWatcher: () => watcher.close(), closeServer: () => server.close() };
 };
 
-export const cmdDev = async (sourceDir: string, outputDir: string, port = 5000) => { await dev(sourceDir, outputDir, port); }
+export const cmdDev = async (sourceDir: string, outputDir: string, port = 5000, addr = "127.0.0.1") => { await dev(sourceDir, outputDir, port, addr); }
