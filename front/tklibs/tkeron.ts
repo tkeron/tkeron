@@ -286,12 +286,15 @@ tkeron.css = (name: string, cssText: string) => {
 };
 
 export interface scriptOptions {
-  appendIn?:string;
+  appendIn?: string;
+  runOnDOMContentLoaded?: boolean;
 }
-tkeron.script = (anonFunc: CallableFunction,options?:scriptOptions) => {
-  const {appendIn} = options || {} as scriptOptions;
-  tkeron({ type: "script", value: `(${anonFunc.toString()})();` }).appendIn(appendIn || "body");
+tkeron.script = (anonFunc: CallableFunction, options?: scriptOptions) => {
+  const { appendIn, runOnDOMContentLoaded } = options || {} as scriptOptions;
+  let value = `(${anonFunc.toString()})();`;
+  if (runOnDOMContentLoaded) value = `document.addEventListener("DOMContentLoaded",(${anonFunc.toString()}));`;
+  tkeron({ type: "script", value }).appendIn(appendIn || "body");
 };
 
 
-export const version = "1.6.0";
+export const version = "1.7.0";

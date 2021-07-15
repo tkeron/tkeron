@@ -2,7 +2,7 @@
 
 Micro framework for developing web user interfaces with typescript.
 
-![tkeron example](./assets/tkeron_example.gif)
+![tkeron example](./assets/tkexample.gif)
 
 **How to use**
 
