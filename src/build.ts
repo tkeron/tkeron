@@ -59,6 +59,10 @@ export const build = async (args: buildArguments, minify = true) => {
         const tsFile = htmlFile.replace(htmlPageRegex, ".page.ts");
         const outHtmlFile = file.replace(sourceDir, outputDir).replace(backRegex, ".html");
         const outTsFile = file.replace(sourceDir, outputDir).replace(backRegex, ".js");
+
+        html = html.replace(/\/\*tkeron\-front\-script/g, "");
+        html = html.replace(/tkeron\-front\-script\*\//g, "");
+
         buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile, minify));
     }
     const htmlFiles = [...getFilesRecursive(sourceDir, { pattern: htmlPageRegex })];
@@ -69,6 +73,10 @@ export const build = async (args: buildArguments, minify = true) => {
         const outHtmlFile = file.replace(sourceDir, outputDir).replace(htmlPageRegex, ".html");
         const outTsFile = file.replace(sourceDir, outputDir).replace(htmlPageRegex, ".html");
         const tsFile = file.replace(htmlPageRegex, ".page.ts");
+
+        html = html.replace(/\/\*tkeron\-front\-script/g, "");
+        html = html.replace(/tkeron\-front\-script\*\//g, "");
+
         buildFrontPromises.push(tryBuildFront(name, html, outHtmlFile, hotRestart, outTsFile, "tkeron_page_js", tsFile, minify));
     }
 

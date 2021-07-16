@@ -76,22 +76,22 @@ describe("bundleTs", () => {
     });
     it("bundle sum function", async () => {
         const result = await bundleTs(sumDir, sumOutDir);
-        const expected = "(()=>{var n=(e,m)=>e+m;})();";
+        const expected = "(()=>{var sum=(a,b)=>a+b;})();";
         expect(result.trim()).toBe(expected);
     });
     it("bundle min function", async () => {
         const result = await bundleTs(minDir, minOutDir);
-        const expected = "(()=>{var m=(n,e)=>n-e;})();";
+        const expected = "(()=>{var min=(a,b)=>a-b;})();";
         expect(result.trim()).toBe(expected);
     });
     it("bundle pow function", async () => {
         const result = await bundleTs(powDir, powOutDir);
-        const expected = "(()=>{var o=(e,n)=>e**n;})();";
+        const expected = "(()=>{var pow=(a,b)=>a**b;})();";
         expect(result.trim()).toBe(expected);
     });
     it("bundle operations, expecting tree shaking", async () => {
         const result = await bundleTs(operationsDir, operationsOutDir);
-        const expected = "(()=>{var n=(o,m)=>o+m;var s=(o,m)=>o**m;var t=56,r=12,e=n(t,r),u=s(t,r);console\.log(`a + b = ${e}`);console\.log(`a ** b = ${u}`);})();";
+        const expected = "(()=>{var sum=(a2,b2)=>a2+b2;var pow=(a2,b2)=>a2**b2;var a=56,b=12,sumResult=sum(a,b),powResult=pow(a,b);console.log(`a + b = ${sumResult}`);console.log(`a ** b = ${powResult}`);})();";
         expect(result.trim()).toBe(expected);
     });
 });

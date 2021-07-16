@@ -5,3 +5,4 @@ export * from "./runOncePerTime";
 export * from "./range";
 export * from "./rnda";
 export * from "./random";
+export * from "./rectReady";

@@ -10,11 +10,14 @@ export const bundleTs = async (file: string, outfile: string, minify = true) => 
     file = normalize(file);
     const exist = await fileExists(file);
     if (!exist) throw `file ${file} doesn't exist`;
+    const minifySyntax = minify;
+    const minifyWhitespace = minify;
     const buildResult = await build({
         entryPoints: [file],
         outfile,
         bundle: true,
-        minify,
+        minifySyntax,
+        minifyWhitespace,
         loader: buildLoaders,
     });
     if (buildResult.errors.length) throw buildResult.errors;

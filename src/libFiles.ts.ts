@@ -7,7 +7,8 @@ export const libFiles = [
     "runOncePerTime.ts",
     "range.ts",
     "rnda.ts",
-    "random.ts"
+    "random.ts",
+    "rectReady.ts"
 ];
 
 
