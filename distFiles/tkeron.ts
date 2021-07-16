@@ -288,13 +288,26 @@ tkeron.css = (name: string, cssText: string) => {
 export interface scriptOptions {
   appendIn?: string;
   runOnDOMContentLoaded?: boolean;
+  globalFunctions?: { name: string, func: CallableFunction }[];
 }
 tkeron.script = (anonFunc: CallableFunction, options?: scriptOptions) => {
-  const { appendIn, runOnDOMContentLoaded } = options || {} as scriptOptions;
+  const { appendIn, runOnDOMContentLoaded, globalFunctions } = options || {} as scriptOptions;
   let value = `(${anonFunc.toString()})();`;
   if (runOnDOMContentLoaded) value = `document.addEventListener("DOMContentLoaded",(${anonFunc.toString()}));`;
+
+  if (globalFunctions) {
+    let functions = "";
+    for (const { name, func } of globalFunctions) {
+      functions += `window.${name} = ${func.toString()};\n`;
+    }
+    value = `${functions} ${value}`;
+  }
+
+  value = `/*tkeron-front-script ${value} tkeron-front-script*/`;
+
   tkeron({ type: "script", value }).appendIn(appendIn || "body");
 };
 
 
-export const version = "1.7.0";
+export const version = "1.8.0";
+
