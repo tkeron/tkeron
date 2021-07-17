@@ -288,7 +288,7 @@ tkeron.css = (name: string, cssText: string) => {
 export interface scriptOptions {
   appendIn?: string;
   runOnDOMContentLoaded?: boolean;
-  globalFunctions?: { name: string, func: CallableFunction }[];
+  globalFunctions?: CallableFunction[];
 }
 tkeron.script = (anonFunc: CallableFunction, options?: scriptOptions) => {
   const { appendIn, runOnDOMContentLoaded, globalFunctions } = options || {} as scriptOptions;
@@ -297,8 +297,12 @@ tkeron.script = (anonFunc: CallableFunction, options?: scriptOptions) => {
 
   if (globalFunctions) {
     let functions = "";
-    for (const { name, func } of globalFunctions) {
-      functions += `window.${name} = ${func.toString()};\n`;
+    for (const func of globalFunctions) {
+      const name = func.name;
+      functions += `
+      const ${name} = ${func.toString()};
+      window.${name} = ${name};
+      `;
     }
     value = `${functions} ${value}`;
   }
@@ -309,5 +313,5 @@ tkeron.script = (anonFunc: CallableFunction, options?: scriptOptions) => {
 };
 
 
-export const version = "1.8.0";
+export const version = "1.9.0";
 
