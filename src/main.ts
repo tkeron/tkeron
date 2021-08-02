@@ -8,6 +8,12 @@ import { cmdInit } from "./cmdInit";
 import { getPackageJson } from "./getVersion";
 
 
+const log = console.log;
+console.log = (...args: any) => {
+    if (process.env.NODE_ENV === "test") return;
+    log(...args);
+};
+
 export const main = (command = "tkeron", argv?: string[]) => {
 
     if (argv) argv = [...process.argv.slice(0, 2), ...argv];

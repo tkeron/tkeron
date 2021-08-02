@@ -15,7 +15,6 @@ export interface buildFrontOptions {
     minify?: boolean;
 }
 
-
 export const buildFront = async (options: buildFrontOptions) => {
     const { hotRestart, outHtmlFile, scriptId, tsFile, outTsFile, minify } = options;
     let { html } = options;
@@ -27,7 +26,7 @@ export const buildFront = async (options: buildFrontOptions) => {
     if (await fileExists(tsFile)) {
         const tsCode = await bundleTs(tsFile, outTsFile, minify);
         await unlink(outTsFile);
-        html = injectCode(html, tsCode, scriptId);
+        if (tsCode.trim() !== "") html = injectCode(html, tsCode, scriptId);
     }
     await mkdir(outHtmlDir, { recursive: true });
     await writeFile(outHtmlFile, html, { encoding: "utf-8" });

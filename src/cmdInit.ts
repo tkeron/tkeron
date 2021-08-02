@@ -1,6 +1,7 @@
 import { writeFile, mkdir, copyFile } from "fs/promises";
 import { join } from "path";
 import { getExtModules } from "./buildLoaders";
+import { copyDir } from "./copyDir";
 import { createModFile } from "./createModFile";
 import { createTsConfigFile } from "./createTsConfigFile";
 import { fileExists } from "./fileExist";
@@ -25,6 +26,12 @@ export const cmdInit = async (sourceDir?: string, outputDir?: string) => {
     const extModules = getExtModules();
     const extModName = join(tklibs, "extensions.d.ts");
     await writeFile(extModName, extModules, { encoding: "utf-8" });
+
+    const rxjsSrc = join(__dirname, "..", "node_modules", "rxjs", "src");
+    const rxjsDest = join(tklibs, "rxjs");
+    await copyDir(rxjsSrc, rxjsDest);
+
+
 };
 
 

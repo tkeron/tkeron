@@ -20,7 +20,10 @@ export const createTsConfigFile = async () => {
             ],
             "@comps/*": [
                 "comps/*"
-            ]
+            ],
+            "@rxjs": [
+                "tklibs/rxjs/index"
+            ],
         }
     },
     "compileOnSave": true,
