@@ -14,7 +14,10 @@
             ],
             "@comps/*": [
                 "comps/*"
-            ]
+            ],
+            "@rxjs": [
+                "tklibs/rxjs/index"
+            ],
         }
     },
     "compileOnSave": true,
