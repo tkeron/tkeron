@@ -46,7 +46,7 @@ export const build = async (args: buildArguments, minify = true) => {
             const handle = setTimeout(() => {
                 console["log"](`time up: ${name}`);
                 ok(0);
-            }, 3e3);
+            }, 6e3);
             document.addEventListener("load", () => {
                 clearTimeout(handle);
                 ok(0);
