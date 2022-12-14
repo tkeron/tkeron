@@ -32,7 +32,6 @@ export const dev = async (
     building = false;
   });
   const app = express();
-  app.use(express.static(outputDir));
 
   let firstRequest = true;
   app.get("/compdate.txt", (_request, reply) => {
@@ -44,6 +43,7 @@ export const dev = async (
     const lastListener = () => reply.send({ reload: true });
     events.once("built", lastListener);
   });
+  app.use(express.static(outputDir));
   let server: Server;
   try {
     server = app.listen(port, addr, () =>
