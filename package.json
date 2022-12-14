@@ -18,8 +18,6 @@
 	"author": "tkeron",
 	"license": "MIT",
 	"dependencies": {
-		"@types/express": "^4.17.14",
-		"canvas": "^2.9.1",
 		"colorette": "^1.4.0",
 		"commander": "^7.2.0",
 		"esbuild": "^0.12.29",
@@ -29,6 +27,7 @@
 		"rxjs": "^7.5.5"
 	},
 	"devDependencies": {
+		"@types/express": "^4.17.15",
 		"@types/jest": "^26.0.24",
 		"@types/jsdom": "^16.2.14",
 		"@types/node": "^15.14.9",
