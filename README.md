@@ -2,6 +2,12 @@
 
 Micro framework for developing web user interfaces with typescript.
 
+- Create web interfaces with typescript without configuration.
+- Take advantage of hot reloading to see your changes as you go.
+- Start your project faster, compile faster than other frameworks (thanks to esbuild).
+- Create pre-rendered components or pages.
+
+
 ![tkeron example](./assets/tkexample.gif)
 
 **How to use**

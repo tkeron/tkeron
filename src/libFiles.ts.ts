@@ -8,7 +8,8 @@ export const libFiles = [
     "range.ts",
     "rnda.ts",
     "random.ts",
-    "rectReady.ts"
+    "rectReady.ts",
+    "simpleHotRestart.ts"
 ];
 
 
