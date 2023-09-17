@@ -1,0 +1,29 @@
+name: when cli directory changes
+on:
+  push:
+    paths:
+      - 'cli/**' 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          registry-url: "https://registry.npmjs.org/"
+          
+      - name: test and publish
+        run: |
+          cd cli
+          npm i
+          npm test
+          npm run cicd
+          rm -rf src dist/test front web .github
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          token: ${{ secrets.NPM_TOKEN }}
+
