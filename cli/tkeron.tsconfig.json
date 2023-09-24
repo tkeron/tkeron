@@ -4,9 +4,12 @@
     "outDir": "dist",
     "target": "ESNext",
     "esModuleInterop": true,
-    "moduleResolution": "node",
     "declaration": true
   },
-  "exclude": ["node_modules"],
-  "include": ["src"]
+  "exclude": [
+    "node_modules"
+  ],
+  "include": [
+    "src"
+  ]
 }

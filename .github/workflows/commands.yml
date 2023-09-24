@@ -1,8 +1,8 @@
-name: cli package
+name: commands package
 on:
   push:
     paths:
-      - 'cli/**' 
+      - 'commands/**' 
 
 jobs:
   build:
@@ -16,11 +16,10 @@ jobs:
           
       - name: test and publish
         run: |
-          cd cli
+          cd commands
           npm i
           npm test
-          npm run cicd
-          rm -rf src dist/test front web .github coverage
+          rm -rf src dist/*.test.js .github coverage
           npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
