@@ -1,8 +1,8 @@
 {
   "name": "@tkeron/commands",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "node library for handling command line arguments",
-  "main": "dist/exports.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
     "test": "jest --roots dist --detectOpenHandles --coverage --verbose "
@@ -22,6 +22,6 @@
     "arguments"
   ],
   "repository": {
-		"url": "git@github.com:tkeron/tkeron.git"
+    "url": "git@github.com:tkeron/tkeron.git"
   }
 }
