@@ -1,29 +1,15 @@
 {
     "compilerOptions": {
-        "experimentalDecorators": true,
-        "module": "ESNext",
-        "target": "ESNext",
-        "esModuleInterop": true,
-        "moduleResolution": "Node",
-        "declaration": false,
-        "skipLibCheck": true,
-        "baseUrl": "front",
-        "paths": {
-            "@tkeron": [
-                "tklibs/mod"
-            ],
-            "@comps/*": [
-                "comps/*"
-            ],
-            "@rxjs": [
-                "tklibs/rxjs/index"
-            ],
-        }
+      "module": "NodeNext",
+      "outDir": "dist",
+      "target": "ESNext",
+      "esModuleInterop": true,
+      "declaration": true
     },
-    "compileOnSave": true,
-    "lib": [
-        "dom",
-        "es2015",
-        "esnext.asynciterable"
+    "exclude": [
+      "node_modules"
+    ],
+    "include": [
+      "src"
     ]
-}
+  }

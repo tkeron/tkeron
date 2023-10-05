@@ -1,47 +1,50 @@
 {
-	"name": "tkeron",
-	"version": "0.0.5",
-	"description": "Micro framework for developing web user interfaces with typescript.",
-	"bin": {
-		"tkeron": "dist/index.js",
-		"tk": "dist/tk.js"
-	},
-	"main": "dist/mod.js",
-	"scripts": {
-		"build": "tsc --project tkeron.tsconfig.json",
-		"start": "node dist/index.js",
-		"tk": "npm run build && node dist/index.js",
-		"test": "rm -rf dist && npm run build && jest --roots dist --detectOpenHandles --coverage --coverageReporters=\"json-summary\"  --verbose ",
-		"coverage": "rm -rf dist && npm run build && jest --roots dist --detectOpenHandles --verbose --coverage ",
-		"cicd": "node dist/cicd.js"
-	},
-	"author": "tkeron",
-	"license": "MIT",
-	"dependencies": {
-		"colorette": "^2.0.19",
-		"commander": "^9.4.1",
-		"esbuild": "^0.16.6",
-		"express": "^4.18.2",
-		"jsdom": "^20.0.3",
-		"node-watch": "^0.7.3",
-		"rxjs": "^7.6.0"
-	},
-	"devDependencies": {
-		"@types/express": "^4.17.15",
-		"@types/jest": "^29.2.4",
-		"@types/jsdom": "^20.0.1",
-		"jest": "^29.3.1",
-		"typescript": "^4.9.4"
-	},
-	"keywords": [
-		"cli",
-		"front-end",
-		"frontend",
-		"typescript",
-		"web components",
-		"microframework"
-	],
-	"repository": {
-		"url": "git@github.com:tkeron/tkeron.git"
-	}
+  "name": "tkeron",
+  "version": "0.0.6",
+  "description": "Micro framework for developing web user interfaces with typescript.",
+  "bin": {
+    "tkeron": "dist/index.js",
+    "tk": "dist/tk.js"
+  },
+  "main": "dist/mod.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "tk": "npm run build && node dist/index.js",
+    "test": "rm -rf dist && npm run build && jest --roots dist --detectOpenHandles --coverage --coverageReporters=\"json-summary\"  --verbose ",
+    "coverage": "rm -rf dist && npm run build && jest --roots dist --detectOpenHandles --verbose --coverage ",
+    "cicd": "node dist/cicd.js"
+  },
+  "author": "tkeron",
+  "license": "MIT",
+  "dependencies": {
+    "colorette": "^2.0.19",
+    "commander": "^9.4.1",
+    "esbuild": "^0.16.6",
+    "express": "^4.18.2",
+    "jsdom": "^20.0.3",
+    "node-watch": "^0.7.3",
+    "rxjs": "^7.6.0"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.15",
+    "@types/jest": "^29.2.4",
+    "@types/jsdom": "^20.0.1",
+    "jest": "^29.3.1",
+    "typescript": "^4.9.4"
+  },
+  "keywords": [
+    "cli",
+    "front-end",
+    "frontend",
+    "typescript",
+    "web components",
+    "microframework"
+  ],
+  "repository": {
+    "url": "git@github.com:tkeron/tkeron.git"
+  },
+  "engines": {
+    "node": ">=18"
+  }
 }
