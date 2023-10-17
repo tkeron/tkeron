@@ -37,6 +37,61 @@ describe("main test", () => {
       .next()
       .run();
 
-    expect(callback).toHaveBeenCalledWith({ op1: "op1value", op2: "op2value" });
+    expect(callback).toHaveBeenCalledWith(
+      { op1: "op1value", op2: "op2value" },
+      ["test"]
+    );
+  });
+  it("should run callback with ordered arguments without command", () => {
+    process.argv = [
+      "",
+      "",
+      "-q",
+      "ord0",
+      "op1:op1value",
+      "ord1",
+      "op2=op2value",
+    ];
+
+    const callback = jest.fn();
+
+    getCommands()
+      .addCommand("qwerty")
+      .addAliases("-q")
+      .addOptions("op1", "op2")
+      .setCallback(callback)
+      .next()
+      .run();
+
+    expect(callback).toHaveBeenCalledWith(
+      { op1: "op1value", op2: "op2value" },
+      ["ord0", "ord1"]
+    );
+  });
+
+  it("should run callback with ordered arguments only", () => {
+    process.argv = [
+      "",
+      "",
+      "qwerty",
+      "ord0",
+      "op1:op1value",
+      "ord1",
+      "op2=op2value",
+    ];
+
+    const callback = jest.fn();
+
+    getCommands()
+      .addCommand("qwerty")
+      .addOptions("op1", "op2")
+      .setCallback(callback)
+      .next()
+      .run();
+
+    expect(callback).toHaveBeenCalledWith(
+      { op1: "op1value", op2: "op2value" },
+      ["ord0", "ord1"]
+    );
   });
 });
