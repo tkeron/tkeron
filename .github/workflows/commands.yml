@@ -1,6 +1,8 @@
 name: commands package
 on:
   push:
+    branches: 
+      - master
     paths:
       - 'commands/**' 
 
