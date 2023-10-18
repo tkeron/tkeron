@@ -6,14 +6,16 @@ export interface CommandHandler {
 }
 
 export type Options = { [key: string]: CommandHandler };
+export type parsedOptions = { [key: string]: string };
 
-export type Callback = (options: Options, orderedArguments?: string[]) => void;
+export type Callback = (options: parsedOptions) => void;
 
 export interface Command {
   name: string;
   next: () => Commands;
   addAliases: (...alias: string[]) => Command;
   addOptions: (...options: string[]) => Command;
+  addPositionedArgument: (arg: string) => Command;
   setCallback: (callback: Callback) => Command;
 }
 
@@ -23,6 +25,7 @@ export interface Commands {
 }
 
 const _commands: Options = {};
+const orderedArgumentNames: string[] = [];
 
 const run = () => {
   const currentCommands = process.argv.slice(2);
@@ -41,17 +44,31 @@ const run = () => {
     Object.keys(_commands).includes(orderedArguments[0])
   )
     orderedArguments.shift();
+  const orderedOptions = {};
+  if (
+    orderedArguments &&
+    orderedArguments.length > 0 &&
+    orderedArgumentNames.length === orderedArguments.length
+  ) {
+    orderedArgumentNames.forEach((key, n) => {
+      orderedOptions[key] = orderedArguments[n];
+    });
+  }
+
   for (const commandIndex of currentCommands) {
     const command: CommandHandler = _commands[commandIndex];
     if (!command) continue;
-    const options =
-      parsedOptions && command.options
+    const options = {
+      ...orderedOptions,
+      ...(parsedOptions && command.options
         ? command.options.reduce((p, c) => {
             p[c] = parsedOptions[c];
             return p;
           }, {})
-        : {};
-    command.callback(options, orderedArguments);
+        : {}),
+    };
+
+    command.callback(options);
   }
 };
 
@@ -66,6 +83,7 @@ export const getCommands = (): Commands => {
       name,
       addAliases: undefined,
       addOptions: undefined,
+      addPositionedArgument: undefined,
       next: undefined,
       setCallback: undefined,
     };
@@ -96,6 +114,11 @@ export const getCommands = (): Commands => {
 
     command.setCallback = (callback: Callback) => {
       _commands[name].callback = callback;
+      return command;
+    };
+
+    command.addPositionedArgument = (arg: string) => {
+      orderedArgumentNames.push(arg);
       return command;
     };
 
