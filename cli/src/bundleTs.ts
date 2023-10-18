@@ -8,7 +8,7 @@ export const bundleTs = async (
   file: string,
   outfile: string,
   minify = true,
-  deleteOutfile = false
+  deleteOutfile = false,
 ) => {
   if (!file) throw "file must be defined";
   if (!outfile) throw "outfile must be defined";

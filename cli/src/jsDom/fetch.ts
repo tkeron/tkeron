@@ -9,5 +9,3 @@ export const ext_fetch = (window: DOMWindow) => {
     } as Response;
   };
 };
-
-

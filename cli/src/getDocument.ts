@@ -32,7 +32,7 @@ export const getDocument = (html: string, options?: getDocumentOptions) => {
         ext_crypto(window);
         ext_fetch(window);
       },
-    }
+    },
   );
   const document = window.document;
 

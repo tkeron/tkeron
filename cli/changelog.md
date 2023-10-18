@@ -13,4 +13,3 @@
 # v0.0.3
 
 - fix error in simpleHotRestart script due to undefined "exports" variable.
-
