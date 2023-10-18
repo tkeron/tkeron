@@ -24,7 +24,7 @@ export const buildFront = async (options: buildFrontOptions) => {
       join(__dirname, "..", "distFiles", "simpleHotRestart.ts"),
       "shr.js",
       true,
-      true
+      true,
     );
     html = injectCode(html, code, "tkeron_simple_hot_restart");
   }

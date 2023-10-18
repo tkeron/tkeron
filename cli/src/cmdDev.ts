@@ -10,7 +10,7 @@ export const dev = async (
   sourceDir: string,
   outputDir: string,
   port = 5000,
-  addr = "127.0.0.1"
+  addr = "127.0.0.1",
 ) => {
   const opts = getOptions({ outputDir, sourceDir });
   sourceDir = opts.sourceDir;
@@ -47,7 +47,7 @@ export const dev = async (
   let server: Server;
   try {
     server = app.listen(port, addr, () =>
-      console["log"](`linstening on ${addr}:${port}`)
+      console["log"](`linstening on ${addr}:${port}`),
     );
   } catch (_) {
     console["log"]("error starting local dev server", _);
@@ -62,7 +62,7 @@ export const cmdDev = async (
   sourceDir: string,
   outputDir: string,
   port = 5000,
-  addr = "127.0.0.1"
+  addr = "127.0.0.1",
 ) => {
   await dev(sourceDir, outputDir, port, addr);
 };

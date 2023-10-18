@@ -1,4 +1,3 @@
-
 export interface tkeronOptions {
   type?: string;
   value?: string;
@@ -48,12 +47,13 @@ export interface Component {
 const enum event {
   render,
   append,
-  msg
+  msg,
 }
 const handlers: any = {};
 const addHandler = (id: string, event: event, fn: (...args: any[]) => void) => {
   if (typeof handlers[event] === "undefined") handlers[event] = {} as any;
-  if (typeof handlers[event][id] === "undefined") handlers[event][id] = [] as any[];
+  if (typeof handlers[event][id] === "undefined")
+    handlers[event][id] = [] as any[];
   handlers[event][id].push(fn);
 };
 const runHandlers = (id: string, event: event, ...args: any[]) => {
@@ -62,8 +62,10 @@ const runHandlers = (id: string, event: event, ...args: any[]) => {
   handlers[event][id].forEach((fn: (...args: any[]) => void) => fn(...args));
 };
 
-const toHexString = (bytes: Uint8Array): string => bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
-const rnds = (n: number): string => toHexString(crypto.getRandomValues(new Uint8Array(n))).slice(0, n);
+const toHexString = (bytes: Uint8Array): string =>
+  bytes.reduce((str, byte) => str + byte.toString(16).padStart(2, "0"), "");
+const rnds = (n: number): string =>
+  toHexString(crypto.getRandomValues(new Uint8Array(n))).slice(0, n);
 
 const IDs: string[] = [];
 const getID = (): string => {
@@ -75,23 +77,23 @@ const getID = (): string => {
   return id;
 };
 
-export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Component => {
+export const tkeron = (
+  opt?: tkeronOptions | string,
+  ...classes: string[]
+): Component => {
   if (typeof opt === "string") {
     classes.push(opt);
     opt = { type: "div" };
   }
   if (!opt) opt = { type: "div" };
-  const valueProp: boolean = [
-    "input",
-    "textarea"
-  ].some(n => {
+  const valueProp: boolean = ["input", "textarea"].some((n) => {
     if ("type" in (opt as any)) return (opt as any).type === n;
   });
   let el = document.createElement(opt.type || "div");
   const priv = {
     parent: {} as Component | null,
     childs: [] as Component[],
-    css: ""
+    css: "",
   };
   priv.parent = null;
   const com: Component = {
@@ -108,7 +110,7 @@ export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Comp
     },
     childs: priv.childs,
     add: (...c: Component[]) => {
-      c.forEach(_ => {
+      c.forEach((_) => {
         _._setParent(com);
         priv.childs.push(_);
         _.getHTMLElement((ele) => {
@@ -119,11 +121,11 @@ export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Comp
     },
     remove: (c: Component) => {
       c._setParent(null);
-      priv.childs = priv.childs.filter(_c => {
+      priv.childs = priv.childs.filter((_c) => {
         if (_c.id === c.id) return false;
         return true;
       });
-      c.getHTMLElement(_el => {
+      c.getHTMLElement((_el) => {
         el.removeChild(_el);
       });
       return com;
@@ -229,7 +231,7 @@ export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Comp
   Object.defineProperty(com, "attributes", {
     get() {
       return el.attributes;
-    }
+    },
   });
   Object.defineProperty(com, "value", {
     get() {
@@ -245,23 +247,23 @@ export const tkeron = (opt?: tkeronOptions | string, ...classes: string[]): Comp
         el.value = v;
         return true;
       }
-      priv.childs.forEach(c => c._setParent(null));
+      priv.childs.forEach((c) => c._setParent(null));
       priv.childs.length = 0;
       el.innerHTML = v;
       return true;
-    }
+    },
   });
   Object.defineProperty(com, "classList", {
     get() {
       //@ts-ignore
       return Array.from(el.classList);
-    }
+    },
   });
 
   if (typeof opt.value !== "undefined") com.setValue(opt.value);
 
   if (classes.length) {
-    classes.forEach(c => {
+    classes.forEach((c) => {
       com.addClass(c);
     });
   }
@@ -291,9 +293,11 @@ export interface scriptOptions {
   globalFunctions?: CallableFunction[];
 }
 tkeron.script = (anonFunc: CallableFunction, options?: scriptOptions) => {
-  const { appendIn, runOnDOMContentLoaded, globalFunctions } = options || {} as scriptOptions;
+  const { appendIn, runOnDOMContentLoaded, globalFunctions } =
+    options || ({} as scriptOptions);
   let value = `(${anonFunc.toString()})();`;
-  if (runOnDOMContentLoaded) value = `document.addEventListener("DOMContentLoaded",(${anonFunc.toString()}));`;
+  if (runOnDOMContentLoaded)
+    value = `document.addEventListener("DOMContentLoaded",(${anonFunc.toString()}));`;
 
   if (globalFunctions) {
     let functions = "";
@@ -312,6 +316,4 @@ tkeron.script = (anonFunc: CallableFunction, options?: scriptOptions) => {
   tkeron({ type: "script", value }).appendIn(appendIn || "body");
 };
 
-
 export const version = "1.9.0";
-

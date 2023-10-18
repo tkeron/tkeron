@@ -1,13 +1,12 @@
 import { join } from "path";
 import { getDocument } from "../getDocument";
 
-
 const front = join(__dirname, "..", "..", "front");
 const web = join(__dirname, "..", "..", "web");
 
 describe("jsdom errors", () => {
-    it("custom error", async () => {
-        const html = `
+  it("custom error", async () => {
+    const html = `
             <!DOCTYPE html>
             <html lang="en">
             <head>
@@ -22,10 +21,9 @@ describe("jsdom errors", () => {
             <body></body>
             </html>
         `;
-        const { document } = getDocument(html);
-        const node = document.querySelector(".tkeron_error");
-        expect(node).toBeTruthy();
-        expect(node.innerHTML).toMatch(/custom error/);
-    });
+    const { document } = getDocument(html);
+    const node = document.querySelector(".tkeron_error");
+    expect(node).toBeTruthy();
+    expect(node.innerHTML).toMatch(/custom error/);
+  });
 });
-
