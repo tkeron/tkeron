@@ -37,10 +37,7 @@ describe("main test", () => {
       .next()
       .run();
 
-    expect(callback).toHaveBeenCalledWith(
-      { op1: "op1value", op2: "op2value" },
-      ["test"]
-    );
+    expect(callback).toHaveBeenCalledWith({ op1: "op1value", op2: "op2value" });
   });
   it("should run callback with ordered arguments without command", () => {
     process.argv = [
@@ -63,10 +60,7 @@ describe("main test", () => {
       .next()
       .run();
 
-    expect(callback).toHaveBeenCalledWith(
-      { op1: "op1value", op2: "op2value" },
-      ["ord0", "ord1"]
-    );
+    expect(callback).toHaveBeenCalledWith({ op1: "op1value", op2: "op2value" });
   });
 
   it("should run callback with ordered arguments only", () => {
@@ -85,13 +79,17 @@ describe("main test", () => {
     getCommands()
       .addCommand("qwerty")
       .addOptions("op1", "op2")
+      .addPositionedArgument("pos0")
+      .addPositionedArgument("pos1")
       .setCallback(callback)
       .next()
       .run();
 
-    expect(callback).toHaveBeenCalledWith(
-      { op1: "op1value", op2: "op2value" },
-      ["ord0", "ord1"]
-    );
+    expect(callback).toHaveBeenCalledWith({
+      op1: "op1value",
+      op2: "op2value",
+      pos0: "ord0",
+      pos1: "ord1",
+    });
   });
 });
