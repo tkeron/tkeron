@@ -7,8 +7,11 @@ import { createTsConfigFile } from "./createTsConfigFile";
 import { fileExists } from "./fileExist";
 import { getOptions } from "./getOptions";
 import { libFiles } from "./libFiles.ts";
+import { Callback } from "@tkeron/commands";
 
-export const cmdInit = async (sourceDir?: string, outputDir?: string) => {
+export const cmdInit: Callback = async (
+  { sourceDir, outputDir } = { sourceDir: "", outputDir: "" },
+) => {
   const options = getOptions({ sourceDir, outputDir });
   sourceDir = options.sourceDir;
   await writeFile("tkeron.json", JSON.stringify(options, null, 4));

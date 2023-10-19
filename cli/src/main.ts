@@ -1,5 +1,5 @@
+import { getCommands } from "@tkeron/commands";
 import { blueBright, bold } from "colorette";
-import { program } from "commander";
 import { fromBase64 } from "./base64";
 import { cmdBuild } from "./cmdBuild";
 import { cmdDev } from "./cmdDev";
@@ -32,39 +32,40 @@ export const main = (command = "tkeron", argv?: string[]) => {
     process.exit(0);
   }
 
-  program.addHelpText("beforeAll", info);
-  program.addHelpText("afterAll", "\n\n");
+  getCommands()
+    .addCommand("init")
+    .addAliases("i")
+    .addPositionedArgument("sourceDir")
+    .addPositionedArgument("outDir")
+    .setCallback(cmdInit)
 
-  program
-    .command("init [sourceDir] [outDir]")
-    .aliases(["i"])
-    .description("initialize or refresh the project")
-    .action(cmdInit);
+    .next()
 
-  program
-    .command("dev [sourceDir] [outDir] [port] [addr]")
-    .aliases(["d"])
-    .description(
-      `start the local develop server\nand watch for src code changes`,
-    )
-    .action(cmdDev);
+    .addCommand("dev")
+    .addAliases("d")
+    .addPositionedArgument("sourceDir")
+    .addPositionedArgument("outDir")
+    .addPositionedArgument("port")
+    .addPositionedArgument("addr")
+    .setCallback(cmdDev)
 
-  program
-    .command("build [sourceDir] [outDir]")
-    .aliases(["b"])
-    .description("build the pages in outDir")
-    .action(cmdBuild);
+    .next()
 
-  program
-    .command("generate [item] [path]")
-    .aliases(["g"])
-    .description(
-      `create a component or page.\nExample:\n"${command} g c buttons/opaque" will generate\nthe component in @comps/buttons/opaque.ts\nand its css file.`,
-    )
-    .action(cmdGenerate);
+    .addCommand("build")
+    .addAliases("b")
+    .addPositionedArgument("sourceDir")
+    .addPositionedArgument("outDir")
+    .setCallback(cmdBuild)
 
-  program.version(version);
+    .next()
 
-  if (argv) program.parse(argv);
-  else program.parse();
+    .addCommand("generate")
+    .addAliases("g")
+    .addPositionedArgument("item")
+    .addPositionedArgument("path")
+    .setCallback(cmdGenerate)
+
+    .next()
+
+    .run();
 };

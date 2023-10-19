@@ -5,6 +5,7 @@ import { EventEmitter } from "stream";
 import { build } from "./build";
 import { fileExists } from "./fileExist";
 import { getOptions } from "./getOptions";
+import { Callback } from "@tkeron/commands";
 
 export const dev = async (
   sourceDir: string,
@@ -58,11 +59,13 @@ export const dev = async (
   };
 };
 
-export const cmdDev = async (
-  sourceDir: string,
-  outputDir: string,
-  port = 5000,
-  addr = "127.0.0.1",
+export const cmdDev: Callback = (
+  { sourceDir, outputDir, port, addr } = {
+    sourceDir: "",
+    outputDir: "",
+    port: "5000",
+    addr: "127.0.0.1",
+  },
 ) => {
-  await dev(sourceDir, outputDir, port, addr);
+  dev(sourceDir, outputDir, Number(port), addr);
 };
