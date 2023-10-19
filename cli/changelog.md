@@ -1,3 +1,7 @@
+# v0.0.7
+
+- replace commander for @tkeron/commands.
+
 # v0.0.6
 
 - fixed fetch error.

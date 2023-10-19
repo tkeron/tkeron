@@ -1,6 +1,9 @@
+import { Callback } from "@tkeron/commands";
 import { build } from "./build";
 
-export const cmdBuild = (sourceDir?: string, outputDir?: string) =>
+export const cmdBuild: Callback = (
+  { sourceDir, outputDir } = { sourceDir: "", outputDir: "" },
+) =>
   build({
     sourceDir,
     outputDir,
