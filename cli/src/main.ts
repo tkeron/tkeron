@@ -20,9 +20,9 @@ export const main = (command = "tkeron", argv?: string[]) => {
   const tkeronWord = bold(
     blueBright(
       fromBase64(
-        "ICAgX19fX19fXyAgXyAgX18gIF9fX19fICBfX19fICAgIF9fXyAgIF8gICBfCiAgfF9fICAgX198fCB8LyAvIHwgIF9fX3x8ICAgIFwgIC8gICBcIHwgXCB8IHwKICAgICB8IHwgICB8ICAgLyAgfCAgX198IHwgIF4gLyB8ICBeICB8fCAgXHwgfAogICAgIHwgfCAgIHwgfFwgXCB8IHxfX18gfCB8XCBcIHwgIHYgIHx8IHxcICB8CiAgICAgfF98ICAgfF98IFxfXHxfX19fX3x8X3wgXF9cIFxfX18vIHxffCBcX3w=",
-      ),
-    ),
+        "ICAgX19fX19fXyAgXyAgX18gIF9fX19fICBfX19fICAgIF9fXyAgIF8gICBfCiAgfF9fICAgX198fCB8LyAvIHwgIF9fX3x8ICAgIFwgIC8gICBcIHwgXCB8IHwKICAgICB8IHwgICB8ICAgLyAgfCAgX198IHwgIF4gLyB8ICBeICB8fCAgXHwgfAogICAgIHwgfCAgIHwgfFwgXCB8IHxfX18gfCB8XCBcIHwgIHYgIHx8IHxcICB8CiAgICAgfF98ICAgfF98IFxfXHxfX19fX3x8X3wgXF9cIFxfX18vIHxffCBcX3w="
+      )
+    )
   );
   const esbuildV = dependencies.esbuild.replace(/\^/, "");
   const info = `${tkeronWord}\n\n     tkeron  ${version}\n     esbuild ${esbuildV}\n`;
@@ -34,38 +34,38 @@ export const main = (command = "tkeron", argv?: string[]) => {
 
   getCommands()
     .addCommand("init")
-    .addAliases("i")
+    .addAlias("i")
     .addPositionedArgument("sourceDir")
     .addPositionedArgument("outDir")
     .setCallback(cmdInit)
 
-    .next()
+    .commands()
 
     .addCommand("dev")
-    .addAliases("d")
+    .addAlias("d")
     .addPositionedArgument("sourceDir")
     .addPositionedArgument("outDir")
     .addPositionedArgument("port")
     .addPositionedArgument("addr")
     .setCallback(cmdDev)
 
-    .next()
+    .commands()
 
     .addCommand("build")
-    .addAliases("b")
+    .addAlias("b")
     .addPositionedArgument("sourceDir")
     .addPositionedArgument("outDir")
     .setCallback(cmdBuild)
 
-    .next()
+    .commands()
 
     .addCommand("generate")
-    .addAliases("g")
+    .addAlias("g")
     .addPositionedArgument("item")
     .addPositionedArgument("path")
     .setCallback(cmdGenerate)
 
-    .next()
+    .commands()
 
-    .run();
+    .start();
 };

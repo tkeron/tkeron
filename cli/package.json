@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Micro framework for developing web user interfaces with typescript.",
   "bin": {
     "tkeron": "dist/index.js",
@@ -19,7 +19,7 @@
   "author": "tkeron",
   "license": "MIT",
   "dependencies": {
-    "@tkeron/commands": "^0.1.1",
+    "@tkeron/commands": "^0.2.0",
     "colorette": "^2.0.19",
     "esbuild": "^0.16.6",
     "express": "^4.18.2",
