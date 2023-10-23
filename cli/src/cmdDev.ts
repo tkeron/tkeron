@@ -5,13 +5,12 @@ import { EventEmitter } from "stream";
 import { build } from "./build";
 import { fileExists } from "./fileExist";
 import { getOptions } from "./getOptions";
-import { Callback } from "@tkeron/commands";
 
 export const dev = async (
   sourceDir: string,
   outputDir: string,
   port = 5000,
-  addr = "127.0.0.1",
+  addr = "127.0.0.1"
 ) => {
   const opts = getOptions({ outputDir, sourceDir });
   sourceDir = opts.sourceDir;
@@ -48,7 +47,7 @@ export const dev = async (
   let server: Server;
   try {
     server = app.listen(port, addr, () =>
-      console["log"](`linstening on ${addr}:${port}`),
+      console["log"](`linstening on ${addr}:${port}`)
     );
   } catch (_) {
     console["log"]("error starting local dev server", _);
@@ -59,13 +58,15 @@ export const dev = async (
   };
 };
 
-export const cmdDev: Callback = (
+export const cmdDev = (
   { sourceDir, outputDir, port, addr } = {
     sourceDir: "",
     outputDir: "",
     port: "5000",
     addr: "127.0.0.1",
-  },
+  }
 ) => {
-  dev(sourceDir, outputDir, Number(port), addr);
+  const numberPort: number = Number(port) || 5000;
+
+  dev(sourceDir, outputDir, numberPort, addr);
 };

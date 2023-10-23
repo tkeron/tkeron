@@ -3,11 +3,8 @@ import { mkdir, writeFile } from "fs/promises";
 import { basename, dirname, join } from "path";
 import { validItems, componentItem, pageItem } from "./generateItems";
 import { getOptions } from "./getOptions";
-import { Callback } from "@tkeron/commands";
 
-export const cmdGenerate: Callback = async (
-  { item, path } = { item: "", path: "" },
-) => {
+export const cmdGenerate = async ({ item, path } = { item: "", path: "" }) => {
   const { sourceDir } = getOptions();
   const name = basename(path);
   if (!validItems.includes(item)) {
