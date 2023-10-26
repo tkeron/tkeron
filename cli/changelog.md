@@ -1,3 +1,11 @@
+# v0.0.9
+
+- improve testing
+
+# v0.0.8
+
+- fix cli commands
+
 # v0.0.7
 
 - replace commander for @tkeron/commands.
