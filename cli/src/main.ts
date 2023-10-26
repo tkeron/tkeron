@@ -29,7 +29,7 @@ export const main = (command = "tkeron", argv?: string[]) => {
 
   if (process.argv.length === 2) {
     console["log"](info, `\n\n     type '${command} help' to see commands\n\n`);
-    process.exit(0);
+    return;
   }
 
   getCommands()
