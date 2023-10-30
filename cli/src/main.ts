@@ -36,7 +36,7 @@ export const main = (command = "tkeron", argv?: string[]) => {
     .addCommand("init")
     .addAlias("i")
     .addPositionedArgument("sourceDir")
-    .addPositionedArgument("outDir")
+    .addPositionedArgument("outputDir")
     .setCallback(cmdInit)
 
     .commands()
@@ -44,7 +44,7 @@ export const main = (command = "tkeron", argv?: string[]) => {
     .addCommand("dev")
     .addAlias("d")
     .addPositionedArgument("sourceDir")
-    .addPositionedArgument("outDir")
+    .addPositionedArgument("outputDir")
     .addPositionedArgument("port")
     .addPositionedArgument("addr")
     .setCallback(cmdDev)
@@ -54,7 +54,7 @@ export const main = (command = "tkeron", argv?: string[]) => {
     .addCommand("build")
     .addAlias("b")
     .addPositionedArgument("sourceDir")
-    .addPositionedArgument("outDir")
+    .addPositionedArgument("outputDir")
     .setCallback(cmdBuild)
 
     .commands()

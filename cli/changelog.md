@@ -1,3 +1,7 @@
+# v0.0.10
+
+- fix positioned argument outputDir
+
 # v0.0.9
 
 - improve testing
