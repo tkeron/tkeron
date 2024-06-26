@@ -1,6 +1,6 @@
 {
   "name": "@tkeron/commands",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "node library for handling command line arguments",
   "main": "dist/index.js",
   "scripts": {
