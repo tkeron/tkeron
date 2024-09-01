@@ -58,15 +58,25 @@ export const dev = async (
   };
 };
 
+const exampleCmdDev = {
+  sourceDir: "",
+  outputDir: "",
+  port: "5000",
+  addr: "127.0.0.1",
+};
+
+export type CmdDevType = typeof exampleCmdDev;
+
 export const cmdDev = (
-  { sourceDir, outputDir, port, addr } = {
+  args: CmdDevType = {
     sourceDir: "",
     outputDir: "",
     port: "5000",
     addr: "127.0.0.1",
   }
 ) => {
-  const numberPort: number = Number(port) || 5000;
+  const { addr, outputDir, port, sourceDir } = args;
 
-  dev(sourceDir, outputDir, numberPort, addr);
+  const numberPort: number = Number(port) || 5000;
+  return dev(sourceDir, outputDir, numberPort, addr);
 };

@@ -47,6 +47,10 @@ export const main = (command = "tkeron", argv?: string[]) => {
     .addPositionedArgument("outputDir")
     .addPositionedArgument("port")
     .addPositionedArgument("addr")
+    .addOption("sourceDir", "front")
+    .addOption("outputDir", "web")
+    .addOption("port", "5000")
+    .addOption("addr", "127.0.0.1")
     .setCallback(cmdDev)
 
     .commands()
