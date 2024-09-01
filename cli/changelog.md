@@ -1,3 +1,8 @@
+# v3.0.0
+
+- changed the argument input for the "dev" command to accept named arguments as well.
+- moved to version 3 due to issues with npm for pre-3 versions from the early phases of the project.
+
 # v0.0.10
 
 - fix positioned argument outputDir
