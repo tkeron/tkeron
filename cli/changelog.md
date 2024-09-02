@@ -1,3 +1,9 @@
+# v3.1.0
+
+## Breaking changes
+
+- the tkeron library and util files was removed, simplify the project.
+
 # v3.0.0
 
 - changed the argument input for the "dev" command to accept named arguments as well.
