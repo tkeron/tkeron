@@ -2,8 +2,8 @@ import { writeFile } from "fs/promises";
 import { getOptions } from "./getOptions";
 
 export const createTsConfigFile = async () => {
-  const { sourceDir } = getOptions();
-  const data = `{
+    const { sourceDir } = getOptions();
+    const data = `{
     "compilerOptions": {
         "experimentalDecorators": true,
         "module": "ESNext",
@@ -14,14 +14,8 @@ export const createTsConfigFile = async () => {
         "skipLibCheck": true,
         "baseUrl": "${sourceDir}",
         "paths": {
-            "@tkeron": [
-                "tklibs/mod"
-            ],
             "@comps/*": [
                 "comps/*"
-            ],
-            "@rxjs": [
-                "tklibs/rxjs/index"
             ],
         }
     },
@@ -32,5 +26,5 @@ export const createTsConfigFile = async () => {
         "esnext.asynciterable"
     ]
 }`;
-  await writeFile("tsconfig.json", data, { encoding: "utf-8" });
+    await writeFile("tsconfig.json", data, { encoding: "utf-8" });
 };
