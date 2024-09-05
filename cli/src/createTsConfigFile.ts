@@ -12,10 +12,13 @@ export const createTsConfigFile = async () => {
         "moduleResolution": "Node",
         "declaration": false,
         "skipLibCheck": true,
-        "baseUrl": "${sourceDir}",
         "paths": {
-            "@comps/*": [
-                "comps/*"
+            "@comps": [
+                "./.tkeron/comps",
+                "./${sourceDir}/comps",
+            ],
+            "@tkeron": [
+                "./.tkeron/tkeron_library"
             ],
         }
     },

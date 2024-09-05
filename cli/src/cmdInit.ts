@@ -1,12 +1,10 @@
-import {
-  writeFile,
-  mkdir,
-} from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { getExtModules } from "./buildLoaders";
 import { createTsConfigFile } from "./createTsConfigFile";
 import { fileExists } from "./fileExist";
 import { getOptions } from "./getOptions";
+import { copyDir } from "./copyDir";
 
 export const cmdInit = async (
   { sourceDir, outputDir } = { sourceDir: "", outputDir: "" }
@@ -19,9 +17,15 @@ export const cmdInit = async (
     await mkdir(sourceDir, { recursive: true });
 
   const dotTkeron = join(sourceDir, "..", ".tkeron");
-  if (!(await fileExists(dotTkeron))) await mkdir(dotTkeron, { recursive: true });
+  if (!(await fileExists(dotTkeron)))
+    await mkdir(dotTkeron, { recursive: true });
 
   const extModules = getExtModules();
   const extModName = join(dotTkeron, "..", "extensions.d.ts");
   await writeFile(extModName, extModules, { encoding: "utf-8" });
+
+  const tkeronLibSrc = join(__dirname, "..", "tkeron_library");
+  const tkeronLibDir = join(dotTkeron, "tkeron_library");
+
+  await copyDir(tkeronLibSrc, tkeronLibDir);
 };
