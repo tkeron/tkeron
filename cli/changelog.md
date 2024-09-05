@@ -1,3 +1,11 @@
+# v3.2.0
+
+## Breaking changes
+
+- Added a simple library to support component development.
+- Modified the tsconfig.json file to use the root directory as a base.
+- Also, an index.ts file should be included in the root of the "comps" directory and components should be exported from there. This is to improve the length of component imports.
+
 # v3.1.1
 
 - placed the extensions.d.ts file in the root directory so that vscode recognizes css files, images, html, among others, as modules.

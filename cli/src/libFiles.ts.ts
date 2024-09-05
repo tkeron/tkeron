@@ -1,5 +1,4 @@
 export const libFiles = [
-  "tkeron.ts",
   "eventEmitter.ts",
   "getType.ts",
   "runOncePerTime.ts",
