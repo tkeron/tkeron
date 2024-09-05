@@ -22,6 +22,6 @@ export const cmdInit = async (
   if (!(await fileExists(dotTkeron))) await mkdir(dotTkeron, { recursive: true });
 
   const extModules = getExtModules();
-  const extModName = join(dotTkeron, "extensions.d.ts");
+  const extModName = join(dotTkeron, "..", "extensions.d.ts");
   await writeFile(extModName, extModules, { encoding: "utf-8" });
 };
