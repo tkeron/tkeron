@@ -1,3 +1,7 @@
+# v3.1.1
+
+- placed the extensions.d.ts file in the root directory so that vscode recognizes css files, images, html, among others, as modules.
+
 # v3.1.0
 
 ## Breaking changes
