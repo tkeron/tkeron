@@ -1,3 +1,7 @@
+# v3.2.1
+
+- removed path entry to @tkeron.
+
 # v3.2.0
 
 ## Breaking changes

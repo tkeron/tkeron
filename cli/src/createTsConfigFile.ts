@@ -14,7 +14,6 @@ export const createTsConfigFile = async () => {
         "skipLibCheck": true,
         "paths": {
             "@comps": [
-                "./.tkeron/comps",
                 "./${sourceDir}/comps",
             ],
             "@tkeron": [
