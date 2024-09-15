@@ -3,4 +3,5 @@ coverage
 front
 web
 dist
+local_test
 

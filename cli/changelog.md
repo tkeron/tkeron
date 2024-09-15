@@ -1,3 +1,11 @@
+# v3.3.0
+
+- update tkeron lilbrary
+    - Add and remove classes
+    - Refactor for quick "div" creation
+    - Add a simple CSS reset
+
+
 # v3.2.1
 
 - removed path entry to @tkeron.

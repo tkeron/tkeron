@@ -1,6 +1,7 @@
 import { appendIn } from "./appendIn";
 import { setAttribute } from "./setAttribute";
 import { setHtml, setText } from "./setHtml_setText";
+import { addClass, removeClass } from "./addClass_removeClass";
 
 export interface TkeronElement {
   htmlElement: HTMLElement;
@@ -12,6 +13,8 @@ export interface TkeronElement {
   setHtml: (html: string) => TkeronElement;
   setText: (text: string) => TkeronElement;
   setAttribute: (attribute: string, value: string) => TkeronElement;
+  addClass: (...className) => TkeronElement;
+  removeClass: (...className) => TkeronElement;
 }
 
 export interface TkeronElementArguments {
@@ -19,14 +22,20 @@ export interface TkeronElementArguments {
   childs: TkeronElement[];
 }
 
-export const tk = (
+export type TkeronElementConstructor = (
   args?: Partial<TkeronElementArguments> | string
+) => TkeronElement;
+
+export type TkeronElementAuto = TkeronElement & TkeronElementConstructor;
+
+export const tk = <TkeronElementAuto>((
+  tagOrArgs?: Partial<TkeronElementArguments> | string
 ): TkeronElement => {
-  if (!args) args = {};
+  if (!tagOrArgs) tagOrArgs = {};
 
-  let { tag, childs } = typeof args === "object" ? args : <any>{};
+  let { tag, childs } = typeof tagOrArgs === "object" ? tagOrArgs : <any>{};
 
-  if (typeof args === "string") tag = args;
+  if (typeof tagOrArgs === "string") tag = tagOrArgs;
 
   if (!tag) tag = "div";
 
@@ -39,6 +48,8 @@ export const tk = (
   setHtml(com);
   setText(com);
   setAttribute(com);
+  addClass(com);
+  removeClass(com);
 
   if (childs)
     for (const child of childs) {
@@ -46,4 +57,20 @@ export const tk = (
     }
 
   return com;
-};
+});
+
+for (const attribute of [
+  "htmlElement",
+  "appendIn",
+  "setHtml",
+  "setText",
+  "setAttribute",
+  "addClass",
+  "removeClass",
+]) {
+  Object.defineProperty(tk, attribute, {
+    get() {
+      return tk()[attribute];
+    },
+  });
+}
