@@ -1,24 +1,78 @@
-# Tkeron: Simple TypeScript Framework for Frontend Development
+# Tkeron
 
-Tkeron is a lightweight and user-friendly frontend development framework designed for web development with TypeScript. Whether you're building a single-page application (SPA) or a traditional static site, Tkeron simplifies the process with its straightforward approach.
+Micro framework for developing web user interfaces with typescript.
 
-## Features
+- Create web interfaces with typescript without configuration.
+- Take advantage of hot reloading to see your changes as you go.
+- Start your project faster, compile faster than other frameworks (thanks to esbuild).
+- Create pre-rendered components or pages.
 
-- **Ease of Use:** Tkeron is incredibly easy to use, making it an ideal choice for developers at any skill level.
-- **Hot Reload:** Experience seamless development with hot reload functionality, allowing instant updates while editing your code.
-- **Component Library:** Tkeron provides a library for creating interfaces with reusable and customizable components.
-- **SPA or Traditional Sites:** Choose between building a modern single-page application or a traditional static site according to your project's requirements.
-- **Precompiled Pages and Components:** Effortlessly create precompiled pages or components, enhancing performance and speeding up load times.
-- **No New Language or Syntax:** Stick to familiar languages—TypeScript, HTML, and CSS—without the need to learn new syntax or languages.
+![tkeron example](./assets/tkexample.gif)
 
+**How to use**
 
 ---
 
-## Monorepo Structure
+- Install tkeron globally
 
-Tkeron is organized as a monorepository, allowing for a unified development and version control process across its various modules and components.
+```bash
+npm i -g tkeron
+```
 
-The monorepo is structured to host multiple packages, each of which serves a specific purpose within the Tkeron ecosystem. Each package in its own directory in the root.
+---
 
-Actions are executed on every package directory change.
+- Enter in your project directory and run:
 
+```bash
+tkeron init
+```
+
+This will create a blank project in the "front" directory.
+
+---
+
+- To build the html file run this:
+
+```bash
+tkeron build
+```
+
+This will transpile the project in the directory "web"
+
+---
+
+- To run in your browser:
+
+```bash
+tkeron dev
+```
+
+This command will create a server on port 5000 for the "web" directory and will observe the file change in the "front" directory.
+
+---
+
+- to create a page use this:
+
+```bash
+tkeron generate page index
+```
+
+or its short version:
+
+```bash
+tk g p index
+```
+
+---
+
+- to create a component use this:
+
+```bash
+tkeron generate component my/button
+```
+
+or its short version:
+
+```bash
+tk g c my/button
+```

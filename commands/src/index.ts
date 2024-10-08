@@ -1,1 +1,0 @@
-export { getCommands } from "./getCommandsFuncs";

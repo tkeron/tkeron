@@ -3,8 +3,6 @@ on:
   push:
     branches: 
       - master
-    paths:
-      - 'cli/**' 
 
 jobs:
   build:
@@ -18,7 +16,6 @@ jobs:
           
       - name: test and publish
         run: |
-          cd cli
           npm i
           npm run build
           npm test
