@@ -1,3 +1,9 @@
+# v3.4.0
+
+- update tkeron library
+    - Add childs property
+    - Add "addChilds" method
+
 # v3.3.0
 
 - update tkeron lilbrary
