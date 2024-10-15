@@ -2,6 +2,7 @@ import { appendIn } from "./appendIn";
 import { setAttribute } from "./setAttribute";
 import { setHtml, setText } from "./setHtml_setText";
 import { addClass, removeClass } from "./addClass_removeClass";
+import { addChilds } from "./addChilds";
 
 export interface TkeronElement {
   htmlElement: HTMLElement;
@@ -15,6 +16,8 @@ export interface TkeronElement {
   setAttribute: (attribute: string, value: string) => TkeronElement;
   addClass: (...className) => TkeronElement;
   removeClass: (...className) => TkeronElement;
+  childs: TkeronElement[];
+  addChilds: (...childs: TkeronElement[]) => TkeronElement;
 }
 
 export interface TkeronElementArguments {
@@ -41,6 +44,7 @@ export const tk = <TkeronElementAuto>((
 
   const com = <TkeronElement>{
     htmlElement: document.createElement(tag),
+    childs: childs || [],
   };
 
   //init chaining methods
@@ -50,9 +54,11 @@ export const tk = <TkeronElementAuto>((
   setAttribute(com);
   addClass(com);
   removeClass(com);
+  addChilds(com);
 
   if (childs)
     for (const child of childs) {
+      com.childs.push(child);
       com.htmlElement.appendChild(child.htmlElement);
     }
 
@@ -67,6 +73,8 @@ for (const attribute of [
   "setAttribute",
   "addClass",
   "removeClass",
+  "childs",
+  "addChilds"
 ]) {
   Object.defineProperty(tk, attribute, {
     get() {
