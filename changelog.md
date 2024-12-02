@@ -1,3 +1,9 @@
+# v3.5.0
+
+- update page and component items
+- update tsconfig
+- upgrade and fix dependencies
+
 # v3.4.0
 
 - update tkeron library
