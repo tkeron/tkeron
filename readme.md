@@ -1,78 +1,69 @@
-# Tkeron
+# tkeron
 
-Micro framework for developing web user interfaces with typescript.
+**tkeron** is a lightweight microframework designed to streamline web development with TypeScript. Its key features include:
 
-- Create web interfaces with typescript without configuration.
-- Take advantage of hot reloading to see your changes as you go.
-- Start your project faster, compile faster than other frameworks (thanks to esbuild).
-- Create pre-rendered components or pages.
+- **CLI for project initialization, page, and component creation.**
+- **Simple library for component management**, using functions instead of classes.
+- **Exclusive use of TypeScript, HTML, and CSS**, without additional configurations or new syntax.
+- **'No magic' philosophy**, where behavior is always explicit and controlled by the developer.
 
-![tkeron example](./assets/tkexample.gif)
+## Main Features
 
-**How to use**
+- **Zero Configuration:** Start developing without any additional setup.
+- **TypeScript Based:** Leverage language features without learning new syntax.
+- **Simplicity:** Easy to understand, focusing on clarity and minimal functionality.
+- **Pre-rendering:** Built-in support for static content.
+- **Hot Reloading:** Real-time changes during development with the `tk dev` command.
 
----
+## Installation
 
-- Install tkeron globally
+Install **tkeron** globally using npm:
 
 ```bash
 npm i -g tkeron
 ```
 
----
+## Usage
 
-- Enter in your project directory and run:
+Here are some basic examples of how to use the tkeron CLI:
 
-```bash
-tkeron init
-```
-
-This will create a blank project in the "front" directory.
-
----
-
-- To build the html file run this:
+- **Initialize a new project:**
 
 ```bash
-tkeron build
+tk init
 ```
 
-This will transpile the project in the directory "web"
-
----
-
-- To run in your browser:
+- **Create a new page:**
 
 ```bash
-tkeron dev
+tk g p <name>
 ```
 
-This command will create a server on port 5000 for the "web" directory and will observe the file change in the "front" directory.
+Example: `tk g p index` would create an initial page.
 
----
+**Each page generates the following files:**
 
-- to create a page use this:
+- **.html** for the page structure.
+- **.css** for styling.
+- **.page.ts** for client-side logic.
+- **.back.ts** for server-side pre-rendering.
 
-```bash
-tkeron generate page index
-```
+## Requirements
 
-or its short version:
+- Node.js (currently required).
+- Future plans for migrate to Bun.
 
-```bash
-tk g p index
-```
+## Differentiators
 
----
+**tkeron** stands out for its focus on simplicity, eliminating complex setups and allowing developers to concentrate solely on coding.
 
-- to create a component use this:
+## Contributions
 
-```bash
-tkeron generate component my/button
-```
+Contributions are welcome! Developers can open issues or submit pull requests at [GitHub](https://github.com/tkeron/tkeron).
 
-or its short version:
+## Current Status
 
-```bash
-tk g c my/button
-```
+The project is actively being developed. Roadmap details include:
+
+- Future integration of its own DOM package.
+- Full compatibility with Bun.
