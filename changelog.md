@@ -1,3 +1,7 @@
+# v3.6.0
+
+- the "from" method was added to the TkeronElement
+
 # v3.5.0
 
 - update page and component items

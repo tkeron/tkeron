@@ -3,9 +3,10 @@ import { setAttribute } from "./setAttribute";
 import { setHtml, setText } from "./setHtml_setText";
 import { addClass, removeClass } from "./addClass_removeClass";
 import { addChilds } from "./addChilds";
+import { from } from "./from";
 
 export interface TkeronElement {
-  htmlElement: HTMLElement;
+  htmlElement: HTMLElement | Element;
   appendIn: {
     body: TkeronElement;
     head: TkeronElement;
@@ -18,6 +19,7 @@ export interface TkeronElement {
   removeClass: (...className) => TkeronElement;
   childs: TkeronElement[];
   addChilds: (...childs: TkeronElement[]) => TkeronElement;
+  from: (querySelector: string) => TkeronElement;
 }
 
 export interface TkeronElementArguments {
@@ -41,10 +43,11 @@ export const tk = <TkeronElementAuto>((
   if (typeof tagOrArgs === "string") tag = tagOrArgs;
 
   if (!tag) tag = "div";
+  if (!childs) childs = [];
 
   const com = <TkeronElement>{
+    childs,
     htmlElement: document.createElement(tag),
-    childs: childs || [],
   };
 
   //init chaining methods
@@ -55,10 +58,11 @@ export const tk = <TkeronElementAuto>((
   addClass(com);
   removeClass(com);
   addChilds(com);
+  from(com);
 
   if (childs)
     for (const child of childs) {
-      com.childs.push(child);
+      // com.childs.push(child);
       com.htmlElement.appendChild(child.htmlElement);
     }
 
@@ -74,7 +78,8 @@ for (const attribute of [
   "addClass",
   "removeClass",
   "childs",
-  "addChilds"
+  "addChilds",
+  "from"
 ]) {
   Object.defineProperty(tk, attribute, {
     get() {
