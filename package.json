@@ -1,11 +1,19 @@
 {
   "name": "tkeron",
-  "module": "index.ts",
+  "version": "4.0.0",
+  "module": "module.ts",
+  "bin": {
+    "tkeron": "index.ts",
+    "tk": "index.ts"
+  },
   "type": "module",
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@tkeron/commands": "^0.3.0"
   }
 }
