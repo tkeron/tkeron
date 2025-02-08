@@ -6,7 +6,7 @@ import { addChilds } from "./addChilds";
 import { from } from "./from";
 
 export interface TkeronElement {
-  htmlElement: HTMLElement | Element;
+  htmlElement: HTMLElement;
   appendIn: {
     body: TkeronElement;
     head: TkeronElement;
@@ -79,7 +79,7 @@ for (const attribute of [
   "removeClass",
   "childs",
   "addChilds",
-  "from"
+  "from",
 ]) {
   Object.defineProperty(tk, attribute, {
     get() {
