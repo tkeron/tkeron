@@ -1,3 +1,7 @@
+# v3.6.3
+
+- update esbuild version
+
 # v3.6.0
 
 - the "from" method was added to the TkeronElement
