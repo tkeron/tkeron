@@ -4,6 +4,7 @@ import { setHtml, setText } from "./setHtml_setText";
 import { addClass, removeClass } from "./addClass_removeClass";
 import { addChilds } from "./addChilds";
 import { from } from "./from";
+import { with_ } from "./with";
 
 export interface TkeronElement {
   htmlElement: HTMLElement;
@@ -20,6 +21,7 @@ export interface TkeronElement {
   childs: TkeronElement[];
   addChilds: (...childs: TkeronElement[]) => TkeronElement;
   from: (querySelector: string) => TkeronElement;
+  with: (fn: (com: TkeronElement) => void) => TkeronElement;
 }
 
 export interface TkeronElementArguments {
@@ -59,6 +61,7 @@ export const tk = <TkeronElementAuto>((
   removeClass(com);
   addChilds(com);
   from(com);
+  with_(com);
 
   if (childs)
     for (const child of childs) {

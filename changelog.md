@@ -1,3 +1,7 @@
+# v3.7.0
+
+- add "with" to tkeron library to handle the component on loaded document
+
 # v3.6.3
 
 - update esbuild version
