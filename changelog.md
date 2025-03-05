@@ -1,3 +1,7 @@
+# v3.7.1
+
+- add mp3 to loader files
+
 # v3.7.0
 
 - add "with" to tkeron library to handle the component on loaded document

@@ -6,6 +6,7 @@ export const buildLoaders = {
   ".gif": "file" as Loader,
   ".ico": "file" as Loader,
   ".webp": "file" as Loader,
+  ".mp3": "file" as Loader,
   ".svg": "file" as Loader,
   ".js": "file" as Loader,
   ".css": "text" as Loader,

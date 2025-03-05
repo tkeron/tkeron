@@ -8,12 +8,14 @@ describe("buildLoaders", () => {
       ".gif",
       ".ico",
       ".webp",
+      ".mp3",
       ".svg",
       ".js",
       ".css",
       ".html",
     ];
     const expectedValues = [
+      "file",
       "file",
       "file",
       "file",
@@ -36,6 +38,7 @@ describe("buildLoaders", () => {
         declare module '*.ico';
         declare module '*.jpg';
         declare module '*.js';
+        declare module '*.mp3';
         declare module '*.png';
         declare module '*.svg';
         declare module '*.webp';
