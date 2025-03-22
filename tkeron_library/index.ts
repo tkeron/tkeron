@@ -8,6 +8,11 @@ import { settings } from "./settings";
 export const addCss = (css: string) => {
   tk({ tag: "style" }).setHtml(css).appendIn.head;
 };
+export const addScript = (fn: CallableFunction) => {
+  tk("script").setHtml(`
+    (${fn})();
+      `).appendIn.body;
+};
 
 export const addCssReset = () => {
   addCss(`

@@ -1,3 +1,7 @@
+# v3.8.0
+
+- add addScript to send code to the web browser in pre rendered components
+
 # v3.7.1
 
 - add mp3 to loader files
