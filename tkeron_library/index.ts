@@ -9,6 +9,29 @@ export const addCss = (css: string) => {
   tk({ tag: "style" }).setHtml(css).appendIn.head;
 };
 
+/**
+ * 
+ * @param fn any sync or async function that will be called in web browser
+ * 
+ * @example 
+ * ```typescript
+ * const div = tk.addClass("my-component");
+ * // I want this component to change its background to orange when user clicks on it.
+ * const setBgOrange = () => {
+ *    const div = tk.from(".my-component");
+ *    div.htmlElement.addEventListener("click", () => {
+ *      div.htmlElement.style.background = "#f60";
+ *    });
+ * };
+ * addScript(setBgOrange);
+ * ```
+ */
+export const addScript = (fn: CallableFunction) => {
+  tk("script").setHtml(`
+    (${fn})();
+      `).appendIn.body;
+};
+
 export const addCssReset = () => {
   addCss(`
       * {
