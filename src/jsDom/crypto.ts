@@ -34,7 +34,7 @@ export const getRandomValues = (
     | Uint32Array
     | Float32Array
     | Float64Array
-    | Uint8ClampedArray,
+    | Uint8ClampedArray
 ) => {
   const type = getType(a);
   if (!allowed.includes(type)) throw DOMException.NOT_SUPPORTED_ERR;
@@ -46,5 +46,5 @@ export const getRandomValues = (
 
 export const ext_crypto = (window: DOMWindow) => {
   //@ts-ignore
-  window.crypto = { getRandomValues };
+  window.crypto.getRandomValues = getRandomValues;
 };
