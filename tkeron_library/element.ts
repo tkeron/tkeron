@@ -30,13 +30,13 @@ export interface TkeronElementArguments {
 }
 
 export type TkeronElementConstructor = (
-  args?: Partial<TkeronElementArguments> | string
+  args?: Partial<TkeronElementArguments> | string,
 ) => TkeronElement;
 
 export type TkeronElementAuto = TkeronElement & TkeronElementConstructor;
 
 export const tk = <TkeronElementAuto>((
-  tagOrArgs?: Partial<TkeronElementArguments> | string
+  tagOrArgs?: Partial<TkeronElementArguments> | string,
 ): TkeronElement => {
   if (!tagOrArgs) tagOrArgs = {};
 

@@ -10,10 +10,10 @@ export const addCss = (css: string) => {
 };
 
 /**
- * 
+ *
  * @param fn any sync or async function that will be called in web browser
- * 
- * @example 
+ *
+ * @example
  * ```typescript
  * const div = tk.addClass("my-component");
  * // I want this component to change its background to orange when user clicks on it.

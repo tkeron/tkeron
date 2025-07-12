@@ -25,7 +25,7 @@ export const appendIn = (com: TkeronElement) => {
     get() {
       if (!settings.loaded) {
         settings.runOnLoad.push(() =>
-          document.body.appendChild(com.htmlElement)
+          document.body.appendChild(com.htmlElement),
         );
         return com;
       }
@@ -37,7 +37,7 @@ export const appendIn = (com: TkeronElement) => {
     get() {
       if (!settings.loaded) {
         settings.runOnLoad.push(() =>
-          document.head.appendChild(com.htmlElement)
+          document.head.appendChild(com.htmlElement),
         );
         return com;
       }
