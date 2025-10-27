@@ -1,19 +1,32 @@
 # tkeron
 
-**tkeron** is a lightweight microframework designed to streamline web development with TypeScript. Its key features include:
+⚠️ **v4.0.0-alpha.1 - Early Alpha Release**
 
-- **CLI for project initialization, page, and component creation.**
-- **Simple library for component management**, using functions instead of classes.
-- **Exclusive use of TypeScript, HTML, and CSS**, without additional configurations or new syntax.
-- **'No magic' philosophy**, where behavior is always explicit and controlled by the developer.
+This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
+**Currently only basic build functionality is available.** More features coming soon.
 
-## Main Features
+---
 
-- **Zero Configuration:** Start developing without any additional setup.
-- **TypeScript Based:** Leverage language features without learning new syntax.
-- **Simplicity:** Easy to understand, focusing on clarity and minimal functionality.
-- **Pre-rendering:** Built-in support for static content.
-- **Hot Reloading:** Real-time changes during development with the `tk dev` command.
+**tkeron** is a lightweight microframework for web development with TypeScript, focused on:
+
+- **Simplicity:** Exclusive use of TypeScript, HTML, and CSS, without additional configurations or new syntax.
+- **'No magic' philosophy:** Behavior is always explicit and controlled by the developer.
+- **Bun-powered:** Fast builds and modern tooling.
+
+## What's Available Now (v4 Alpha)
+
+- ✅ **Build command:** Bundle TypeScript and process HTML files
+  ```bash
+  tk build <sourceDir> <targetDir>
+  ```
+
+## What's Coming
+
+- 🚧 Project initialization (`tk init`)
+- 🚧 Page and component generators  
+- 🚧 Dev server with hot reloading
+- 🚧 Pre-rendering capabilities
+- 🚧 Component management library
 
 ## Installation
 
@@ -23,47 +36,8 @@ Install **tkeron** globally using npm:
 npm i -g tkeron
 ```
 
-## Usage
+**Requirements:** Bun runtime (Node.js support coming later)
 
-Here are some basic examples of how to use the tkeron CLI:
+## Example
 
-- **Initialize a new project:**
-
-```bash
-tk init
-```
-
-- **Create a new page:**
-
-```bash
-tk g p <name>
-```
-
-Example: `tk g p index` would create an initial page.
-
-**Each page generates the following files:**
-
-- **.html** for the page structure.
-- **.css** for styling.
-- **.page.ts** for client-side logic.
-- **.back.ts** for server-side pre-rendering.
-
-## Requirements
-
-- Node.js (currently required).
-- Future plans for migrate to Bun.
-
-## Differentiators
-
-**tkeron** stands out for its focus on simplicity, eliminating complex setups and allowing developers to concentrate solely on coding.
-
-## Contributions
-
-Contributions are welcome! Developers can open issues or submit pull requests at [GitHub](https://github.com/tkeron/tkeron).
-
-## Current Status
-
-The project is actively being developed. Roadmap details include:
-
-- Future integration of its own DOM package.
-- Full compatibility with Bun.
+See the `examples/basic_build` directory for a working example.
