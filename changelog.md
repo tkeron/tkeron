@@ -1,3 +1,18 @@
+# v4.0.0-alpha.1
+
+## ⚠️ Alpha Release - Work in Progress
+
+Complete rewrite from v3. Migration from Node.js to Bun runtime.
+Only basic build functionality is available.
+
+## Changes
+- Add `build` command with TypeScript bundling and minification
+- Migration to Bun runtime (replacing Node.js)
+- Add `@tkeron/tools` dependency
+- Update `@tkeron/commands` to 0.3.1
+- Update tsconfig with DOM types
+- Include basic build example
+
 # v3.8.0
 
 - add addScript to send code to the web browser in pre rendered components
