@@ -1,6 +1,6 @@
 import { normalize } from "path";
 
-export const buildFile = async (filePaths: string[], root: string) => {
+export const buildEntrypoints = async (filePaths: string[], root: string) => {
   const { outputs, success } = await Bun.build({
     entrypoints: filePaths,
     minify: true,

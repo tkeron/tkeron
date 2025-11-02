@@ -1,6 +1,5 @@
-import { getPaths } from "@tkeron/tools";
-import { resolve, join, dirname } from "path";
-import { buildFile } from "./buildFile";
+import { resolve, dirname } from "path";
+import { buildDir } from "./buildDir";
 
 export interface BuildOptions {
     sourceDir?: string;
@@ -13,13 +12,7 @@ export const build = async (options: BuildOptions) => {
         ? await resolve(options.targetDir)
         : await resolve(dirname(source), "webout");
 
-    const htmlFiles = await getPaths(source, "**/*.html", "no", true);
-
-    const files = await buildFile(htmlFiles, source);
-
-    for (const a of files?.artifacts || []) {
-        await Bun.write(join(target, a.pathR), a.artifact, { createPath: true });
-    }
+    await buildDir(source, target);
 
 };
 
