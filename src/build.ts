@@ -1,5 +1,6 @@
 import { resolve, dirname } from "path";
 import { buildDir } from "./buildDir";
+import { rm, exists } from "fs/promises";
 
 export interface BuildOptions {
     sourceDir?: string;
@@ -11,6 +12,10 @@ export const build = async (options: BuildOptions) => {
     const target = options.targetDir
         ? await resolve(options.targetDir)
         : await resolve(dirname(source), "webout");
+
+    if (await exists(target)) {
+        await rm(target, { recursive: true, force: true });
+    }
 
     await buildDir(source, target);
 
