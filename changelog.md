@@ -1,3 +1,35 @@
+# v4.0.0-alpha.3
+
+## New Features
+- Add `.pre.ts` preprocessing system for HTML manipulation before build
+  - Manipulate DOM with TypeScript before final build
+  - Support for `querySelector`, `setAttribute`, and other DOM methods
+  - Automatic execution of `.pre.ts` files during build process
+- Add `processPre` module for handling `.pre.ts` files
+- Use temporary directories with UUID for isolated builds
+- Automatic cleanup of temporary directories after build
+
+## Improvements
+- Use `crypto.randomUUID()` for unique temporary directory names
+- Use `fs.cp()` for efficient recursive directory copying
+- Use `Bun.spawn()` for isolated `.pre.ts` execution
+- Add `with_pre` example demonstrating preprocessing capabilities
+
+## Testing
+- Add snapshot tests for build examples
+- Add `examples.test.ts` with snapshot validation
+- Change test syntax from `test` to `it` (BDD style)
+- Use `import.meta.dir` instead of `process.cwd()` (Bun native)
+- Use `getFilePaths` from `@tkeron/tools` for recursive file operations
+- Add snapshot for `with_pre` example
+
+## Dependencies
+- Update `@tkeron/html-parser` with `setAttribute` and `outerHTML` synchronization fix
+
+# v4.0.0-alpha.2
+
+(Previous changes)
+
 # v4.0.0-alpha.1
 
 ## ⚠️ Alpha Release - Work in Progress

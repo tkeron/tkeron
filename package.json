@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "4.0.0-alpha.2",
+  "version": "4.0.0-alpha.3",
   "description": "CLI tool and micro framework for developing web user interfaces with TypeScript.",
   "type": "module",
   "bin": {
@@ -13,13 +13,14 @@
     "lint": "prettier --write .",
     "sample1": "bun . build examples/basic_build/src",
     "sample2": "bun . build examples/with_assets/src",
-    "build_examples": "npm run sample1 && npm run sample2"
+    "sample3": "bun . build examples/with_pre/src",
+    "build_examples": "npm run sample1 && npm run sample2 && npm run sample3"
   },
   "author": "tkeron",
   "license": "MIT",
   "dependencies": {
     "@tkeron/commands": "0.3.1",
-    "@tkeron/html-parser": "^0.1.0",
+    "@tkeron/html-parser": "^0.1.1",
     "@tkeron/tools": "^0.2.2"
   },
   "devDependencies": {

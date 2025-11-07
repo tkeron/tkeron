@@ -18,7 +18,7 @@
   "packages": {
     "@tkeron/commands": ["@tkeron/commands@0.3.1", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-b7YpdpwVrq8dwnvztpFYCNhjYjiQhX5xix1XXL1Dvt2oHcWiZ3RnG/6yzH0woL3Vbc7shpRNfIexlxmtEkhnIQ=="],
 
-    "@tkeron/html-parser": ["@tkeron/html-parser@0.1.0", "", { "peerDependencies": { "typescript": "^5.8.3" } }, "sha512-5ShK6c5JnRJb1M6SwuHqMQ+3ka7Lqc24xrzIcxI69pxBlex5zr16J0lWtbLlC6HCrt5fRl79oKPwJqmK6ojGzQ=="],
+    "@tkeron/html-parser": ["@tkeron/html-parser@0.1.1", "", { "peerDependencies": { "typescript": "^5.8.3" } }, "sha512-Ot+Mb0gT7zEjXoB5dyfUczFcqrEwKz3vkF6RZPcfVkQgcsHb1xHm1lmyGSm/GWT52g+KZlMzVHbq5S0vyOAVLw=="],
 
     "@tkeron/tools": ["@tkeron/tools@0.2.2", "", { "peerDependencies": { "typescript": "^5.7.3" } }, "sha512-DaS1bMiJnmrTJ1QBeYvI0CMDADPHArRj+bwI5FDp3ohgWrnXwK22vbDfqf4dyhqBUSGjdx5N7t/L2UZ8XLc1hg=="],
 

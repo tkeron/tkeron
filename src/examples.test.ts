@@ -10,6 +10,7 @@ describe("Examples Build Snapshots", () => {
   const examples = [
     { name: "basic_build", src: "basic_build/src", out: "basic_build/webout" },
     { name: "with_assets", src: "with_assets/src", out: "with_assets/webout" },
+    { name: "with_pre", src: "with_pre/src", out: "with_pre/webout" },
   ];
 
   // Helper function to read all files recursively from a directory

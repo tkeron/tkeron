@@ -1,6 +1,6 @@
 # tkeron
 
-⚠️ **v4.0.0-alpha.1 - Early Alpha Release**
+⚠️ **v4.0.0-alpha.3 - Early Alpha Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
 **Currently only basic build functionality is available.** More features coming soon.
@@ -18,13 +18,21 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
 - ✅ **Build command:** Bundle TypeScript and process HTML files
   ```bash
   tk build <sourceDir> <targetDir>
+  # or using alias
+  tk b <sourceDir>
   ```
+  
+- ✅ **Pre-processing with `.pre.ts` files:** Manipulate HTML programmatically before build
+  - Use TypeScript to modify DOM elements
+  - Generate dynamic content
+  - Process data and inject into HTML
+  - Full DOM manipulation with `@tkeron/html-parser`
 
 ## What's Coming
 
 - 🚧 Project initialization (`tk init`)
 - 🚧 Page and component generators  
-- 🚧 Dev server with hot reloading
+- 🚧 Dev server with hot reloading (`tk dev`)
 - 🚧 Pre-rendering capabilities
 - 🚧 Component management library
 
@@ -38,6 +46,33 @@ npm i -g tkeron
 
 **Requirements:** Bun runtime (Node.js support coming later)
 
-## Example
+## Examples
 
-See the `examples/basic_build` directory for a working example.
+The `examples/` directory contains three working examples:
+
+- **`basic_build/`** - Simple TypeScript + HTML project
+- **`with_assets/`** - Project with nested directories and assets
+- **`with_pre/`** - Demonstrates `.pre.ts` preprocessing capabilities
+
+### Using `.pre.ts` Files
+
+Create `.pre.ts` files alongside your HTML files to manipulate them programmatically before the build:
+
+```typescript
+// section/index.pre.ts
+const img = <HTMLImageElement>document.querySelector('.my-image');
+img.setAttribute('src', './generated-image.png');
+```
+
+The `.pre.ts` file:
+- Has access to a `document` global representing the HTML file
+- Can use `querySelector`, `setAttribute`, and other DOM methods
+- Runs before the final build, modifying the HTML output
+- Can generate HTML files if no corresponding `.html` exists
+
+This enables powerful use cases like:
+- Generating lists from data files
+- Creating sitemaps automatically
+- Injecting build timestamps
+- Processing markdown to HTML
+- Dynamic component generation
