@@ -1,4 +1,4 @@
-import { describe, test, expect, afterAll } from "bun:test";
+import { describe, it, expect, afterAll } from "bun:test";
 import { build } from "./build";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
@@ -15,7 +15,7 @@ describe("build", () => {
     }
   });
 
-  test("should build HTML with TypeScript and inject bundled script", async () => {
+  it("should build HTML with TypeScript and inject bundled script", async () => {
     mkdirSync(TEST_SRC, { recursive: true });
     const htmlContent = `<!DOCTYPE html>
 <html>
