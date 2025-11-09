@@ -20,6 +20,12 @@ describe("Examples Build Snapshots", () => {
 
     for (const fullPath of filePaths) {
       const relativePath = fullPath.substring(dir.length + 1).replace(/\\/g, '/');
+      
+      // Only include generated files (HTML and JS) to avoid snapshot issues with binary files
+      if (!/\.(html|js)$/i.test(relativePath)) {
+        continue;
+      }
+      
       const content = readFileSync(fullPath, "utf-8");
       files[relativePath] = content;
     }
