@@ -24,8 +24,8 @@
     "@tkeron/tools": "^0.2.2"
   },
   "devDependencies": {
-    "@types/bun": "^1.3.2",
-    "prettier": "^3.6.2",
+    "@types/bun": "^1.3.4",
+    "prettier": "^3.7.4",
     "typescript": "^5.9.3"
   },
   "keywords": [
