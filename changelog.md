@@ -1,3 +1,20 @@
+# v4.0.0-alpha.4
+
+## New Features
+- Add `develop` command for development server with hot reload
+  - Live server with automatic rebuild on file changes
+  - File system watcher using native `fs.watch`
+  - Serves files from output directory
+  - Returns `DevelopServer` interface with `stop()` method for cleanup
+- Add `develop.ts` module with `TkeronDevOptions` interface
+
+## Testing
+- Add integration tests for `develop` command
+- Add `develop.test.ts` with E2E tests
+- Implement polling-based assertions for more reliable tests
+- Add console.log spy for verifying server messages
+- Tests run ~12x faster (0.18s vs 2s) with active polling
+
 # v4.0.0-alpha.3
 
 ## New Features

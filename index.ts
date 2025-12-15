@@ -1,8 +1,8 @@
 import { getCommands } from "@tkeron/commands";
 import { build } from "./src/build";
+import { develop } from "./develop";
 
 getCommands()
-
 
 
     .addCommand("build")
@@ -11,6 +11,20 @@ getCommands()
     .addPositionedArgument("sourceDir")
     .addPositionedArgument("targetDir")
     .setCallback(build)
+
+
+    .commands()
+
+
+    .addCommand("develop")
+    .addAlias("dev")
+    .addAlias("d")
+    .addDescription("Start development server")
+    .addPositionedArgument("sourceDir")
+    .addPositionedArgument("targetDir")
+    .addPositionedArgument("port")
+    .addPositionedArgument("host")
+    .setCallback(develop)
 
 
     .commands().start();

@@ -1,9 +1,9 @@
 # tkeron
 
-⚠️ **v4.0.0-alpha.3 - Early Alpha Release**
+⚠️ **v4.0.0-alpha.4 - Early Alpha Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
-**Currently only basic build functionality is available.** More features coming soon.
+**Core functionality available:** build system and development server. More features coming soon.
 
 ---
 
@@ -22,6 +22,17 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
   tk b <sourceDir>
   ```
   
+- ✅ **Development server with hot reload:**
+  ```bash
+  tk develop <sourceDir> <targetDir> <port> <host>
+  # or using aliases
+  tk dev <sourceDir>
+  tk d <sourceDir>
+  ```
+  - Live server with automatic rebuild on file changes
+  - File system watcher for instant updates
+  - Serves built files from output directory
+  
 - ✅ **Pre-processing with `.pre.ts` files:** Manipulate HTML programmatically before build
   - Use TypeScript to modify DOM elements
   - Generate dynamic content
@@ -32,7 +43,6 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
 
 - 🚧 Project initialization (`tk init`)
 - 🚧 Page and component generators  
-- 🚧 Dev server with hot reloading (`tk dev`)
 - 🚧 Pre-rendering capabilities
 - 🚧 Component management library
 

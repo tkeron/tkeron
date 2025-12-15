@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "4.0.0-alpha.3",
+  "version": "4.0.0-alpha.4",
   "description": "CLI tool and micro framework for developing web user interfaces with TypeScript.",
   "type": "module",
   "bin": {
