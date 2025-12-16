@@ -1,6 +1,6 @@
 import { resolve, dirname } from "path";
 import { watch } from "fs";
-import { build } from "./src/build";
+import { build } from "./build";
 
 export interface TkeronDevOptions {
   outputDir?: string;
@@ -8,6 +8,8 @@ export interface TkeronDevOptions {
   port?: number;
   host?: string;
 }
+
+const reloadClients = new Set<ReadableStreamDefaultController>();
 
 export interface DevelopServer {
   stop: () => void;
@@ -21,8 +23,8 @@ export const develop = async (
   const {
     port = 3000,
     host = "localhost",
-    outputDir = "webout",
     sourceDir = "websrc",
+    outputDir,
   } = options;
 
   const source = await resolve(sourceDir);
@@ -35,14 +37,48 @@ export const develop = async (
   console.log("✅ Build complete!");
 
   const server = Bun.serve({
+    development: true,
     port,
     hostname: host,
     async fetch(req) {
       const url = new URL(req.url);
+
+      if (url.pathname === "/dev-reload") {
+        let controller: ReadableStreamDefaultController;
+        const stream = new ReadableStream({
+          start(ctrl) {
+            controller = ctrl;
+            reloadClients.add(controller);
+            controller.enqueue("data: connected\n\n");
+          },
+          cancel() {
+            reloadClients.delete(controller);
+          },
+        });
+
+        return new Response(stream, {
+          headers: {
+            "Content-Type": "text/event-stream",
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+          },
+        });
+      }
+
       const filePath = url.pathname === "/" ? "/index.html" : url.pathname;
       const file = Bun.file(`${target}${filePath}`);
 
       if (await file.exists()) {
+        if (filePath.endsWith(".html")) {
+          const html = await file.text();
+          const injectedHtml = html.replace(
+            "</body>",
+            `<script>new EventSource('/dev-reload').onmessage=e=>{if(e.data==='reload')location.reload()}</script></body>`
+          );
+          return new Response(injectedHtml, {
+            headers: { "Content-Type": "text/html" },
+          });
+        }
         return new Response(file);
       }
 
@@ -61,6 +97,14 @@ export const develop = async (
         console.log("🔨 Rebuilding...");
         await build({ sourceDir: source, targetDir: target });
         console.log("✅ Build complete!");
+        
+        reloadClients.forEach((controller) => {
+          try {
+            controller.enqueue("data: reload\n\n");
+          } catch (e) {
+            reloadClients.delete(controller);
+          }
+        });
       }
     }
   );

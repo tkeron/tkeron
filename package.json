@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "4.0.0-alpha.4",
+  "version": "4.0.0-alpha.5",
   "description": "CLI tool and micro framework for developing web user interfaces with TypeScript.",
   "type": "module",
   "bin": {
@@ -8,7 +8,7 @@
     "tk": "./index.ts"
   },
   "scripts": {
-    "start": "bun run index.ts",
+    "tk": "bun index.ts ",
     "test": "bun test",
     "lint": "prettier --write .",
     "sample1": "bun . build examples/basic_build/src",

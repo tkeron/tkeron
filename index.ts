@@ -1,6 +1,7 @@
+#!/usr/bin/env bun
 import { getCommands } from "@tkeron/commands";
 import { build } from "./src/build";
-import { develop } from "./develop";
+import { develop } from "./src/develop";
 
 getCommands()
 

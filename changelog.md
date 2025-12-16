@@ -1,3 +1,17 @@
+# v4.0.0-alpha.5
+
+## Bug Fixes
+- Fix incorrect import path for develop module (moved from root to src/)
+- Add shebang to index.ts for proper CLI execution
+- Fix develop.test.ts import path after module reorganization
+- Update package.json script from "start" to "tk"
+
+## Improvements
+- Reorganize project structure: move develop.ts to src/ directory
+- Enhance hot reload with Server-Sent Events (SSE) implementation
+- Add automatic HTML injection for dev reload script
+- Improve reload client management with proper cleanup
+
 # v4.0.0-alpha.4
 
 ## New Features

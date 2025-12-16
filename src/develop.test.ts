@@ -2,7 +2,7 @@ import { it, expect, afterEach, beforeEach } from "bun:test";
 import { mkdir, writeFile, rm } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
-import { develop } from "../develop";
+import { develop } from "./develop";
 
 let testDir: string;
 let logs: string[];
