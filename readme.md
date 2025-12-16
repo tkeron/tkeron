@@ -1,17 +1,19 @@
 # tkeron
 
-⚠️ **v4.0.0-alpha.4 - Early Alpha Release**
+⚠️ **v4.0.0-alpha.6 - Early Alpha Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
-**Core functionality available:** build system and development server. More features coming soon.
+**Core functionality available:** build system, development server, and pre-rendering. More features coming soon.
 
 ---
 
-**tkeron** is a lightweight microframework for web development with TypeScript, focused on:
+**tkeron** is a CLI tool for web development with TypeScript that enables a backend-driven frontend approach:
 
-- **Simplicity:** Exclusive use of TypeScript, HTML, and CSS, without additional configurations or new syntax.
-- **'No magic' philosophy:** Behavior is always explicit and controlled by the developer.
-- **Bun-powered:** Fast builds and modern tooling.
+- **Build-time HTML generation:** Use TypeScript to generate static HTML during the build process
+- **Pre-rendering capabilities:** Manipulate and create HTML pages programmatically before deployment
+- **Simplicity:** Pure TypeScript, HTML, and CSS - no new syntax to learn
+- **'No magic' philosophy:** Explicit behavior controlled by the developer
+- **Bun-powered:** Fast builds and modern tooling
 
 ## What's Available Now (v4 Alpha)
 
@@ -33,18 +35,18 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
   - File system watcher for instant updates
   - Serves built files from output directory
   
-- ✅ **Pre-processing with `.pre.ts` files:** Manipulate HTML programmatically before build
+- ✅ **Pre-processing and pre-rendering with `.pre.ts` files:** 
+  - Generate complete HTML pages from TypeScript
+  - Manipulate existing HTML programmatically before build
   - Use TypeScript to modify DOM elements
-  - Generate dynamic content
-  - Process data and inject into HTML
+  - Generate dynamic content and inject data
   - Full DOM manipulation with `@tkeron/html-parser`
+  - Create pages without base HTML files (pure pre-rendering)
 
 ## What's Coming
 
 - 🚧 Project initialization (`tk init`)
-- 🚧 Page and component generators  
-- 🚧 Pre-rendering capabilities
-- 🚧 Component management library
+- 🚧 Page and component generators
 
 ## Installation
 
@@ -64,9 +66,9 @@ The `examples/` directory contains three working examples:
 - **`with_assets/`** - Project with nested directories and assets
 - **`with_pre/`** - Demonstrates `.pre.ts` preprocessing capabilities
 
-### Using `.pre.ts` Files
+### Using `.pre.ts` Files (Backend Pre-rendering)
 
-Create `.pre.ts` files alongside your HTML files to manipulate them programmatically before the build:
+Create `.pre.ts` files to generate or manipulate HTML during the **build process** (backend/build-time, not browser runtime):
 
 ```typescript
 // section/index.pre.ts
@@ -74,15 +76,20 @@ const img = <HTMLImageElement>document.querySelector('.my-image');
 img.setAttribute('src', './generated-image.png');
 ```
 
-The `.pre.ts` file:
-- Has access to a `document` global representing the HTML file
-- Can use `querySelector`, `setAttribute`, and other DOM methods
-- Runs before the final build, modifying the HTML output
-- Can generate HTML files if no corresponding `.html` exists
+**How `.pre.ts` files work:**
+- Execute at **build time** on the server/local machine (backend)
+- Have access to a `document` global representing the HTML file
+- Can use standard DOM APIs: `querySelector`, `setAttribute`, `createElement`, etc.
+- Output static `.html` files that get bundled
+- Can generate complete HTML pages without a corresponding `.html` file
+- You can use any npm packages or TypeScript libraries you want
 
-This enables powerful use cases like:
-- Generating lists from data files
-- Creating sitemaps automatically
-- Injecting build timestamps
-- Processing markdown to HTML
-- Dynamic component generation
+**Key concept:** `.pre.ts` is for generating static HTML at build time, not for browser interactivity. Use regular `.ts` files for client-side JavaScript.
+
+**Powerful use cases:**
+- Generate pages from data files (JSON, databases, APIs)
+- Create sitemaps and RSS feeds automatically
+- Inject build timestamps and environment variables
+- Process markdown to HTML
+- Generate static content from CMS or external sources
+- Build entire static sites programmatically

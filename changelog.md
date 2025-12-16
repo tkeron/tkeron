@@ -1,3 +1,17 @@
+# v4.0.0-alpha.6
+
+## Breaking Changes
+- Remove `tkeron_library/` from project - never used in alpha versions
+  - The UI library will be available as a separate package `@tkeron/ui` in the future
+  - Current focus: CLI build tool with pre-rendering capabilities
+  - No impact on existing users as the library was not documented or used in examples
+
+## Documentation
+- Clarify project concept: CLI tool for backend-driven frontend development
+- Update description to emphasize build-time HTML generation
+- Improve `.pre.ts` documentation with clearer backend vs frontend distinction
+- Remove "microframework" terminology - tkeron is a build tool
+
 # v4.0.0-alpha.5
 
 ## Bug Fixes

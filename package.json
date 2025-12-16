@@ -1,7 +1,7 @@
 {
   "name": "tkeron",
-  "version": "4.0.0-alpha.5",
-  "description": "CLI tool and micro framework for developing web user interfaces with TypeScript.",
+  "version": "4.0.0-alpha.6",
+  "description": "CLI tool for backend-driven frontend development with TypeScript.",
   "type": "module",
   "bin": {
     "tkeron": "./index.ts",
@@ -30,11 +30,12 @@
   },
   "keywords": [
     "cli",
-    "front-end",
+    "build-tool",
     "frontend",
     "typescript",
-    "web components",
-    "microframework"
+    "pre-rendering",
+    "static-site-generator",
+    "backend-driven"
   ],
   "repository": {
     "url": "git@github.com:tkeron/tkeron.git"
