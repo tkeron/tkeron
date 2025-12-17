@@ -1,3 +1,26 @@
+# v4.0.0-alpha.7
+
+## New Features
+- Add `.com.html` component system for HTML reusability
+  - Create reusable HTML components with `.com.html` files
+  - Custom elements (with hyphens) automatically replaced with component content
+  - Support for nested components
+  - Local component resolution: prioritizes components in same directory, falls back to root
+  - Circular dependency detection to prevent infinite loops
+  - Complete substitution: components replace the entire custom element (not just innerHTML)
+
+## Implementation Details
+- Integrated `processCom()` into build pipeline after `.pre.ts` processing
+- Uses `@tkeron/html-parser` for DOM manipulation
+- Filters `.com.html` files from final output
+- Normalizes DOCTYPE in HTML output for consistency
+
+## Testing
+- Add comprehensive test suite with 18 test cases in `processCom.test.ts`
+- Tests cover: basic substitution, nested components, circular dependencies, edge cases
+- Validates component resolution priority (local vs root)
+- Performance testing with 50+ components
+
 # v4.0.0-alpha.6
 
 ## Breaking Changes

@@ -1,9 +1,9 @@
 # tkeron
 
-⚠️ **v4.0.0-alpha.6 - Early Alpha Release**
+⚠️ **v4.0.0-alpha.7 - Early Alpha Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
-**Core functionality available:** build system, development server, and pre-rendering. More features coming soon.
+**Core functionality available:** build system, development server, pre-rendering, and HTML components. More features coming soon.
 
 ---
 
@@ -42,6 +42,12 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
   - Generate dynamic content and inject data
   - Full DOM manipulation with `@tkeron/html-parser`
   - Create pages without base HTML files (pure pre-rendering)
+
+- ✅ **HTML Components with `.com.html` files:**
+  - Create reusable HTML components
+  - Custom elements automatically replaced with component content
+  - Support for nested components
+  - Local and root component resolution
 
 ## What's Coming
 
@@ -93,3 +99,45 @@ img.setAttribute('src', './generated-image.png');
 - Process markdown to HTML
 - Generate static content from CMS or external sources
 - Build entire static sites programmatically
+
+### Using `.com.html` Files (HTML Components)
+
+Create reusable HTML components with `.com.html` files. Any custom element (tag with a hyphen) will be automatically replaced with the component's content during build:
+
+```html
+<!-- my-component.com.html -->
+<div class="my-component">
+  <h1>Component Title</h1>
+  <p>Reusable content</p>
+</div>
+```
+
+```html
+<!-- index.html -->
+<body>
+  <my-component></my-component>
+</body>
+```
+
+**Result after build:**
+```html
+<body>
+  <div class="my-component">
+    <h1>Component Title</h1>
+    <p>Reusable content</p>
+  </div>
+</body>
+```
+
+**Component features:**
+- **Complete substitution:** The component replaces the entire custom element tag
+- **Nested components:** Components can include other components
+- **Local resolution:** Components in the same directory take priority over root components
+- **No runtime overhead:** All substitution happens at build time
+- **Circular dependency detection:** Prevents infinite loops
+
+**Use cases:**
+- Reusable headers, footers, and navigation bars
+- Consistent UI elements across multiple pages
+- Building design systems with pure HTML
+- DRY principle for HTML structure

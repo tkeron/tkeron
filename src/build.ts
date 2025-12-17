@@ -2,6 +2,7 @@ import { resolve, dirname, join, relative } from "path";
 import { tmpdir } from "os";
 import { buildDir } from "./buildDir";
 import { processPre } from "./processPre";
+import { processCom } from "./processCom";
 import { rm, exists, mkdir, cp } from "fs/promises";
 
 export interface BuildOptions {
@@ -21,6 +22,8 @@ export const build = async (options: BuildOptions) => {
     await cp(source, tempDir, { recursive: true });
 
     await processPre(tempDir);
+
+    await processCom(tempDir);
 
     if (await exists(target)) {
         await rm(target, { recursive: true, force: true });

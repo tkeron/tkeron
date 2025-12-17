@@ -1,0 +1,517 @@
+import { describe, it, expect, afterAll, beforeEach } from "bun:test";
+import { processCom } from "./processCom";
+import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
+import { join } from "path";
+import { tmpdir } from "os";
+
+describe("processCom - Component substitution", () => {
+  const TEST_DIR = join(tmpdir(), `tkeron-com-test-${Date.now()}`);
+
+  beforeEach(() => {
+    if (existsSync(TEST_DIR)) {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+    mkdirSync(TEST_DIR, { recursive: true });
+  });
+
+  afterAll(() => {
+    if (existsSync(TEST_DIR)) {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  describe("Basic .com.html substitution", () => {
+    it("should replace custom element with .com.html content", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+</head>
+<body>
+  <my-component1></my-component1>
+</body>
+</html>`;
+
+      const componentHtml = `<h1>My comp title</h1>
+<img src="path/to/image.jpg" alt="image description" />
+<div>My comp text content....</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-component1.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain("<h1>My comp title</h1>");
+      expect(result).toContain('<img src="path/to/image.jpg" alt="image description"');
+      expect(result).toContain("<div>My comp text content....</div>");
+      expect(result).not.toContain("<my-component1>");
+    });
+
+    it("should replace component with wrapped content", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+</head>
+<body>
+  <my-component1></my-component1>
+</body>
+</html>`;
+
+      const componentHtml = `<div class="my-comp-class">
+  <h1>My comp title</h1>
+  <img src="path/to/image.jpg" alt="image description" />
+  <div>My comp text content....</div>
+</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-component1.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain('<div class="my-comp-class">');
+      expect(result).toContain("<h1>My comp title</h1>");
+      expect(result).not.toContain("<my-component1>");
+    });
+
+    it("should handle multiple instances of the same component", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-component1></my-component1>
+  <p>Some text</p>
+  <my-component1></my-component1>
+</body>
+</html>`;
+
+      const componentHtml = `<div class="comp">Content</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-component1.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      // Should have 2 instances of the component content
+      const matches = result.match(/<div class="comp">Content<\/div>/g);
+      expect(matches).toBeTruthy();
+      expect(matches?.length).toBe(2);
+      expect(result).not.toContain("<my-component1>");
+    });
+
+    it("should handle multiple different components", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <header-comp></header-comp>
+  <main-comp></main-comp>
+  <footer-comp></footer-comp>
+</body>
+</html>`;
+
+      const headerHtml = `<header><h1>Header</h1></header>`;
+      const mainHtml = `<main><p>Main content</p></main>`;
+      const footerHtml = `<footer><p>Footer</p></footer>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "header-comp.com.html"), headerHtml);
+      writeFileSync(join(TEST_DIR, "main-comp.com.html"), mainHtml);
+      writeFileSync(join(TEST_DIR, "footer-comp.com.html"), footerHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain("<header><h1>Header</h1></header>");
+      expect(result).toContain("<main><p>Main content</p></main>");
+      expect(result).toContain("<footer><p>Footer</p></footer>");
+      expect(result).not.toContain("<header-comp>");
+      expect(result).not.toContain("<main-comp>");
+      expect(result).not.toContain("<footer-comp>");
+    });
+  });
+
+  describe("Component with attributes", () => {
+    it("should replace self-closing component tags", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-component1 />
+</body>
+</html>`;
+
+      const componentHtml = `<div>Component content</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-component1.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain("<div>Component content</div>");
+      expect(result).not.toContain("<my-component1");
+    });
+
+    it("should ignore component attributes during substitution", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-component1 class="custom-class" id="my-id"></my-component1>
+</body>
+</html>`;
+
+      const componentHtml = `<div class="comp-class">Component</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-component1.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      // Component's own classes should be there, not the original element's
+      expect(result).toContain('<div class="comp-class">Component</div>');
+      expect(result).not.toContain("custom-class");
+      expect(result).not.toContain("my-id");
+    });
+  });
+
+  describe("Nested components", () => {
+    it("should handle components inside other components", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <outer-comp></outer-comp>
+</body>
+</html>`;
+
+      const outerHtml = `<div class="outer">
+  <h1>Outer</h1>
+  <inner-comp></inner-comp>
+</div>`;
+
+      const innerHtml = `<div class="inner">Inner content</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "outer-comp.com.html"), outerHtml);
+      writeFileSync(join(TEST_DIR, "inner-comp.com.html"), innerHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain('<div class="outer">');
+      expect(result).toContain('<div class="inner">Inner content</div>');
+      expect(result).not.toContain("<outer-comp>");
+      expect(result).not.toContain("<inner-comp>");
+    });
+  });
+
+  describe("Component not found", () => {
+    it("should leave element unchanged if no .com.html found", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <unknown-component></unknown-component>
+</body>
+</html>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      // Should remain unchanged
+      expect(result).toContain("<unknown-component></unknown-component>");
+    });
+
+    it("should handle mix of found and not-found components", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <found-comp></found-comp>
+  <not-found-comp></not-found-comp>
+</body>
+</html>`;
+
+      const foundHtml = `<div>Found</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "found-comp.com.html"), foundHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain("<div>Found</div>");
+      expect(result).not.toContain("<found-comp>");
+      expect(result).toContain("<not-found-comp></not-found-comp>");
+    });
+  });
+
+  describe("Multiple HTML files", () => {
+    it("should process components in all HTML files", async () => {
+      mkdirSync(join(TEST_DIR, "section"), { recursive: true });
+
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-comp></my-comp>
+</body>
+</html>`;
+
+      const sectionHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-comp></my-comp>
+</body>
+</html>`;
+
+      const componentHtml = `<div class="comp">Shared component</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "section", "page.html"), sectionHtml);
+      writeFileSync(join(TEST_DIR, "my-comp.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const indexResult = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      const sectionResult = readFileSync(join(TEST_DIR, "section", "page.html"), "utf-8");
+      
+      expect(indexResult).toContain('<div class="comp">Shared component</div>');
+      expect(sectionResult).toContain('<div class="comp">Shared component</div>');
+      expect(indexResult).not.toContain("<my-comp>");
+      expect(sectionResult).not.toContain("<my-comp>");
+    });
+  });
+
+  describe("Component in subdirectories", () => {
+    it("should find components in the same directory as HTML", async () => {
+      mkdirSync(join(TEST_DIR, "section"), { recursive: true });
+
+      const sectionHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <local-comp></local-comp>
+</body>
+</html>`;
+
+      const componentHtml = `<div>Local component</div>`;
+
+      writeFileSync(join(TEST_DIR, "section", "page.html"), sectionHtml);
+      writeFileSync(join(TEST_DIR, "section", "local-comp.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "section", "page.html"), "utf-8");
+      
+      expect(result).toContain("<div>Local component</div>");
+      expect(result).not.toContain("<local-comp>");
+    });
+
+    it("should prioritize local components over root components", async () => {
+      mkdirSync(join(TEST_DIR, "section"), { recursive: true });
+
+      const sectionHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <shared-comp></shared-comp>
+</body>
+</html>`;
+
+      const rootComponentHtml = `<div>Root component</div>`;
+      const localComponentHtml = `<div>Local component</div>`;
+
+      writeFileSync(join(TEST_DIR, "section", "page.html"), sectionHtml);
+      writeFileSync(join(TEST_DIR, "shared-comp.com.html"), rootComponentHtml);
+      writeFileSync(join(TEST_DIR, "section", "shared-comp.com.html"), localComponentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "section", "page.html"), "utf-8");
+      
+      // Should use local component, not root
+      expect(result).toContain("<div>Local component</div>");
+      expect(result).not.toContain("<div>Root component</div>");
+    });
+  });
+
+  describe("Edge cases", () => {
+    it("should handle empty component files", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-comp></my-comp>
+</body>
+</html>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-comp.com.html"), "");
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      // Should replace with empty content
+      expect(result).not.toContain("<my-comp>");
+    });
+
+    it("should handle components with inner content (should be ignored)", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-comp>
+    <p>This inner content should be replaced</p>
+  </my-comp>
+</body>
+</html>`;
+
+      const componentHtml = `<div>Component replaces everything</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-comp.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain("<div>Component replaces everything</div>");
+      expect(result).not.toContain("This inner content should be replaced");
+      expect(result).not.toContain("<my-comp>");
+    });
+
+    it("should preserve HTML structure and indentation context", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <div class="container">
+    <my-comp></my-comp>
+  </div>
+</body>
+</html>`;
+
+      const componentHtml = `<div class="component">Content</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-comp.com.html"), componentHtml);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain('<div class="container">');
+      expect(result).toContain('<div class="component">Content</div>');
+      expect(result).toContain("</body>");
+    });
+
+    it("should handle component names with numbers and dashes", async () => {
+      const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-comp-123></my-comp-123>
+  <comp-v2></comp-v2>
+</body>
+</html>`;
+
+      const comp123Html = `<div>Component 123</div>`;
+      const compV2Html = `<div>Component V2</div>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+      writeFileSync(join(TEST_DIR, "my-comp-123.com.html"), comp123Html);
+      writeFileSync(join(TEST_DIR, "comp-v2.com.html"), compV2Html);
+
+      await processCom(TEST_DIR);
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      expect(result).toContain("<div>Component 123</div>");
+      expect(result).toContain("<div>Component V2</div>");
+      expect(result).not.toContain("<my-comp-123>");
+      expect(result).not.toContain("<comp-v2>");
+    });
+  });
+
+  describe("Performance and scalability", () => {
+    it("should handle many components efficiently", async () => {
+      const components = Array.from({ length: 50 }, (_, i) => `comp-${i}`);
+      
+      let indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+`;
+      
+      for (const comp of components) {
+        indexHtml += `  <${comp}></${comp}>\n`;
+        writeFileSync(
+          join(TEST_DIR, `${comp}.com.html`), 
+          `<div class="${comp}">Content ${comp}</div>`
+        );
+      }
+      
+      indexHtml += `</body>
+</html>`;
+
+      writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+
+      const startTime = performance.now();
+      await processCom(TEST_DIR);
+      const duration = performance.now() - startTime;
+
+      const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+      
+      // Verify all components were replaced
+      for (const comp of components) {
+        expect(result).toContain(`<div class="${comp}">Content ${comp}</div>`);
+        expect(result).not.toContain(`<${comp}>`);
+      }
+
+      // Should complete in reasonable time (< 1 second for 50 components)
+      expect(duration).toBeLessThan(1000);
+    });
+  });
+
+  describe("Circular dependency detection", () => {
+    it("should throw error on 2-component circular dependency", async () => {
+      writeFileSync(join(TEST_DIR, "index.html"), "<comp-a></comp-a>");
+      writeFileSync(join(TEST_DIR, "comp-a.com.html"), "<div><comp-b></comp-b></div>");
+      writeFileSync(join(TEST_DIR, "comp-b.com.html"), "<div><comp-a></comp-a></div>");
+      
+      await expect(processCom(TEST_DIR)).rejects.toThrow();
+    });
+
+    it("should throw error on 3-component circular dependency", async () => {
+      writeFileSync(join(TEST_DIR, "index.html"), "<comp-x></comp-x>");
+      writeFileSync(join(TEST_DIR, "comp-x.com.html"), "<div><comp-y></comp-y></div>");
+      writeFileSync(join(TEST_DIR, "comp-y.com.html"), "<div><comp-z></comp-z></div>");
+      writeFileSync(join(TEST_DIR, "comp-z.com.html"), "<div><comp-x></comp-x></div>");
+      
+      await expect(processCom(TEST_DIR)).rejects.toThrow();
+    });
+
+    it("should throw error on 4-component circular dependency", async () => {
+      writeFileSync(join(TEST_DIR, "index.html"), "<comp-alpha></comp-alpha>");
+      writeFileSync(join(TEST_DIR, "comp-alpha.com.html"), "<div><comp-beta></comp-beta></div>");
+      writeFileSync(join(TEST_DIR, "comp-beta.com.html"), "<div><comp-gamma></comp-gamma></div>");
+      writeFileSync(join(TEST_DIR, "comp-gamma.com.html"), "<div><comp-delta></comp-delta></div>");
+      writeFileSync(join(TEST_DIR, "comp-delta.com.html"), "<div><comp-alpha></comp-alpha></div>");
+      
+      await expect(processCom(TEST_DIR)).rejects.toThrow();
+    });
+
+    it("should throw error on self-referencing component", async () => {
+      writeFileSync(join(TEST_DIR, "index.html"), "<recursive-comp></recursive-comp>");
+      writeFileSync(join(TEST_DIR, "recursive-comp.com.html"), "<div><recursive-comp></recursive-comp></div>");
+      
+      await expect(processCom(TEST_DIR)).rejects.toThrow();
+    });
+  });
+});
