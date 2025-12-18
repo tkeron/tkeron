@@ -1,6 +1,6 @@
 # tkeron
 
-⚠️ **v4.0.0-alpha.7 - Early Alpha Release**
+⚠️ **v4.0.0-alpha.8 - Early Alpha Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
 **Core functionality available:** build system, development server, pre-rendering, and HTML components. More features coming soon.
@@ -49,6 +49,13 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
   - Support for nested components
   - Local and root component resolution
 
+- ✅ **TypeScript Components with `.com.ts` files:**
+  - Dynamic components with full TypeScript logic
+  - Access to element attributes and content
+  - Generate HTML programmatically at build time
+  - Use TypeScript features: types, functions, conditionals, loops
+  - Import external libraries and modules
+
 ## What's Coming
 
 - 🚧 Project initialization (`tk init`)
@@ -66,11 +73,12 @@ npm i -g tkeron
 
 ## Examples
 
-The `examples/` directory contains three working examples:
+The `examples/` directory contains working examples:
 
 - **`basic_build/`** - Simple TypeScript + HTML project
 - **`with_assets/`** - Project with nested directories and assets
 - **`with_pre/`** - Demonstrates `.pre.ts` preprocessing capabilities
+- **`with_com_ts/`** - TypeScript components with dynamic logic
 
 ### Using `.pre.ts` Files (Backend Pre-rendering)
 
@@ -141,3 +149,73 @@ Create reusable HTML components with `.com.html` files. Any custom element (tag 
 - Consistent UI elements across multiple pages
 - Building design systems with pure HTML
 - DRY principle for HTML structure
+
+### Using `.com.ts` Files (TypeScript Components)
+
+Create dynamic HTML components with full TypeScript logic using `.com.ts` files. These components execute at build time and have access to a `com` variable representing the HTML element:
+
+```typescript
+// user-card.com.ts
+const name = com.getAttribute("data-name") || "Unknown";
+const role = com.getAttribute("data-role") || "N/A";
+
+// Use TypeScript logic
+com.innerHTML = `
+  <div class="user-card">
+    <h3>${name}</h3>
+    <p>Role: ${role}</p>
+  </div>
+`;
+```
+
+```html
+<!-- index.html -->
+<body>
+  <user-card data-name="Alice" data-role="Developer"></user-card>
+  <user-card data-name="Bob" data-role="Designer"></user-card>
+</body>
+```
+
+**Result after build:**
+```html
+<body>
+  <div class="user-card">
+    <h3>Alice</h3>
+    <p>Role: Developer</p>
+  </div>
+  <div class="user-card">
+    <h3>Bob</h3>
+    <p>Role: Designer</p>
+  </div>
+</body>
+```
+
+**TypeScript component features:**
+- **Full TypeScript support:** Use types, functions, classes, and all TypeScript features
+- **Attribute access:** Read custom attributes from the element using `com.getAttribute()`
+- **Content access:** Read inner content with `com.innerHTML` or `com.querySelector()`
+- **Import libraries:** Use npm packages and external modules
+- **Build-time execution:** All logic runs during build, no runtime JavaScript overhead
+- **Priority over `.com.html`:** If both `.com.ts` and `.com.html` exist, `.com.ts` takes priority
+
+**Use cases:**
+- Generate cards from data attributes
+- Create lists with TypeScript array methods
+- Conditional rendering based on attributes
+- Date/time formatting and calculations
+- Complex data transformations
+- Reading from files or APIs at build time
+- Template-based HTML generation with type safety
+
+**Example with logic:**
+```typescript
+// product-list.com.ts
+const products = ["Apple", "Banana", "Cherry", "Date"];
+
+const items = products
+  .filter(p => p.length > 5)
+  .map((p, i) => `<li>${i + 1}. ${p}</li>`)
+  .join("\n");
+
+com.innerHTML = `<ul>${items}</ul>`;
+```

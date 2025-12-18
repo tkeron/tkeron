@@ -3,6 +3,7 @@ import { tmpdir } from "os";
 import { buildDir } from "./buildDir";
 import { processPre } from "./processPre";
 import { processCom } from "./processCom";
+import { processComTs } from "./processComTs";
 import { rm, exists, mkdir, cp } from "fs/promises";
 
 export interface BuildOptions {
@@ -22,6 +23,8 @@ export const build = async (options: BuildOptions) => {
     await cp(source, tempDir, { recursive: true });
 
     await processPre(tempDir);
+
+    await processComTs(tempDir);
 
     await processCom(tempDir);
 

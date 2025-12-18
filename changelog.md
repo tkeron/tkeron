@@ -1,3 +1,34 @@
+# v4.0.0-alpha.8
+
+## New Features
+- Add `.com.ts` TypeScript component system for dynamic HTML generation
+  - Components with full TypeScript logic at build time
+  - Access to `com` variable representing the HTML element
+  - Read attributes with `com.getAttribute()`
+  - Modify content with `com.innerHTML`
+  - Import external modules and use npm packages
+  - Execute before `.com.html` components (higher priority)
+  - Support for nested components and local/root resolution
+  - Complete test coverage with 26 tests
+
+## Implementation Details
+- Integrated `processComTs()` into build pipeline before `.com.html` processing
+- Uses `Bun.spawn()` to execute component TypeScript files
+- Temporary output files for communication between processes
+- Proper error handling with stderr capture
+- Circular dependency detection
+
+## Examples
+- Add `with_com_ts/` example demonstrating:
+  - Attribute-based components (`user-card.com.ts`)
+  - Array/iteration logic (`dynamic-list.com.ts`)
+  - Dynamic data and calculations (`greeting-message.com.ts`)
+
+## Documentation
+- Update README with `.com.ts` documentation and examples
+- Add comprehensive README for `with_com_ts` example
+- Document component priority: `.com.ts` > `.com.html`
+
 # v4.0.0-alpha.7
 
 ## New Features
