@@ -5,4 +5,5 @@ web
 dist
 local_test
 **/webout/
+**/web/
 

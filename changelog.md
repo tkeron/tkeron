@@ -1,3 +1,12 @@
+# v4.0.0-alpha.9
+
+## Breaking Changes
+- **Change default output directory from `webout` to `web`**
+  - All build and develop commands now output to `web/` by default instead of `webout/`
+  - Users can still specify a custom output directory using the `targetDir` parameter
+  - Updated all tests and examples to use the new default directory
+  - Updated `.gitignore` to ignore `**/web/` instead of `**/webout/`
+
 # v4.0.0-alpha.8
 
 ## New Features

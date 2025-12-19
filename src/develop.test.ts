@@ -28,7 +28,7 @@ afterEach(async () => {
 it("develop starts server and serves files", async () => {
   testDir = join(tmpdir(), `tkeron-test-${Date.now()}`);
   const sourceDir = join(testDir, "websrc");
-  const outputDir = join(testDir, "webout");
+  const outputDir = join(testDir, "web");
 
   await mkdir(sourceDir, { recursive: true });
   await writeFile(join(sourceDir, "index.html"), "<h1>Test</h1>");
@@ -59,7 +59,7 @@ it("develop starts server and serves files", async () => {
 it("develop rebuilds on file change", async () => {
   testDir = join(tmpdir(), `tkeron-test-${Date.now()}`);
   const sourceDir = join(testDir, "websrc");
-  const outputDir = join(testDir, "webout");
+  const outputDir = join(testDir, "web");
 
   await mkdir(sourceDir, { recursive: true });
   await writeFile(join(sourceDir, "index.html"), "<h1>Original</h1>");
@@ -111,7 +111,7 @@ it("develop rebuilds on file change", async () => {
 it("develop serves 404 for missing files", async () => {
   testDir = join(tmpdir(), `tkeron-test-${Date.now()}`);
   const sourceDir = join(testDir, "websrc");
-  const outputDir = join(testDir, "webout");
+  const outputDir = join(testDir, "web");
 
   await mkdir(sourceDir, { recursive: true });
   await writeFile(join(sourceDir, "index.html"), "<h1>Test</h1>");

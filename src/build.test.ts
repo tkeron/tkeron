@@ -7,7 +7,7 @@ import { tmpdir } from "os";
 describe("build", () => {
   const TEST_DIR = join(tmpdir(), `tkeron-test-${Date.now()}`);
   const TEST_SRC = join(TEST_DIR, "src");
-  const TEST_OUT = join(TEST_DIR, "webout");
+  const TEST_OUT = join(TEST_DIR, "web");
 
   beforeEach(() => {
     if (existsSync(TEST_DIR)) {
@@ -185,7 +185,7 @@ if (title) title.textContent = "Auto-generated";
 
   it("should use default directories when not specified", async () => {
     const defaultSrc = join(TEST_DIR, "websrc");
-    const defaultOut = join(TEST_DIR, "webout");
+    const defaultOut = join(TEST_DIR, "web");
     
     mkdirSync(defaultSrc, { recursive: true });
 

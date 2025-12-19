@@ -30,7 +30,7 @@ export const develop = async (
   const source = await resolve(sourceDir);
   const target = outputDir
     ? await resolve(outputDir)
-    : await resolve(dirname(source), "webout");
+    : await resolve(dirname(source), "web");
 
   console.log("🔨 Building project...");
   await build({ sourceDir: source, targetDir: target });

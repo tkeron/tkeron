@@ -15,7 +15,7 @@ export const build = async (options: BuildOptions) => {
     const source = await resolve(options.sourceDir || "websrc");
     const target = options.targetDir
         ? await resolve(options.targetDir)
-        : await resolve(dirname(source), "webout");
+        : await resolve(dirname(source), "web");
     const tempDir = join(tmpdir(), `tkeron-build-${crypto.randomUUID()}`);
 
     await mkdir(tempDir, { recursive: true });

@@ -9,7 +9,7 @@ describe("Examples Build Tests", () => {
 
   describe("basic_build", () => {
     const srcDir = join(EXAMPLES_DIR, "basic_build/src");
-    const outDir = join(EXAMPLES_DIR, "basic_build/webout");
+    const outDir = join(EXAMPLES_DIR, "basic_build/web");
 
     beforeAll(async () => {
       await build({
@@ -52,7 +52,7 @@ describe("Examples Build Tests", () => {
 
   describe("with_assets", () => {
     const srcDir = join(EXAMPLES_DIR, "with_assets/src");
-    const outDir = join(EXAMPLES_DIR, "with_assets/webout");
+    const outDir = join(EXAMPLES_DIR, "with_assets/web");
 
     beforeAll(async () => {
       await build({
@@ -102,7 +102,7 @@ describe("Examples Build Tests", () => {
 
   describe("with_pre", () => {
     const srcDir = join(EXAMPLES_DIR, "with_pre/src");
-    const outDir = join(EXAMPLES_DIR, "with_pre/webout");
+    const outDir = join(EXAMPLES_DIR, "with_pre/web");
 
     beforeAll(async () => {
       await build({
@@ -157,7 +157,7 @@ describe("Examples Build Tests", () => {
 
   describe("with_com_html_priority", () => {
     const srcDir = join(EXAMPLES_DIR, "with_com_html_priority/src");
-    const outDir = join(EXAMPLES_DIR, "with_com_html_priority/webout");
+    const outDir = join(EXAMPLES_DIR, "with_com_html_priority/web");
 
     beforeAll(async () => {
       await build({
@@ -233,7 +233,7 @@ describe("Examples Build Tests", () => {
 
   describe("with_com_ts_priority", () => {
     const srcDir = join(EXAMPLES_DIR, "with_com_ts_priority/src");
-    const outDir = join(EXAMPLES_DIR, "with_com_ts_priority/webout");
+    const outDir = join(EXAMPLES_DIR, "with_com_ts_priority/web");
 
     beforeAll(async () => {
       await build({
@@ -313,7 +313,7 @@ describe("Examples Build Tests", () => {
 
   describe("with_com_mixed_priority", () => {
     const srcDir = join(EXAMPLES_DIR, "with_com_mixed_priority/src");
-    const outDir = join(EXAMPLES_DIR, "with_com_mixed_priority/webout");
+    const outDir = join(EXAMPLES_DIR, "with_com_mixed_priority/web");
 
     beforeAll(async () => {
       await build({
