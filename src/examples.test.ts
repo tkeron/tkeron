@@ -7,16 +7,30 @@ import { parseHTML } from "@tkeron/html-parser";
 describe("Examples Build Tests", () => {
   const EXAMPLES_DIR = join(import.meta.dir, "..", "examples");
 
+  // Build all examples once before running any tests
+  beforeAll(async () => {
+    const examples = [
+      "basic_build",
+      "with_assets", 
+      "with_pre",
+      "with_com_html_priority",
+      "with_com_ts_priority",
+      "with_com_mixed_priority"
+    ];
+
+    await Promise.all(
+      examples.map(example => 
+        build({
+          sourceDir: join(EXAMPLES_DIR, example, "src"),
+          targetDir: join(EXAMPLES_DIR, example, "web"),
+        })
+      )
+    );
+  }, 30000);
+
   describe("basic_build", () => {
     const srcDir = join(EXAMPLES_DIR, "basic_build/src");
     const outDir = join(EXAMPLES_DIR, "basic_build/web");
-
-    beforeAll(async () => {
-      await build({
-        sourceDir: srcDir,
-        targetDir: outDir,
-      });
-    });
 
     it("should generate index.html and index.js", () => {
       expect(existsSync(join(outDir, "index.html"))).toBe(true);
@@ -53,13 +67,6 @@ describe("Examples Build Tests", () => {
   describe("with_assets", () => {
     const srcDir = join(EXAMPLES_DIR, "with_assets/src");
     const outDir = join(EXAMPLES_DIR, "with_assets/web");
-
-    beforeAll(async () => {
-      await build({
-        sourceDir: srcDir,
-        targetDir: outDir,
-      });
-    });
 
     it("should generate main files", () => {
       expect(existsSync(join(outDir, "index.html"))).toBe(true);
@@ -103,13 +110,6 @@ describe("Examples Build Tests", () => {
   describe("with_pre", () => {
     const srcDir = join(EXAMPLES_DIR, "with_pre/src");
     const outDir = join(EXAMPLES_DIR, "with_pre/web");
-
-    beforeAll(async () => {
-      await build({
-        sourceDir: srcDir,
-        targetDir: outDir,
-      });
-    });
 
     it("should generate files from .pre.ts files", () => {
       expect(existsSync(join(outDir, "contact.html"))).toBe(true);
@@ -158,13 +158,6 @@ describe("Examples Build Tests", () => {
   describe("with_com_html_priority", () => {
     const srcDir = join(EXAMPLES_DIR, "with_com_html_priority/src");
     const outDir = join(EXAMPLES_DIR, "with_com_html_priority/web");
-
-    beforeAll(async () => {
-      await build({
-        sourceDir: srcDir,
-        targetDir: outDir,
-      });
-    });
 
     it("should generate all HTML files", () => {
       expect(existsSync(join(outDir, "index.html"))).toBe(true);
@@ -234,13 +227,6 @@ describe("Examples Build Tests", () => {
   describe("with_com_ts_priority", () => {
     const srcDir = join(EXAMPLES_DIR, "with_com_ts_priority/src");
     const outDir = join(EXAMPLES_DIR, "with_com_ts_priority/web");
-
-    beforeAll(async () => {
-      await build({
-        sourceDir: srcDir,
-        targetDir: outDir,
-      });
-    });
 
     it("should generate all HTML files", () => {
       expect(existsSync(join(outDir, "index.html"))).toBe(true);
@@ -314,13 +300,6 @@ describe("Examples Build Tests", () => {
   describe("with_com_mixed_priority", () => {
     const srcDir = join(EXAMPLES_DIR, "with_com_mixed_priority/src");
     const outDir = join(EXAMPLES_DIR, "with_com_mixed_priority/web");
-
-    beforeAll(async () => {
-      await build({
-        sourceDir: srcDir,
-        targetDir: outDir,
-      });
-    });
 
     it("should generate all HTML files", () => {
       expect(existsSync(join(outDir, "index.html"))).toBe(true);

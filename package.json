@@ -18,7 +18,7 @@
     "sample5": "bun . build examples/with_com_ts/src",
     "sample6": "bun . build examples/with_com_ts_priority/src",
     "sample7": "bun . build examples/with_com_mixed_priority/src",
-    "build_examples": "npm run sample1 && npm run sample2 && npm run sample3 && npm run sample4 && npm run sample5 && npm run sample6 && npm run sample7"
+    "build_examples": "bun run sample1 && bun run sample2 && bun run sample3 && bun run sample4 && bun run sample5 && bun run sample6 && bun run sample7"
   },
   "author": "tkeron",
   "license": "MIT",
