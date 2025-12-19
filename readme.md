@@ -59,7 +59,6 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
 ## What's Coming
 
 - 🚧 Project initialization (`tk init`)
-- 🚧 Page and component generators
 
 ## Installation
 
