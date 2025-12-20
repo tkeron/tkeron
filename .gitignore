@@ -1,9 +1,6 @@
 node_modules
 coverage
-front
 web
-dist
 local_test
-**/webout/
 **/web/
 
