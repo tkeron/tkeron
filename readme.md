@@ -1,6 +1,6 @@
 # tkeron
 
-⚠️ **v4.0.0-alpha.8 - Early Alpha Release**
+⚠️ **v4.0.0-alpha.10 - Early Alpha Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
 **Core functionality available:** build system, development server, pre-rendering, and HTML components. More features coming soon.
@@ -16,6 +16,16 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
 - **Bun-powered:** Fast builds and modern tooling
 
 ## What's Available Now (v4 Alpha)
+
+- ✅ **Project initialization:**
+  ```bash
+  tk init <projectName>
+  # or using alias
+  tk i my-app
+  ```
+  - Creates new project with complete template
+  - Includes examples of all tkeron features
+  - Ready-to-use development setup
 
 - ✅ **Build command:** Bundle TypeScript and process HTML files
   ```bash
@@ -56,10 +66,6 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
   - Use TypeScript features: types, functions, conditionals, loops
   - Import external libraries and modules
 
-## What's Coming
-
-- 🚧 Project initialization (`tk init`)
-
 ## Installation
 
 Install **tkeron** globally using npm:
@@ -70,14 +76,47 @@ npm i -g tkeron
 
 **Requirements:** Bun runtime (Node.js support coming later)
 
+## Quick Start
+
+Create a new project with the `init` command:
+
+```bash
+# Create new project in a subdirectory
+tk init my-project
+cd my-project
+tk dev src
+
+# Or initialize in current directory
+mkdir my-project && cd my-project
+tk init .
+
+# Force overwrite if tkeron files already exist
+tk init . force=true
+```
+
+This creates a complete project with examples of all tkeron features:
+- Pre-rendering with `.pre.ts`
+- HTML components with `.com.html`
+- TypeScript components with `.com.ts`
+- Interactive counter example
+- Ready-to-use development setup
+
+**Note:** When initializing in a directory with existing tkeron files (`src/`, `web/`, `tkeron.d.ts`), you'll be prompted to confirm overwriting. Use `force=true` to skip the prompt. Other files in the directory are preserved.
+
+Open `http://localhost:8080` to see your app!
+
 ## Examples
 
 The `examples/` directory contains working examples:
 
+- **`init_sample/`** - Complete template used by `tk init` command (all features)
 - **`basic_build/`** - Simple TypeScript + HTML project
 - **`with_assets/`** - Project with nested directories and assets
 - **`with_pre/`** - Demonstrates `.pre.ts` preprocessing capabilities
+- **`with_com_html_priority/`** - HTML component resolution (local vs root)
 - **`with_com_ts/`** - TypeScript components with dynamic logic
+- **`with_com_ts_priority/`** - TypeScript component priority demonstration
+- **`with_com_mixed_priority/`** - Mixed `.com.html` and `.com.ts` priority handling
 
 ### Using `.pre.ts` Files (Backend Pre-rendering)
 

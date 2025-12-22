@@ -2,6 +2,7 @@
 import { getCommands } from "@tkeron/commands";
 import { build } from "./src/build";
 import { develop } from "./src/develop";
+import { init } from "./src/init";
 
 getCommands()
 
@@ -26,6 +27,17 @@ getCommands()
     .addPositionedArgument("port")
     .addPositionedArgument("host")
     .setCallback(develop)
+
+
+    .commands()
+
+
+    .addCommand("init")
+    .addAlias("i")
+    .addDescription("Initialize a new tkeron project")
+    .addPositionedArgument("projectName")
+    .addOption("force")
+    .setCallback(init)
 
 
     .commands().start();

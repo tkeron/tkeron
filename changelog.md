@@ -1,3 +1,29 @@
+# v4.0.0-alpha.10
+
+## New Features
+- **Add `init` command for project initialization**
+  - Create new tkeron projects with `tk init <projectName>` or `tk i`
+  - Initialize in current directory with `tk init .`
+  - Interactive prompt when tkeron files already exist
+  - Force overwrite with `force=true` option
+  - Only removes tkeron files (src/, web/, tkeron.d.ts), preserves other files
+  - Scaffolds complete project structure with all feature examples
+  - Includes template with pre-rendering, HTML components, and TypeScript components
+  - Automatically copies type declarations (tkeron.d.ts)
+  - Comprehensive test coverage with 16 passing tests
+
+## Template Content
+- Hero section with gradient background
+- Interactive counter component
+- Multiple component examples (HTML and TypeScript)
+- Pre-rendering demonstration
+- Favicon and profile image assets
+- Ready-to-use development setup
+
+## Documentation
+- README updated to reflect `init` command availability
+- Comprehensive template showcasing all tkeron features
+
 # v4.0.0-alpha.9
 
 ## Breaking Changes
