@@ -38,8 +38,8 @@ export async function init(options: InitOptions) {
       throw new Error(`Directory "${projectName}" already exists`);
     }
     
-    // Check if tkeron files already exist
-    const tkeronFiles = ['src', 'web', 'tkeron.d.ts'];
+    // Check if tkeron files already exist (web is not included - it's a generated directory)
+    const tkeronFiles = ['src', 'tkeron.d.ts'];
     const existingTkeronFiles = tkeronFiles.filter(f => existsSync(join(targetPath, f)));
     
     if (existingTkeronFiles.length > 0) {
