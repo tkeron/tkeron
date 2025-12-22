@@ -1,4 +1,4 @@
-import { describe, it, expect, afterAll, beforeEach } from "bun:test";
+import { describe, it, expect, afterAll, beforeEach, spyOn } from "bun:test";
 import { build } from "./build";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
@@ -8,17 +8,25 @@ describe("build", () => {
   const TEST_DIR = join(tmpdir(), `tkeron-test-${Date.now()}`);
   const TEST_SRC = join(TEST_DIR, "src");
   const TEST_OUT = join(TEST_DIR, "web");
+  let consoleLogSpy: any;
+  let consoleErrorSpy: any;
 
   beforeEach(() => {
     if (existsSync(TEST_DIR)) {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
+    // Suppress console output
+    consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterAll(() => {
     if (existsSync(TEST_DIR)) {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
+    // Restore console
+    consoleLogSpy?.mockRestore();
+    consoleErrorSpy?.mockRestore();
   });
 
   it("should build HTML with TypeScript and inject bundled script", async () => {

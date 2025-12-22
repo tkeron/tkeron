@@ -1,4 +1,4 @@
-import { describe, it, expect, afterEach, beforeEach } from "bun:test";
+import { describe, it, expect, afterEach, beforeEach, spyOn } from "bun:test";
 import { init } from "./init";
 import { rmSync, existsSync, readFileSync, mkdirSync } from "fs";
 import { join } from "path";
@@ -6,18 +6,30 @@ import { tmpdir } from "os";
 
 describe("init", () => {
   const TEST_DIR = join(tmpdir(), `tkeron-init-test-${Date.now()}`);
+  
+  // Spy on console to suppress output during tests
+  let consoleLogSpy: any;
+  let consoleErrorSpy: any;
 
   beforeEach(() => {
     if (existsSync(TEST_DIR)) {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
     mkdirSync(TEST_DIR, { recursive: true });
+    
+    // Suppress console output
+    consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
   });
 
   afterEach(() => {
     if (existsSync(TEST_DIR)) {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
+    
+    // Restore console
+    consoleLogSpy?.mockRestore();
+    consoleErrorSpy?.mockRestore();
   });
 
   it("should create project directory with init_sample content", async () => {

@@ -51,10 +51,26 @@ await Bun.write(htmlPath, htmlOutput);
         // Execute the modified .pre.ts
         const proc = Bun.spawn(["bun", "run", preFile], {
             cwd: dirname(preFile),
-            stdout: "inherit",
-            stderr: "inherit",
+            stdout: "pipe",
+            stderr: "pipe",
         });
         
         await proc.exited;
+        
+        // Check if execution was successful
+        if (proc.exitCode !== 0) {
+            const stderr = await new Response(proc.stderr).text();
+            const stdout = await new Response(proc.stdout).text();
+            console.error(`\n❌ Error: Pre-rendering failed for ${preFile.split('/').pop()}`);
+            console.error(`\n💡 File: ${preFile}`);
+            if (stderr) {
+                console.error(`\nError details:\n${stderr}`);
+            }
+            if (stdout) {
+                console.error(`\nOutput:\n${stdout}`);
+            }
+            console.error();
+            throw new Error(`Pre-rendering failed for ${preFile}`);
+        }
     }
 };

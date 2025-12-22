@@ -11,31 +11,40 @@ export interface BuildOptions {
     targetDir?: string;
 }
 export const build = async (options: BuildOptions) => {
+    try {
+        const source = await resolve(options.sourceDir || "websrc");
+        const target = options.targetDir
+            ? await resolve(options.targetDir)
+            : await resolve(dirname(source), "web");
+        const tempDir = join(tmpdir(), `tkeron-build-${crypto.randomUUID()}`);
 
-    const source = await resolve(options.sourceDir || "websrc");
-    const target = options.targetDir
-        ? await resolve(options.targetDir)
-        : await resolve(dirname(source), "web");
-    const tempDir = join(tmpdir(), `tkeron-build-${crypto.randomUUID()}`);
+        await mkdir(tempDir, { recursive: true });
 
-    await mkdir(tempDir, { recursive: true });
+        await cp(source, tempDir, { recursive: true });
 
-    await cp(source, tempDir, { recursive: true });
+        await processPre(tempDir);
 
-    await processPre(tempDir);
+        await processComTs(tempDir);
 
-    await processComTs(tempDir);
+        await processCom(tempDir);
 
-    await processCom(tempDir);
+        if (await exists(target)) {
+            await rm(target, { recursive: true, force: true });
+        }
 
-    if (await exists(target)) {
-        await rm(target, { recursive: true, force: true });
+        await buildDir(tempDir, target);
+
+        await rm(tempDir, { recursive: true, force: true });
+    } catch (error: any) {
+        if (error.code === "ENOENT") {
+            const sourceDir = options.sourceDir || "websrc";
+            console.error(`\n❌ Error: Source directory "${sourceDir}" does not exist.`);
+            console.error(`\n💡 Tip: Create the directory first or check the path.`);
+            console.error(`   Expected: ${await resolve(sourceDir)}\n`);
+            process.exit(1);
+        }
+        throw error;
     }
-
-    await buildDir(tempDir, target);
-
-    await rm(tempDir, { recursive: true, force: true });
-
 };
 
 

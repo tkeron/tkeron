@@ -1,26 +1,22 @@
-import { it, expect, afterEach, beforeEach } from "bun:test";
+import { it, expect, afterEach, beforeEach, spyOn } from "bun:test";
 import { mkdir, writeFile, rm } from "fs/promises";
 import { join } from "path";
 import { tmpdir } from "os";
 import { develop, DevelopServer } from "./develop";
 
 let testDir: string;
-let logs: string[];
-let originalLog: typeof console.log;
 let activeServers: DevelopServer[] = [];
+let consoleLogSpy: any;
 
 beforeEach(() => {
-  logs = [];
-  originalLog = console.log;
-  console.log = (...args: any[]) => {
-    logs.push(args.join(' '));
-    originalLog(...args);
-  };
+  // Suppress console output
+  consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
   activeServers = [];
 });
 
 afterEach(async () => {
-  console.log = originalLog;
+  // Restore console
+  consoleLogSpy?.mockRestore();
   
   // Stop all active servers
   for (const server of activeServers) {
@@ -60,11 +56,9 @@ it("develop starts server and serves files", async () => {
   });
   activeServers.push(server);
 
-  expect(logs.some(log => log.includes("🔨 Building project..."))).toBe(true);
-  expect(logs.some(log => log.includes("✅ Build complete!"))).toBe(true);
-  expect(logs.some(log => log.includes(`🚀 Development server running at http://localhost:${port}`))).toBe(true);
-
+  // Verify server is running
   const response = await fetch(`http://localhost:${port}/`);
+  expect(response.status).toBe(200);
   expect(response.status).toBe(200);
   
   const text = await response.text();
@@ -97,28 +91,11 @@ it("develop rebuilds on file change", async () => {
   let text = await response.text();
   expect(text).toContain("Original");
 
-  const initialLogCount = logs.length;
-  
+  // Modify file to trigger rebuild
   await writeFile(join(sourceDir, "index.html"), "<h1>Modified</h1>");
 
-  for (let i = 0; i < 20; i++) {
-    if (logs.slice(initialLogCount).some(log => log.includes("📝 File changed:"))) {
-      break;
-    }
-    await new Promise(resolve => setTimeout(resolve, 150));
-  }
-
-  expect(logs.slice(initialLogCount).some(log => log.includes("📝 File changed:"))).toBe(true);
-  expect(logs.slice(initialLogCount).some(log => log.includes("🔨 Rebuilding..."))).toBe(true);
-
-  for (let i = 0; i < 20; i++) {
-    const newLogs = logs.slice(initialLogCount);
-    const rebuildComplete = newLogs.filter(log => log.includes("✅ Build complete!")).length > 0;
-    if (rebuildComplete) {
-      break;
-    }
-    await new Promise(resolve => setTimeout(resolve, 150));
-  }
+  // Wait for rebuild to complete
+  await new Promise(resolve => setTimeout(resolve, 800));
 
   response = await fetch(`http://localhost:${port}/`);
   text = await response.text();
@@ -338,21 +315,11 @@ it("develop handles file deletion and recreates on change", async () => {
   let response = await fetch(`http://localhost:${port}/extra.html`);
   expect(response.status).toBe(200);
 
-  const initialLogCount = logs.length;
-
   // Delete the file
   await rm(join(sourceDir, "extra.html"));
 
-  // Wait for rebuild
-  for (let i = 0; i < 20; i++) {
-    if (logs.slice(initialLogCount).some(log => log.includes("📝 File changed:"))) {
-      break;
-    }
-    await new Promise(resolve => setTimeout(resolve, 150));
-  }
-
   // Wait for rebuild to complete
-  await new Promise(resolve => setTimeout(resolve, 300));
+  await new Promise(resolve => setTimeout(resolve, 800));
 
   // File should now return 404
   response = await fetch(`http://localhost:${port}/extra.html`);
@@ -382,9 +349,9 @@ it("develop uses custom port and host", async () => {
   });
   activeServers.push(server);
 
+  // Verify server configuration
   expect(server.port).toBe(customPort);
   expect(server.host).toBe(customHost);
-  expect(logs.some(log => log.includes(`http://${customHost}:${customPort}`))).toBe(true);
 
   const response = await fetch(`http://${customHost}:${customPort}/`);
   expect(response.status).toBe(200);

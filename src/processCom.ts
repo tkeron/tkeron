@@ -83,7 +83,11 @@ async function processComponents(
       if (componentPath) {
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
-          throw new Error(`Circular component dependency detected: ${chain}`);
+          console.error(`\n❌ Error: Circular component dependency detected.`);
+          console.error(`\n💡 Component chain: ${chain}`);
+          console.error(`\n   Components cannot include themselves directly or indirectly.`);
+          console.error(`   Check your .com.html files for circular references.\n`);
+          throw new Error(`Circular dependency: ${chain}`);
         }
 
         // Read component content

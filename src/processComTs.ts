@@ -85,7 +85,11 @@ async function processComponentsTs(
         // Check for circular dependencies
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
-          throw new Error(`Circular component dependency detected: ${chain}`);
+          console.error(`\n❌ Error: Circular component dependency detected.`);
+          console.error(`\n💡 Component chain: ${chain}`);
+          console.error(`\n   Components cannot include themselves directly or indirectly.`);
+          console.error(`   Check your .com.ts files for circular references.\n`);
+          throw new Error(`Circular dependency: ${chain}`);
         }
 
         // Read component TypeScript code
@@ -134,7 +138,10 @@ await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.i
           // Check if execution was successful
           if (proc.exitCode !== 0) {
             const stderr = await new Response(proc.stderr).text();
-            throw new Error(`Component ${tagName} execution failed with exit code ${proc.exitCode}: ${stderr}`);
+            console.error(`\n❌ Error: Component <${tagName}> failed to execute.`);
+            console.error(`\n💡 Component file: ${componentPath}`);
+            console.error(`\nError details:\n${stderr}\n`);
+            throw new Error(`Component ${tagName} execution failed`);
           }
 
           // Read the output

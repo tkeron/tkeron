@@ -33,7 +33,17 @@ export const develop = async (
     : await resolve(dirname(source), "web");
 
   console.log("🔨 Building project...");
-  await build({ sourceDir: source, targetDir: target });
+  try {
+    await build({ sourceDir: source, targetDir: target });
+  } catch (error: any) {
+    if (error.code === "ENOENT") {
+      console.error(`\n❌ Error: Source directory "${sourceDir}" does not exist.`);
+      console.error(`\n💡 Tip: Create the directory first or check the path.`);
+      console.error(`   Expected: ${source}\n`);
+      process.exit(1);
+    }
+    throw error;
+  }
   console.log("✅ Build complete!");
 
   const server = Bun.serve({
