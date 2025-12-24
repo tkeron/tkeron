@@ -1,37 +1,21 @@
-import { describe, it, expect, afterAll, beforeEach, spyOn } from "bun:test";
+import { describe, it, expect, spyOn } from "bun:test";
 import { build } from "./build";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
-import { tmpdir } from "os";
+import { getTestResources } from "./test-helpers";
 
 describe("build", () => {
-  const TEST_DIR = join(tmpdir(), `tkeron-test-${Date.now()}`);
-  const TEST_SRC = join(TEST_DIR, "src");
-  const TEST_OUT = join(TEST_DIR, "web");
-  let consoleLogSpy: any;
-  let consoleErrorSpy: any;
-
-  beforeEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true, force: true });
-    }
-    // Suppress console output
-    consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
-    consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
-  });
-
-  afterAll(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true, force: true });
-    }
-    // Restore console
-    consoleLogSpy?.mockRestore();
-    consoleErrorSpy?.mockRestore();
-  });
 
   it("should build HTML with TypeScript and inject bundled script", async () => {
-    mkdirSync(TEST_SRC, { recursive: true });
-    const htmlContent = `<!DOCTYPE html>
+    const { dir } = getTestResources("build-html-with-typescript");
+    const TEST_SRC = join(dir, "src");
+    const TEST_OUT = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+
+    try {
+      mkdirSync(TEST_SRC, { recursive: true });
+      const htmlContent = `<!DOCTYPE html>
 <html>
 <head><title>Test</title></head>
 <body>
@@ -40,27 +24,39 @@ describe("build", () => {
 </body>
 </html>`;
 
-    const tsContent = `const message: string = "hello"; console.log(message);`;
+      const tsContent = `const message: string = "hello"; console.log(message);`;
 
-    writeFileSync(join(TEST_SRC, "index.html"), htmlContent);
-    writeFileSync(join(TEST_SRC, "index.ts"), tsContent);
+      writeFileSync(join(TEST_SRC, "index.html"), htmlContent);
+      writeFileSync(join(TEST_SRC, "index.ts"), tsContent);
 
-    await build({
-      sourceDir: TEST_SRC,
-      targetDir: TEST_OUT,
-    });
+      await build({
+        sourceDir: TEST_SRC,
+        targetDir: TEST_OUT,
+      });
 
-    expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
-    expect(existsSync(join(TEST_OUT, "index.js"))).toBe(true);
+      expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
+      expect(existsSync(join(TEST_OUT, "index.js"))).toBe(true);
 
-    const outputHtml = readFileSync(join(TEST_OUT, "index.html"), "utf-8");
-    expect(outputHtml).toContain("index.js");
+      const outputHtml = readFileSync(join(TEST_OUT, "index.html"), "utf-8");
+      expect(outputHtml).toContain("index.js");
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("should handle multiple HTML files in subdirectories", async () => {
-    mkdirSync(join(TEST_SRC, "section"), { recursive: true });
+    const { dir } = getTestResources("build-multiple-html-subdirs");
+    const TEST_SRC = join(dir, "src");
+    const TEST_OUT = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
-    const indexHtml = `<!DOCTYPE html>
+    try {
+      mkdirSync(join(TEST_SRC, "section"), { recursive: true });
+
+      const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
   <h1>Index</h1>
@@ -68,7 +64,7 @@ describe("build", () => {
 </body>
 </html>`;
 
-    const sectionHtml = `<!DOCTYPE html>
+      const sectionHtml = `<!DOCTYPE html>
 <html>
 <body>
   <h1>Section</h1>
@@ -76,79 +72,115 @@ describe("build", () => {
 </body>
 </html>`;
 
-    writeFileSync(join(TEST_SRC, "index.html"), indexHtml);
-    writeFileSync(join(TEST_SRC, "index.ts"), `console.log("main");`);
-    writeFileSync(join(TEST_SRC, "section", "index.html"), sectionHtml);
-    writeFileSync(join(TEST_SRC, "section", "index.ts"), `console.log("section");`);
+      writeFileSync(join(TEST_SRC, "index.html"), indexHtml);
+      writeFileSync(join(TEST_SRC, "index.ts"), `console.log("main");`);
+      writeFileSync(join(TEST_SRC, "section", "index.html"), sectionHtml);
+      writeFileSync(join(TEST_SRC, "section", "index.ts"), `console.log("section");`);
 
-    await build({
-      sourceDir: TEST_SRC,
-      targetDir: TEST_OUT,
-    });
+      await build({
+        sourceDir: TEST_SRC,
+        targetDir: TEST_OUT,
+      });
 
-    expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
-    expect(existsSync(join(TEST_OUT, "index.js"))).toBe(true);
-    expect(existsSync(join(TEST_OUT, "section", "index.html"))).toBe(true);
-    expect(existsSync(join(TEST_OUT, "section", "index.js"))).toBe(true);
+      expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
+      expect(existsSync(join(TEST_OUT, "index.js"))).toBe(true);
+      expect(existsSync(join(TEST_OUT, "section", "index.html"))).toBe(true);
+      expect(existsSync(join(TEST_OUT, "section", "index.js"))).toBe(true);
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("should process .pre.ts files and generate HTML", async () => {
-    mkdirSync(TEST_SRC, { recursive: true });
+    const { dir } = getTestResources("build-process-pre-ts");
+    const TEST_SRC = join(dir, "src");
+    const TEST_OUT = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
-    const preContent = `
+    try {
+      mkdirSync(TEST_SRC, { recursive: true });
+
+      const preContent = `
 // Modify the document
 const h1 = document.createElement("h1");
 h1.textContent = "Generated by pre.ts";
 document.body.appendChild(h1);
 `;
 
-    const htmlContent = `<!DOCTYPE html>
+      const htmlContent = `<!DOCTYPE html>
 <html>
 <head><title>Pre Test</title></head>
 <body></body>
 </html>`;
 
-    writeFileSync(join(TEST_SRC, "page.pre.ts"), preContent);
-    writeFileSync(join(TEST_SRC, "page.html"), htmlContent);
+      writeFileSync(join(TEST_SRC, "page.pre.ts"), preContent);
+      writeFileSync(join(TEST_SRC, "page.html"), htmlContent);
 
-    await build({
-      sourceDir: TEST_SRC,
-      targetDir: TEST_OUT,
-    });
+      await build({
+        sourceDir: TEST_SRC,
+        targetDir: TEST_OUT,
+      });
 
-    expect(existsSync(join(TEST_OUT, "page.html"))).toBe(true);
-    const outputHtml = readFileSync(join(TEST_OUT, "page.html"), "utf-8");
-    expect(outputHtml).toContain("Generated by pre.ts");
+      expect(existsSync(join(TEST_OUT, "page.html"))).toBe(true);
+      const outputHtml = readFileSync(join(TEST_OUT, "page.html"), "utf-8");
+      expect(outputHtml).toContain("Generated by pre.ts");
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("should create default HTML for .pre.ts without corresponding .html", async () => {
-    mkdirSync(TEST_SRC, { recursive: true });
+    const { dir } = getTestResources("build-pre-ts-default-html");
+    const TEST_SRC = join(dir, "src");
+    const TEST_OUT = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
-    const preContent = `
+    try {
+      mkdirSync(TEST_SRC, { recursive: true });
+
+      const preContent = `
 const title = document.querySelector("title");
 if (title) title.textContent = "Auto-generated";
 `;
 
-    writeFileSync(join(TEST_SRC, "auto.pre.ts"), preContent);
+      writeFileSync(join(TEST_SRC, "auto.pre.ts"), preContent);
 
-    await build({
-      sourceDir: TEST_SRC,
-      targetDir: TEST_OUT,
-    });
+      await build({
+        sourceDir: TEST_SRC,
+        targetDir: TEST_OUT,
+      });
 
-    expect(existsSync(join(TEST_OUT, "auto.html"))).toBe(true);
-    const outputHtml = readFileSync(join(TEST_OUT, "auto.html"), "utf-8");
-    expect(outputHtml).toContain("Auto-generated");
+      expect(existsSync(join(TEST_OUT, "auto.html"))).toBe(true);
+      const outputHtml = readFileSync(join(TEST_OUT, "auto.html"), "utf-8");
+      expect(outputHtml).toContain("Auto-generated");
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("should clean existing target directory before building", async () => {
-    mkdirSync(TEST_SRC, { recursive: true });
-    mkdirSync(TEST_OUT, { recursive: true });
+    const { dir } = getTestResources("build-clean-target-directory");
+    const TEST_SRC = join(dir, "src");
+    const TEST_OUT = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
-    // Create a file in target that shouldn't exist after build
-    writeFileSync(join(TEST_OUT, "old-file.txt"), "should be deleted");
+    try {
+      mkdirSync(TEST_SRC, { recursive: true });
+      mkdirSync(TEST_OUT, { recursive: true });
 
-    const htmlContent = `<!DOCTYPE html>
+      // Create a file in target that shouldn't exist after build
+      writeFileSync(join(TEST_OUT, "old-file.txt"), "should be deleted");
+
+      const htmlContent = `<!DOCTYPE html>
 <html>
 <body>
   <h1>New Build</h1>
@@ -156,22 +188,34 @@ if (title) title.textContent = "Auto-generated";
 </body>
 </html>`;
 
-    writeFileSync(join(TEST_SRC, "index.html"), htmlContent);
-    writeFileSync(join(TEST_SRC, "index.ts"), `console.log("new");`);
+      writeFileSync(join(TEST_SRC, "index.html"), htmlContent);
+      writeFileSync(join(TEST_SRC, "index.ts"), `console.log("new");`);
 
-    await build({
-      sourceDir: TEST_SRC,
-      targetDir: TEST_OUT,
-    });
+      await build({
+        sourceDir: TEST_SRC,
+        targetDir: TEST_OUT,
+      });
 
-    expect(existsSync(join(TEST_OUT, "old-file.txt"))).toBe(false);
-    expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
+      expect(existsSync(join(TEST_OUT, "old-file.txt"))).toBe(false);
+      expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("should handle HTML without scripts", async () => {
-    mkdirSync(TEST_SRC, { recursive: true });
+    const { dir } = getTestResources("build-html-without-scripts");
+    const TEST_SRC = join(dir, "src");
+    const TEST_OUT = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
-    const htmlContent = `<!DOCTYPE html>
+    try {
+      mkdirSync(TEST_SRC, { recursive: true });
+
+      const htmlContent = `<!DOCTYPE html>
 <html>
 <head><title>No Scripts</title></head>
 <body>
@@ -179,25 +223,34 @@ if (title) title.textContent = "Auto-generated";
 </body>
 </html>`;
 
-    writeFileSync(join(TEST_SRC, "static.html"), htmlContent);
+      writeFileSync(join(TEST_SRC, "static.html"), htmlContent);
 
-    await build({
-      sourceDir: TEST_SRC,
-      targetDir: TEST_OUT,
-    });
+      await build({
+        sourceDir: TEST_SRC,
+        targetDir: TEST_OUT,
+      });
 
-    expect(existsSync(join(TEST_OUT, "static.html"))).toBe(true);
-    const outputHtml = readFileSync(join(TEST_OUT, "static.html"), "utf-8");
-    expect(outputHtml).toContain("Static HTML");
+      expect(existsSync(join(TEST_OUT, "static.html"))).toBe(true);
+      const outputHtml = readFileSync(join(TEST_OUT, "static.html"), "utf-8");
+      expect(outputHtml).toContain("Static HTML");
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 
   it("should use default directories when not specified", async () => {
-    const defaultSrc = join(TEST_DIR, "websrc");
-    const defaultOut = join(TEST_DIR, "web");
+    const { dir } = getTestResources("build-default-directories");
+    const defaultSrc = join(dir, "websrc");
+    const defaultOut = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
     
-    mkdirSync(defaultSrc, { recursive: true });
+    try {
+      mkdirSync(defaultSrc, { recursive: true });
 
-    const htmlContent = `<!DOCTYPE html>
+      const htmlContent = `<!DOCTYPE html>
 <html>
 <body>
   <h1>Default Dirs</h1>
@@ -205,47 +258,64 @@ if (title) title.textContent = "Auto-generated";
 </body>
 </html>`;
 
-    writeFileSync(join(defaultSrc, "index.html"), htmlContent);
-    writeFileSync(join(defaultSrc, "index.ts"), `console.log("default");`);
+      writeFileSync(join(defaultSrc, "index.html"), htmlContent);
+      writeFileSync(join(defaultSrc, "index.ts"), `console.log("default");`);
 
-    // Change to TEST_DIR to test default behavior
-    const originalCwd = process.cwd();
-    process.chdir(TEST_DIR);
+      // Change to dir to test default behavior
+      const originalCwd = process.cwd();
+      process.chdir(dir);
 
-    try {
-      await build({});
-      
-      expect(existsSync(join(defaultOut, "index.html"))).toBe(true);
-      expect(existsSync(join(defaultOut, "index.js"))).toBe(true);
+      try {
+        await build({});
+        
+        expect(existsSync(join(defaultOut, "index.html"))).toBe(true);
+        expect(existsSync(join(defaultOut, "index.js"))).toBe(true);
+      } finally {
+        process.chdir(originalCwd);
+      }
     } finally {
-      process.chdir(originalCwd);
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
     }
   });
 
   it("should handle .pre.ts files in subdirectories", async () => {
-    mkdirSync(join(TEST_SRC, "nested"), { recursive: true });
+    const { dir } = getTestResources("build-pre-ts-subdirectories");
+    const TEST_SRC = join(dir, "src");
+    const TEST_OUT = join(dir, "web");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
 
-    const preContent = `
+    try {
+      mkdirSync(join(TEST_SRC, "nested"), { recursive: true });
+
+      const preContent = `
 const h2 = document.createElement("h2");
 h2.textContent = "Nested Pre";
 document.body.appendChild(h2);
 `;
 
-    const htmlContent = `<!DOCTYPE html>
+      const htmlContent = `<!DOCTYPE html>
 <html>
 <body><h1>Nested</h1></body>
 </html>`;
 
-    writeFileSync(join(TEST_SRC, "nested", "page.pre.ts"), preContent);
-    writeFileSync(join(TEST_SRC, "nested", "page.html"), htmlContent);
+      writeFileSync(join(TEST_SRC, "nested", "page.pre.ts"), preContent);
+      writeFileSync(join(TEST_SRC, "nested", "page.html"), htmlContent);
 
-    await build({
-      sourceDir: TEST_SRC,
-      targetDir: TEST_OUT,
-    });
+      await build({
+        sourceDir: TEST_SRC,
+        targetDir: TEST_OUT,
+      });
 
-    expect(existsSync(join(TEST_OUT, "nested", "page.html"))).toBe(true);
-    const outputHtml = readFileSync(join(TEST_OUT, "nested", "page.html"), "utf-8");
-    expect(outputHtml).toContain("Nested Pre");
+      expect(existsSync(join(TEST_OUT, "nested", "page.html"))).toBe(true);
+      const outputHtml = readFileSync(join(TEST_OUT, "nested", "page.html"), "utf-8");
+      expect(outputHtml).toContain("Nested Pre");
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
   });
 });

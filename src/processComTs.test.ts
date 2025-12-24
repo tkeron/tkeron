@@ -1,27 +1,17 @@
-import { describe, it, expect, afterAll, beforeEach } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { processComTs } from "./processComTs";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
-import { tmpdir } from "os";
+import { getTestResources } from "./test-helpers";
 
 describe("processComTs - TypeScript component substitution", () => {
-  const TEST_DIR = join(tmpdir(), `tkeron-comts-test-${Date.now()}`);
-
-  beforeEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true, force: true });
-    }
-    mkdirSync(TEST_DIR, { recursive: true });
-  });
-
-  afterAll(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true, force: true });
-    }
-  });
 
   describe("Basic .com.ts substitution", () => {
     it("should replace custom element with .com.ts generated content", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-replace-custom-element-with-com-ts-generated-content");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -50,9 +40,16 @@ describe("processComTs - TypeScript component substitution", () => {
       expect(result).toContain('<img src="path/to/image.jpg" alt="image description"');
       expect(result).toContain("<div>My comp text content....</div>");
       expect(result).not.toContain("<my-component1>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle simple text content", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-simple-text-content");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -71,9 +68,16 @@ describe("processComTs - TypeScript component substitution", () => {
       
       expect(result).toContain("<h1>Hello World!</h1>");
       expect(result).not.toContain("<greeting-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should replace multiple instances of the same component", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-replace-multiple-instances-of-the-same-component");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -96,11 +100,18 @@ describe("processComTs - TypeScript component substitution", () => {
       expect(matches).toBeTruthy();
       expect(matches?.length).toBe(2);
       expect(result).not.toContain("<my-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Component with access to com element", () => {
     it("should provide access to original element attributes", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-provide-access-to-original-element-attributes");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -123,9 +134,16 @@ com.innerHTML = \`<p>Name: \${name}, Age: \${age}</p>\`;
       
       expect(result).toContain("<p>Name: John, Age: 30</p>");
       expect(result).not.toContain("<data-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should allow reading element's inner content", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-allow-reading-element-s-inner-content");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -147,9 +165,16 @@ com.innerHTML = \`<div class="wrapped">\${original}</div>\`;
       
       expect(result).toContain('<div class="wrapped">Original content</div>');
       expect(result).not.toContain("<wrapper-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should allow querying children of the element", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-allow-querying-children-of-the-element");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -176,11 +201,18 @@ com.innerHTML = \`<div>Found \${count} items</div>\`;
       
       expect(result).toContain("<div>Found 3 items</div>");
       expect(result).not.toContain("<list-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Dynamic content generation", () => {
     it("should allow conditional logic", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-allow-conditional-logic");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -204,9 +236,16 @@ com.innerHTML = show ? "<div>Visible</div>" : "<div>Hidden</div>";
       expect(result).toContain("<div>Visible</div>");
       expect(result).toContain("<div>Hidden</div>");
       expect(result).not.toContain("<conditional-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should allow loops and array operations", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-allow-loops-and-array-operations");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -229,9 +268,16 @@ com.innerHTML = \`<ul>\${listItems}</ul>\`;
       
       expect(result).toContain("<ul><li>Apple</li><li>Banana</li><li>Cherry</li></ul>");
       expect(result).not.toContain("<list-gen-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should support complex TypeScript logic", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-support-complex-typescript-logic");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -261,11 +307,18 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       // 5 * 3 + (5 + 3) = 15 + 8 = 23
       expect(result).toContain("<div>Result: 23</div>");
       expect(result).not.toContain("<calc-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Multiple .com.ts files", () => {
     it("should process all .com.ts components in a single HTML", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-process-all-com-ts-components-in-a-single-html");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -294,9 +347,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       expect(result).not.toContain("<header-ts>");
       expect(result).not.toContain("<content-ts>");
       expect(result).not.toContain("<footer-ts>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should process components across multiple HTML files", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-process-components-across-multiple-html-files");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       mkdirSync(join(TEST_DIR, "section"), { recursive: true });
 
       const index1Html = `<!DOCTYPE html>
@@ -328,11 +388,18 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       expect(result2).toContain("<div>Shared TS</div>");
       expect(result1).not.toContain("<shared-ts-comp>");
       expect(result2).not.toContain("<shared-ts-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Component location priority", () => {
     it("should find components in the same directory as HTML", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-find-components-in-the-same-directory-as-html");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       mkdirSync(join(TEST_DIR, "section"), { recursive: true });
 
       const sectionHtml = `<!DOCTYPE html>
@@ -353,9 +420,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       
       expect(result).toContain("<div>Local TS</div>");
       expect(result).not.toContain("<local-ts-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should prioritize local .com.ts over root .com.ts", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-prioritize-local-com-ts-over-root-com-ts");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       mkdirSync(join(TEST_DIR, "section"), { recursive: true });
 
       const sectionHtml = `<!DOCTYPE html>
@@ -379,9 +453,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       expect(result).toContain("<div>Local TS</div>");
       expect(result).not.toContain("<div>Root TS</div>");
       expect(result).not.toContain("<priority-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should fall back to root if local not found", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-fall-back-to-root-if-local-not-found");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       mkdirSync(join(TEST_DIR, "section"), { recursive: true });
 
       const sectionHtml = `<!DOCTYPE html>
@@ -402,11 +483,18 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       
       expect(result).toContain("<div>From Root</div>");
       expect(result).not.toContain("<root-only-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Edge cases", () => {
     it("should handle empty innerHTML assignment", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-empty-innerhtml-assignment");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -424,9 +512,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
       
       expect(result).not.toContain("<empty-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle component with no innerHTML modification", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-component-with-no-innerhtml-modification");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -445,9 +540,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       
       // Should keep original content since innerHTML wasn't modified
       expect(result).toContain("Original");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle self-closing tags", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-self-closing-tags");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -466,9 +568,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       
       expect(result).toContain("<div>Self-closed replaced</div>");
       expect(result).not.toContain("<self-close-comp");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle components with special characters in names", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-components-with-special-characters-in-names");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -487,9 +596,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       
       expect(result).toContain("<div>Special name</div>");
       expect(result).not.toContain("<my-comp-v2-final>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should preserve HTML structure around components", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-preserve-html-structure-around-components");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <head>
@@ -515,11 +631,18 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       expect(result).toContain("<p>Inside wrapper</p>");
       expect(result).toContain("</div>");
       expect(result).toContain("<title>Test</title>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Component not found", () => {
     it("should leave element unchanged if no .com.ts found", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-leave-element-unchanged-if-no-com-ts-found");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -534,9 +657,16 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
       
       expect(result).toContain("<unknown-ts-comp></unknown-ts-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should process found components and leave unfound ones", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-process-found-components-and-leave-unfound-ones");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -557,11 +687,18 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
       expect(result).toContain("<div>Found</div>");
       expect(result).not.toContain("<found-ts>");
       expect(result).toContain("<not-found-ts></not-found-ts>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Error handling", () => {
     it("should handle TypeScript syntax errors gracefully", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-typescript-syntax-errors-gracefully");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -580,9 +717,16 @@ com.innerHTML = "<div>Error</div>";
 
       // Should throw or handle error
       await expect(processComTs(TEST_DIR)).rejects.toThrow();
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle runtime errors in component code", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-runtime-errors-in-component-code");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -600,11 +744,18 @@ com.innerHTML = "<div>Should not reach here</div>";
 
       // Should throw error
       await expect(processComTs(TEST_DIR)).rejects.toThrow();
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Integration with imports", () => {
     it("should allow importing external modules", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-allow-importing-external-modules");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -627,11 +778,18 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
       
       expect(result).toContain("<div>Path: test");
       expect(result).not.toContain("<import-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Performance", () => {
     it("should handle multiple components efficiently", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-multiple-components-efficiently");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const components = Array.from({ length: 30 }, (_, i) => `ts-comp-${i}`);
       
       let indexHtml = `<!DOCTYPE html>
@@ -665,11 +823,18 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
 
       // Should complete in reasonable time
       expect(duration).toBeLessThan(5000);
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe(".com.ts vs .com.html priority", () => {
     it("should use .com.ts over .com.html when both exist", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-use-com-ts-over-com-html-when-both-exist");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -698,6 +863,9 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
       expect(result).toContain("<div>From TS</div>");
       expect(result).not.toContain("<div>From HTML</div>");
       expect(result).not.toContain("<both-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 });

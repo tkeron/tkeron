@@ -1,27 +1,17 @@
-import { describe, it, expect, afterAll, beforeEach } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { processCom } from "./processCom";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
-import { tmpdir } from "os";
+import { getTestResources } from "./test-helpers";
 
 describe("processCom - Component substitution", () => {
-  const TEST_DIR = join(tmpdir(), `tkeron-com-test-${Date.now()}`);
-
-  beforeEach(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true, force: true });
-    }
-    mkdirSync(TEST_DIR, { recursive: true });
-  });
-
-  afterAll(() => {
-    if (existsSync(TEST_DIR)) {
-      rmSync(TEST_DIR, { recursive: true, force: true });
-    }
-  });
 
   describe("Basic .com.html substitution", () => {
     it("should replace custom element with .com.html content", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-replace-custom-element-with-com-html-content");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,9 +38,16 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain('<img src="path/to/image.jpg" alt="image description"');
       expect(result).toContain("<div>My comp text content....</div>");
       expect(result).not.toContain("<my-component1>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should replace component with wrapped content", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-replace-component-with-wrapped-content");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -78,9 +75,16 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain('<div class="my-comp-class">');
       expect(result).toContain("<h1>My comp title</h1>");
       expect(result).not.toContain("<my-component1>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle multiple instances of the same component", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-multiple-instances-of-the-same-component");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -104,9 +108,16 @@ describe("processCom - Component substitution", () => {
       expect(matches).toBeTruthy();
       expect(matches?.length).toBe(2);
       expect(result).not.toContain("<my-component1>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle multiple different components", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-multiple-different-components");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -135,11 +146,18 @@ describe("processCom - Component substitution", () => {
       expect(result).not.toContain("<header-comp>");
       expect(result).not.toContain("<main-comp>");
       expect(result).not.toContain("<footer-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Component with attributes", () => {
     it("should replace self-closing component tags", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-replace-self-closing-component-tags");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -158,9 +176,16 @@ describe("processCom - Component substitution", () => {
       
       expect(result).toContain("<div>Component content</div>");
       expect(result).not.toContain("<my-component1");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should ignore component attributes during substitution", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-ignore-component-attributes-during-substitution");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -181,11 +206,18 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain('<div class="comp-class">Component</div>');
       expect(result).not.toContain("custom-class");
       expect(result).not.toContain("my-id");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Nested components", () => {
     it("should handle components inside other components", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-components-inside-other-components");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -212,11 +244,18 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain('<div class="inner">Inner content</div>');
       expect(result).not.toContain("<outer-comp>");
       expect(result).not.toContain("<inner-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Component not found", () => {
     it("should leave element unchanged if no .com.html found", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-leave-element-unchanged-if-no-com-html-found");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -232,9 +271,16 @@ describe("processCom - Component substitution", () => {
       
       // Should remain unchanged
       expect(result).toContain("<unknown-component></unknown-component>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle mix of found and not-found components", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-mix-of-found-and-not-found-components");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -255,11 +301,18 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain("<div>Found</div>");
       expect(result).not.toContain("<found-comp>");
       expect(result).toContain("<not-found-comp></not-found-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Multiple HTML files", () => {
     it("should process components in all HTML files", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-process-components-in-all-html-files");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       mkdirSync(join(TEST_DIR, "section"), { recursive: true });
 
       const indexHtml = `<!DOCTYPE html>
@@ -291,11 +344,18 @@ describe("processCom - Component substitution", () => {
       expect(sectionResult).toContain('<div class="comp">Shared component</div>');
       expect(indexResult).not.toContain("<my-comp>");
       expect(sectionResult).not.toContain("<my-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Component in subdirectories", () => {
     it("should find components in the same directory as HTML", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-find-components-in-the-same-directory-as-html");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       mkdirSync(join(TEST_DIR, "section"), { recursive: true });
 
       const sectionHtml = `<!DOCTYPE html>
@@ -316,9 +376,16 @@ describe("processCom - Component substitution", () => {
       
       expect(result).toContain("<div>Local component</div>");
       expect(result).not.toContain("<local-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should prioritize local components over root components", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-prioritize-local-components-over-root-components");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       mkdirSync(join(TEST_DIR, "section"), { recursive: true });
 
       const sectionHtml = `<!DOCTYPE html>
@@ -342,11 +409,18 @@ describe("processCom - Component substitution", () => {
       // Should use local component, not root
       expect(result).toContain("<div>Local component</div>");
       expect(result).not.toContain("<div>Root component</div>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Edge cases", () => {
     it("should handle empty component files", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-empty-component-files");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -363,9 +437,16 @@ describe("processCom - Component substitution", () => {
       
       // Should replace with empty content
       expect(result).not.toContain("<my-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle components with inner content (should be ignored)", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-components-with-inner-content-should-be-ignored");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -387,9 +468,16 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain("<div>Component replaces everything</div>");
       expect(result).not.toContain("This inner content should be replaced");
       expect(result).not.toContain("<my-comp>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should preserve HTML structure and indentation context", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-preserve-html-structure-and-indentation-context");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -411,9 +499,16 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain('<div class="container">');
       expect(result).toContain('<div class="component">Content</div>');
       expect(result).toContain("</body>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should handle component names with numbers and dashes", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-component-names-with-numbers-and-dashes");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const indexHtml = `<!DOCTYPE html>
 <html>
 <body>
@@ -437,11 +532,18 @@ describe("processCom - Component substitution", () => {
       expect(result).toContain("<div>Component V2</div>");
       expect(result).not.toContain("<my-comp-123>");
       expect(result).not.toContain("<comp-v2>");
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Performance and scalability", () => {
     it("should handle many components efficiently", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-handle-many-components-efficiently");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       const components = Array.from({ length: 50 }, (_, i) => `comp-${i}`);
       
       let indexHtml = `<!DOCTYPE html>
@@ -476,28 +578,49 @@ describe("processCom - Component substitution", () => {
 
       // Should complete in reasonable time (< 1 second for 50 components)
       expect(duration).toBeLessThan(1000);
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 
   describe("Circular dependency detection", () => {
     it("should throw error on 2-component circular dependency", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-throw-error-on-2-component-circular-dependency");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       writeFileSync(join(TEST_DIR, "index.html"), "<comp-a></comp-a>");
       writeFileSync(join(TEST_DIR, "comp-a.com.html"), "<div><comp-b></comp-b></div>");
       writeFileSync(join(TEST_DIR, "comp-b.com.html"), "<div><comp-a></comp-a></div>");
       
       await expect(processCom(TEST_DIR)).rejects.toThrow();
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should throw error on 3-component circular dependency", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-throw-error-on-3-component-circular-dependency");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       writeFileSync(join(TEST_DIR, "index.html"), "<comp-x></comp-x>");
       writeFileSync(join(TEST_DIR, "comp-x.com.html"), "<div><comp-y></comp-y></div>");
       writeFileSync(join(TEST_DIR, "comp-y.com.html"), "<div><comp-z></comp-z></div>");
       writeFileSync(join(TEST_DIR, "comp-z.com.html"), "<div><comp-x></comp-x></div>");
       
       await expect(processCom(TEST_DIR)).rejects.toThrow();
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should throw error on 4-component circular dependency", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-throw-error-on-4-component-circular-dependency");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       writeFileSync(join(TEST_DIR, "index.html"), "<comp-alpha></comp-alpha>");
       writeFileSync(join(TEST_DIR, "comp-alpha.com.html"), "<div><comp-beta></comp-beta></div>");
       writeFileSync(join(TEST_DIR, "comp-beta.com.html"), "<div><comp-gamma></comp-gamma></div>");
@@ -505,13 +628,23 @@ describe("processCom - Component substitution", () => {
       writeFileSync(join(TEST_DIR, "comp-delta.com.html"), "<div><comp-alpha></comp-alpha></div>");
       
       await expect(processCom(TEST_DIR)).rejects.toThrow();
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
 
     it("should throw error on self-referencing component", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-throw-error-on-self-referencing-component");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
       writeFileSync(join(TEST_DIR, "index.html"), "<recursive-comp></recursive-comp>");
       writeFileSync(join(TEST_DIR, "recursive-comp.com.html"), "<div><recursive-comp></recursive-comp></div>");
       
       await expect(processCom(TEST_DIR)).rejects.toThrow();
+          } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
     });
   });
 });
