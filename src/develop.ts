@@ -125,10 +125,7 @@ export const develop = async (
     server.stop();
   };
 
-  process.on("SIGINT", () => {
-    stop();
-    process.exit(0);
-  });
+  setupSigintHandler(stop);
 
   return {
     stop,
@@ -136,3 +133,10 @@ export const develop = async (
     host: server.hostname ?? host,
   };
 };
+
+export function setupSigintHandler(stopCallback: () => void) {
+  process.on("SIGINT", () => {
+    stopCallback();
+    process.exit(0);
+  });
+}

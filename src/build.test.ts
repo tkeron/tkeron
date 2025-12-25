@@ -318,4 +318,30 @@ document.body.appendChild(h2);
       rmSync(dir, { recursive: true, force: true });
     }
   });
+
+  it("should handle error when source directory does not exist", async () => {
+    const { dir } = getTestResources("build-source-directory-does-not-exist");
+    const TEST_SRC = join(dir, "nonexistent-src");
+    const TEST_OUT = join(dir, "web");
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+    const processExitSpy = spyOn(process, "exit").mockImplementation((() => {
+      throw new Error("PROCESS_EXIT");
+    }) as any);
+
+    try {
+      await expect(async () => {
+        await build({
+          sourceDir: TEST_SRC,
+          targetDir: TEST_OUT,
+        });
+      }).toThrow("PROCESS_EXIT");
+
+      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(processExitSpy).toHaveBeenCalledWith(1);
+    } finally {
+      consoleErrorSpy?.mockRestore();
+      processExitSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, spyOn } from "bun:test";
 import { processCom } from "./processCom";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
@@ -643,6 +643,42 @@ describe("processCom - Component substitution", () => {
       
       await expect(processCom(TEST_DIR)).rejects.toThrow();
           } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe("Deep nesting MAX_DEPTH", () => {
+    it("should warn when exceeding MAX_DEPTH of 50", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-max-depth-warning");
+      const consoleWarnSpy = spyOn(console, "warn").mockImplementation(() => {});
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        // Create deeply nested HTML
+        let html = `<!DOCTYPE html><html><body>`;
+        for (let i = 0; i < 52; i++) {
+          html += `<nest-${i}>`;
+        }
+        for (let i = 51; i >= 0; i--) {
+          html += `</nest-${i}>`;
+        }
+        html += `</body></html>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), html);
+
+        // Create components that nest into each other
+        for (let i = 0; i < 52; i++) {
+          const next = i < 51 ? `<nest-${i + 1}></nest-${i + 1}>` : "End";
+          writeFileSync(join(TEST_DIR, `nest-${i}.com.html`), `<div>${next}</div>`);
+        }
+
+        await processCom(TEST_DIR);
+
+        expect(consoleWarnSpy).toHaveBeenCalled();
+      } finally {
+        consoleWarnSpy?.mockRestore();
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });

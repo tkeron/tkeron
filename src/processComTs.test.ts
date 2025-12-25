@@ -1,4 +1,4 @@
-import { describe, it, expect } from "bun:test";
+import { describe, it, expect, spyOn } from "bun:test";
 import { processComTs } from "./processComTs";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
@@ -864,6 +864,145 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
       expect(result).not.toContain("<div>From HTML</div>");
       expect(result).not.toContain("<both-comp>");
           } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe("Empty component content handling", () => {
+    it("should handle component that produces empty content", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-empty-component-content");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <p>Before</p>
+  <empty-comp></empty-comp>
+  <p>After</p>
+</body>
+</html>`;
+
+        // Component that clears its content
+        const tsComponent = `com.innerHTML = "";`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "empty-comp.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        // Component should be removed since it has no content
+        expect(result).toContain("Before");
+        expect(result).toContain("After");
+        expect(result).not.toContain("empty-comp");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe("Deep nesting and MAX_DEPTH", () => {
+    it("should handle deep component nesting up to MAX_DEPTH", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-deep-nesting");
+      const consoleWarnSpy = spyOn(console, "warn").mockImplementation(() => {});
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        // Create deeply nested structure
+        let htmlContent = `<!DOCTYPE html><html><body>`;
+        
+        // Create 52 levels of nesting (exceeds MAX_DEPTH of 50)
+        for (let i = 0; i < 52; i++) {
+          htmlContent += `<level-${i}>`;
+        }
+        for (let i = 51; i >= 0; i--) {
+          htmlContent += `</level-${i}>`;
+        }
+        
+        htmlContent += `</body></html>`;
+        writeFileSync(join(TEST_DIR, "index.html"), htmlContent);
+
+        // Create components that nest each other
+        for (let i = 0; i < 52; i++) {
+          const nextLevel = i < 51 ? `<level-${i + 1}></level-${i + 1}>` : "Bottom";
+          writeFileSync(
+            join(TEST_DIR, `level-${i}.com.ts`),
+            `com.innerHTML = \`<div>Level ${i}: ${nextLevel}</div>\`;`
+          );
+        }
+
+        await processComTs(TEST_DIR);
+
+        // Should warn about exceeding MAX_DEPTH
+        expect(consoleWarnSpy).toHaveBeenCalled();
+      } finally {
+        consoleWarnSpy?.mockRestore();
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle component with empty content", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-empty-content");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html><body>
+  <empty-comp></empty-comp>
+  <p>After</p>
+</body></html>`;
+
+        const componentTs = `com.innerHTML = "";`; // Empty content
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "empty-comp.com.ts"), componentTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        // Component should be removed, but surrounding content preserved
+        expect(result).not.toContain("<empty-comp>");
+        expect(result).toContain("<p>After</p>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle component with null parent node edge case", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-null-parent-edge-case");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html><body>
+  <div><orphan-comp></orphan-comp></div>
+</body></html>`;
+
+        // Component that returns empty/null innerHTML
+        const componentTs = `
+// This component will have empty content
+com.innerHTML = "";
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "orphan-comp.com.ts"), componentTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        // Component with empty content should be removed
+        expect(result).not.toContain("orphan-comp");
+        expect(result).toContain("<div></div>");
+      } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });

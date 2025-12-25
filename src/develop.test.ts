@@ -350,3 +350,254 @@ it("develop uses custom port and host", async () => {
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 4000);
+
+it("develop handles nonexistent source directory error", async () => {
+  const { port, dir } = getTestResources("develop-handles-nonexistent-source-directory");
+  const sourceDir = join(dir, "nonexistent-websrc");
+  const outputDir = join(dir, "web");
+  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+  const processExitSpy = spyOn(process, "exit").mockImplementation((() => {
+    throw new Error("PROCESS_EXIT");
+  }) as any);
+
+  try {
+    await expect(async () => {
+      await develop({
+        sourceDir,
+        outputDir,
+        port,
+        host: "localhost",
+      });
+    }).toThrow("PROCESS_EXIT");
+
+    expect(consoleErrorSpy).toHaveBeenCalled();
+    expect(processExitSpy).toHaveBeenCalledWith(1);
+  } finally {
+    consoleLogSpy?.mockRestore();
+    consoleErrorSpy?.mockRestore();
+    processExitSpy?.mockRestore();
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 3000);
+
+it("develop handles SSE client disconnection during reload", async () => {
+  const { port, dir } = getTestResources("develop-handles-sse-client-disconnection");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  let server: DevelopServer | null = null;
+
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Original</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+
+    server = await develop({
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+
+    // Connect SSE client and then close it
+    const response = await fetch(`http://localhost:${port}/dev-reload`);
+    const reader = response.body?.getReader();
+    
+    // Read first message
+    await reader?.read();
+    
+    // Cancel the stream (simulates disconnection)
+    await reader?.cancel();
+    
+    // Wait a bit
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Trigger file change - should handle the closed controller gracefully
+    await writeFile(join(sourceDir, "index.html"), "<h1>Changed</h1>");
+    
+    // Wait for rebuild
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Verify the change was processed
+    const newResponse = await fetch(`http://localhost:${port}/`);
+    const text = await newResponse.text();
+    expect(text).toContain("Changed");
+  } finally {
+    if (server) server.stop();
+    consoleLogSpy?.mockRestore();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 5000);
+
+it("develop handles SSE stream cancel event", async () => {
+  const { port, dir } = getTestResources("develop-handles-sse-stream-cancel");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  let server: DevelopServer | null = null;
+
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Test</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+
+    server = await develop({
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+
+    // Connect and immediately disconnect to trigger cancel
+    const abortController = new AbortController();
+    const response = await fetch(`http://localhost:${port}/dev-reload`, {
+      signal: abortController.signal
+    });
+    
+    const reader = response.body?.getReader();
+    await reader?.read();
+    
+    // Abort connection
+    abortController.abort();
+    
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    // Server should still be running
+    const testResponse = await fetch(`http://localhost:${port}/`);
+    expect(testResponse.status).toBe(200);
+  } finally {
+    if (server) server.stop();
+    consoleLogSpy?.mockRestore();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 3000);
+
+it("develop handles reload client enqueue error gracefully", async () => {
+  const { port, dir } = getTestResources("develop-handles-reload-enqueue-error");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  let server: DevelopServer | null = null;
+
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Test</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+
+    server = await develop({
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+
+    // Connect SSE client
+    const controller = new AbortController();
+    const response = await fetch(`http://localhost:${port}/dev-reload`, {
+      signal: controller.signal
+    });
+    const reader = response.body?.getReader();
+    
+    // Read connection message
+    await reader?.read();
+    
+    // Immediately abort to close the connection
+    controller.abort();
+    
+    // Wait for connection to close
+    await new Promise(resolve => setTimeout(resolve, 200));
+    
+    // Now trigger a file change - this should handle the closed controller
+    await writeFile(join(sourceDir, "index.html"), "<h1>Updated</h1>");
+    
+    // Wait for rebuild
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Server should still work
+    const testResponse = await fetch(`http://localhost:${port}/`);
+    expect(testResponse.status).toBe(200);
+    const text = await testResponse.text();
+    expect(text).toContain("Updated");
+  } finally {
+    if (server) server.stop();
+    consoleLogSpy?.mockRestore();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 4000);
+
+it("develop serves non-HTML static files correctly", async () => {
+  const { port, dir } = getTestResources("develop-serves-static-files");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  let server: DevelopServer | null = null;
+
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Test</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+
+    server = await develop({
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+
+    // Wait for build to complete
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
+    // Test JS file (generated, non-HTML) - should return file without HTML content-type
+    const jsResponse = await fetch(`http://localhost:${port}/index.js`);
+    // The response will be 200 or 204, both are valid for serving files
+    expect([200, 204]).toContain(jsResponse.status);
+    
+    if (jsResponse.status === 200) {
+      const contentType = jsResponse.headers.get("Content-Type");
+      // Bun.file() automatically detects content type
+      expect(contentType).not.toBeNull();
+      // The key is that it's NOT text/html
+      if (contentType) {
+        expect(contentType).not.toContain("text/html");
+      }
+    }
+  } finally {
+    if (server) server.stop();
+    consoleLogSpy?.mockRestore();
+    await new Promise(resolve => setTimeout(resolve, 100));
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 3000);
+
+it("setupSigintHandler should call stop callback", async () => {
+  const { setupSigintHandler } = await import("./develop");
+  let stopCalled = false;
+  const processExitSpy = spyOn(process, "exit").mockImplementation(((code?: number) => {
+    throw new Error(`PROCESS_EXIT_${code}`);
+  }) as any);
+
+  try {
+    const stopCallback = () => {
+      stopCalled = true;
+    };
+
+    // Setup handler
+    setupSigintHandler(stopCallback);
+
+    // Simulate SIGINT
+    await expect(() => {
+      process.emit("SIGINT" as any);
+    }).toThrow("PROCESS_EXIT_0");
+
+    expect(stopCalled).toBe(true);
+    expect(processExitSpy).toHaveBeenCalledWith(0);
+  } finally {
+    processExitSpy?.mockRestore();
+    // Remove all SIGINT listeners
+    process.removeAllListeners("SIGINT");
+  }
+});

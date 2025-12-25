@@ -4,9 +4,10 @@ import { join, resolve, basename } from "path";
 export interface InitOptions {
   projectName: string;
   force?: boolean;
+  promptFn?: (question: string) => Promise<boolean>;
 }
 
-async function promptUser(question: string): Promise<boolean> {
+export async function promptUser(question: string): Promise<boolean> {
   const readline = await import("readline");
   const rl = readline.createInterface({
     input: process.stdin,
@@ -45,7 +46,8 @@ export async function init(options: InitOptions) {
     if (existingTkeronFiles.length > 0) {
       if (!force) {
         console.log(`\n⚠️  The following tkeron files already exist: ${existingTkeronFiles.join(', ')}`);
-        const shouldContinue = await promptUser(
+        const prompt = options.promptFn || promptUser;
+        const shouldContinue = await prompt(
           "\nDo you want to overwrite them? (y/N): "
         );
         
