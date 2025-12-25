@@ -3,6 +3,7 @@ import { getCommands } from "@tkeron/commands";
 import { build } from "./src/build";
 import { develop } from "./src/develop";
 import { init } from "./src/init";
+import { showBanner } from "./src/banner";
 
 async function initWrapper(options: any) {
   try {
@@ -31,6 +32,12 @@ async function initWrapper(options: any) {
     }
     process.exit(1);
   }
+}
+
+// Show banner if no arguments provided
+if (process.argv.length === 2) {
+  await showBanner();
+  process.exit(0);
 }
 
 getCommands()
