@@ -20,7 +20,7 @@ jobs:
         run: bun i
 
       - name: Run tests
-        run: bun test --concurrent
+        run: bun test --concurrent --coverage
 
       - name: Check version
         id: check

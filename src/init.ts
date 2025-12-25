@@ -40,7 +40,7 @@ export async function init(options: InitOptions) {
     }
     
     // Check if tkeron files already exist (web is not included - it's a generated directory)
-    const tkeronFiles = ['src', 'tkeron.d.ts'];
+    const tkeronFiles = ['websrc', 'tkeron.d.ts'];
     const existingTkeronFiles = tkeronFiles.filter(f => existsSync(join(targetPath, f)));
     
     if (existingTkeronFiles.length > 0) {
@@ -89,5 +89,5 @@ export async function init(options: InitOptions) {
   if (!isCurrentDir) {
     console.log(`  cd ${projectName}`);
   }
-  console.log(`  tk dev src`);
+  console.log(`  tk dev websrc`);
 }

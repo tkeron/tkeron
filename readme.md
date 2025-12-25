@@ -84,7 +84,7 @@ Create a new project with the `init` command:
 # Create new project in a subdirectory
 tk init my-project
 cd my-project
-tk dev src
+tk dev websrc
 
 # Or initialize in current directory
 mkdir my-project && cd my-project
@@ -101,7 +101,7 @@ This creates a complete project with examples of all tkeron features:
 - Interactive counter example
 - Ready-to-use development setup
 
-**Note:** When initializing in a directory with existing tkeron files (`src/`, `web/`, `tkeron.d.ts`), you'll be prompted to confirm overwriting. Use `force=true` to skip the prompt. Other files in the directory are preserved.
+**Note:** When initializing in a directory with existing tkeron files (`websrc/`, `tkeron.d.ts`), you'll be prompted to confirm overwriting. Use `force=true` to skip the prompt. Other files in the directory are preserved.
 
 Open `http://localhost:8080` to see your app!
 

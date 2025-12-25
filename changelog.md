@@ -1,3 +1,14 @@
+# v4.0.0-beta.2
+
+## Bug Fixes
+- **Fix default source directory inconsistency**
+  - Changed default source directory from `src` to `websrc` for consistency
+  - Renamed `init_sample/src` to `init_sample/websrc`
+  - Updated `init.ts` to check for `websrc` instead of `src`
+  - Updated all test files to use `websrc`
+  - Updated documentation (README and changelog) to reflect `websrc` as default
+  - Aligns init template with default directories used in build and develop commands
+
 # v4.0.0-beta.1
 
 ## Milestone: Beta Release 🎉

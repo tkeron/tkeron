@@ -1,0 +1,38 @@
+{
+  "lockfileVersion": 1,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "tkeron",
+      "dependencies": {
+        "@tkeron/commands": "0.3.1",
+        "@tkeron/html-parser": "^0.1.5",
+        "@tkeron/tools": "^0.2.2",
+      },
+      "devDependencies": {
+        "@types/bun": "^1.3.5",
+        "prettier": "^3.7.4",
+        "typescript": "^5.9.3",
+      },
+    },
+  },
+  "packages": {
+    "@tkeron/commands": ["@tkeron/commands@0.3.1", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-b7YpdpwVrq8dwnvztpFYCNhjYjiQhX5xix1XXL1Dvt2oHcWiZ3RnG/6yzH0woL3Vbc7shpRNfIexlxmtEkhnIQ=="],
+
+    "@tkeron/html-parser": ["@tkeron/html-parser@0.1.5", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-H+hJ+hSYs6NgvxLVQeGlSc46XNMtE0BetfFvwS1WJEBRlNP/9ksNkSF/0MYHonazCl7tUJtS5X0LW4Z8/ebZww=="],
+
+    "@tkeron/tools": ["@tkeron/tools@0.2.2", "", { "peerDependencies": { "typescript": "^5.7.3" } }, "sha512-DaS1bMiJnmrTJ1QBeYvI0CMDADPHArRj+bwI5FDp3ohgWrnXwK22vbDfqf4dyhqBUSGjdx5N7t/L2UZ8XLc1hg=="],
+
+    "@types/bun": ["@types/bun@1.3.5", "", { "dependencies": { "bun-types": "1.3.5" } }, "sha512-RnygCqNrd3srIPEWBd5LFeUYG7plCoH2Yw9WaZGyNmdTEei+gWaHqydbaIRkIkcbXwhBT94q78QljxN0Sk838w=="],
+
+    "@types/node": ["@types/node@25.0.3", "", { "dependencies": { "undici-types": "~7.16.0" } }, "sha512-W609buLVRVmeW693xKfzHeIV6nJGGz98uCPfeXI1ELMLXVeKYZ9m15fAMSaUPBHYLGFsVRcMmSCksQOrZV9BYA=="],
+
+    "bun-types": ["bun-types@1.3.5", "", { "dependencies": { "@types/node": "*" } }, "sha512-inmAYe2PFLs0SUbFOWSVD24sg1jFlMPxOjOSSCYqUgn4Hsc3rDc7dFvfVYjFPNHtov6kgUeulV4SxbuIV/stPw=="],
+
+    "prettier": ["prettier@3.7.4", "", { "bin": { "prettier": "bin/prettier.cjs" } }, "sha512-v6UNi1+3hSlVvv8fSaoUbggEM5VErKmmpGA7Pl3HF8V6uKY7rvClBOJlH6yNwQtfTueNkGVpOv/mtWL9L4bgRA=="],
+
+    "typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "undici-types": ["undici-types@7.16.0", "", {}, "sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw=="],
+  }
+}

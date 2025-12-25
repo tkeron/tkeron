@@ -229,12 +229,12 @@ describe("init", () => {
       });
   
       expect(existsSync(projectPath)).toBe(true);
-      expect(existsSync(join(projectPath, "src"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "index.html"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "index.ts"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "index.pre.ts"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "info-card.com.html"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "user-badge.com.ts"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "index.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "index.ts"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "index.pre.ts"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "info-card.com.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "user-badge.com.ts"))).toBe(true);
     } finally {
       consoleLogSpy?.mockRestore();
       consoleErrorSpy?.mockRestore();
@@ -296,11 +296,11 @@ describe("init", () => {
         projectName: join(TEST_DIR, projectName),
       });
   
-      expect(existsSync(join(projectPath, "src", "hero-section.com.html"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "pre-render-card.com.html"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "html-components-card.com.html"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "ts-components-card.com.html"))).toBe(true);
-      expect(existsSync(join(projectPath, "src", "counter-card.com.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "hero-section.com.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "pre-render-card.com.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "html-components-card.com.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "ts-components-card.com.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "counter-card.com.html"))).toBe(true);
     } finally {
       consoleLogSpy?.mockRestore();
       consoleErrorSpy?.mockRestore();
@@ -322,11 +322,11 @@ describe("init", () => {
         projectName: join(TEST_DIR, projectName),
       });
   
-      const indexTs = readFileSync(join(projectPath, "src", "index.ts"), "utf-8");
+      const indexTs = readFileSync(join(projectPath, "websrc", "index.ts"), "utf-8");
       expect(indexTs).toContain("let count = 0");
       expect(indexTs).toContain("getElementById");
   
-      const indexHtml = readFileSync(join(projectPath, "src", "index.html"), "utf-8");
+      const indexHtml = readFileSync(join(projectPath, "websrc", "index.html"), "utf-8");
       expect(indexHtml).toContain("<hero-section>");
       expect(indexHtml).toContain("<counter-card>");
     } finally {
@@ -428,8 +428,8 @@ describe("init", () => {
       try {
         await init({ projectName: "." });
   
-        expect(existsSync(join(emptyDir, "src"))).toBe(true);
-        expect(existsSync(join(emptyDir, "src", "index.html"))).toBe(true);
+        expect(existsSync(join(emptyDir, "websrc"))).toBe(true);
+        expect(existsSync(join(emptyDir, "websrc", "index.html"))).toBe(true);
         expect(existsSync(join(emptyDir, "tkeron.d.ts"))).toBe(true);
       } finally {
         process.chdir(originalCwd);
@@ -452,8 +452,8 @@ describe("init", () => {
       mkdirSync(forceDir, { recursive: true });
       
       // Create existing tkeron files
-      mkdirSync(join(forceDir, "src"), { recursive: true });
-      writeFileSync(join(forceDir, "src", "old.txt"), "old content");
+      mkdirSync(join(forceDir, "websrc"), { recursive: true });
+      writeFileSync(join(forceDir, "websrc", "old.txt"), "old content");
       writeFileSync(join(forceDir, "tkeron.d.ts"), "old types");
   
       const originalCwd = process.cwd();
@@ -463,12 +463,12 @@ describe("init", () => {
         await init({ projectName: ".", force: true });
   
         // Should have new tkeron structure
-        expect(existsSync(join(forceDir, "src"))).toBe(true);
-        expect(existsSync(join(forceDir, "src", "index.html"))).toBe(true);
+        expect(existsSync(join(forceDir, "websrc"))).toBe(true);
+        expect(existsSync(join(forceDir, "websrc", "index.html"))).toBe(true);
         expect(existsSync(join(forceDir, "tkeron.d.ts"))).toBe(true);
         
         // Old file should be gone
-        expect(existsSync(join(forceDir, "src", "old.txt"))).toBe(false);
+        expect(existsSync(join(forceDir, "websrc", "old.txt"))).toBe(false);
       } finally {
         process.chdir(originalCwd);
       }
@@ -490,7 +490,7 @@ describe("init", () => {
       mkdirSync(preserveDir, { recursive: true });
       
       // Create tkeron file and non-tkeron files
-      mkdirSync(join(preserveDir, "src"), { recursive: true });
+      mkdirSync(join(preserveDir, "websrc"), { recursive: true });
       writeFileSync(join(preserveDir, "README.md"), "my readme");
       writeFileSync(join(preserveDir, "package.json"), "{}");
   
@@ -505,7 +505,7 @@ describe("init", () => {
         expect(existsSync(join(preserveDir, "package.json"))).toBe(true);
         
         // Tkeron files should be new
-        expect(existsSync(join(preserveDir, "src", "index.html"))).toBe(true);
+        expect(existsSync(join(preserveDir, "websrc", "index.html"))).toBe(true);
         expect(existsSync(join(preserveDir, "tkeron.d.ts"))).toBe(true);
       } finally {
         process.chdir(originalCwd);
@@ -534,7 +534,7 @@ describe("init", () => {
       try {
         await init({ projectName: "." });
   
-        expect(existsSync(join(dirWithGit, "src"))).toBe(true);
+        expect(existsSync(join(dirWithGit, "websrc"))).toBe(true);
         expect(existsSync(join(dirWithGit, "tkeron.d.ts"))).toBe(true);
       } finally {
         process.chdir(originalCwd);
@@ -555,8 +555,8 @@ describe("init", () => {
   
       const partialDir = join(TEST_DIR, "partial-src-dir");
       mkdirSync(partialDir, { recursive: true });
-      mkdirSync(join(partialDir, "src"), { recursive: true });
-      writeFileSync(join(partialDir, "src", "old.js"), "old");
+      mkdirSync(join(partialDir, "websrc"), { recursive: true });
+      writeFileSync(join(partialDir, "websrc", "old.js"), "old");
   
       const originalCwd = process.cwd();
       process.chdir(partialDir);
@@ -565,10 +565,10 @@ describe("init", () => {
         await init({ projectName: ".", force: true });
   
         // Should have new complete structure
-        expect(existsSync(join(partialDir, "src", "index.html"))).toBe(true);
+        expect(existsSync(join(partialDir, "websrc", "index.html"))).toBe(true);
         expect(existsSync(join(partialDir, "tkeron.d.ts"))).toBe(true);
         // web is not part of init - it's generated by build
-        expect(existsSync(join(partialDir, "src", "old.js"))).toBe(false);
+        expect(existsSync(join(partialDir, "websrc", "old.js"))).toBe(false);
       } finally {
         process.chdir(originalCwd);
       }
@@ -598,7 +598,7 @@ describe("init", () => {
         await init({ projectName: ".", force: true });
   
         // Should have new structure
-        expect(existsSync(join(partialDir, "src"))).toBe(true);
+        expect(existsSync(join(partialDir, "websrc"))).toBe(true);
         expect(existsSync(join(partialDir, "tkeron.d.ts"))).toBe(true);
         // web is not part of init - it's generated by build
         
@@ -626,8 +626,8 @@ describe("init", () => {
       const mixedDir = join(TEST_DIR, "git-and-tkeron-dir");
       mkdirSync(mixedDir, { recursive: true });
       mkdirSync(join(mixedDir, ".git"), { recursive: true });
-      mkdirSync(join(mixedDir, "src"), { recursive: true });
-      writeFileSync(join(mixedDir, "src", "old.txt"), "old");
+      mkdirSync(join(mixedDir, "websrc"), { recursive: true });
+      writeFileSync(join(mixedDir, "websrc", "old.txt"), "old");
   
       const originalCwd = process.cwd();
       process.chdir(mixedDir);
@@ -636,14 +636,14 @@ describe("init", () => {
         await init({ projectName: ".", force: true });
   
         // Should have new tkeron structure
-        expect(existsSync(join(mixedDir, "src", "index.html"))).toBe(true);
+        expect(existsSync(join(mixedDir, "websrc", "index.html"))).toBe(true);
         expect(existsSync(join(mixedDir, "tkeron.d.ts"))).toBe(true);
         
         // .git should be preserved
         expect(existsSync(join(mixedDir, ".git"))).toBe(true);
         
         // Old src file should be gone
-        expect(existsSync(join(mixedDir, "src", "old.txt"))).toBe(false);
+        expect(existsSync(join(mixedDir, "websrc", "old.txt"))).toBe(false);
       } finally {
         process.chdir(originalCwd);
       }
@@ -663,7 +663,7 @@ describe("init", () => {
   
       const multipleDir = join(TEST_DIR, "multiple-files-dir");
       mkdirSync(multipleDir, { recursive: true });
-      mkdirSync(join(multipleDir, "src"), { recursive: true });
+      mkdirSync(join(multipleDir, "websrc"), { recursive: true });
       writeFileSync(join(multipleDir, "package.json"), "{}");
       writeFileSync(join(multipleDir, ".gitignore"), "node_modules");
       writeFileSync(join(multipleDir, "README.md"), "readme");
@@ -677,7 +677,7 @@ describe("init", () => {
         await init({ projectName: ".", force: true });
   
         // Tkeron files should be new
-        expect(existsSync(join(multipleDir, "src", "index.html"))).toBe(true);
+        expect(existsSync(join(multipleDir, "websrc", "index.html"))).toBe(true);
         expect(existsSync(join(multipleDir, "tkeron.d.ts"))).toBe(true);
         
         // All non-tkeron files should be preserved
@@ -706,8 +706,8 @@ describe("init", () => {
       mkdirSync(currentDir, { recursive: true });
       
       // Crear archivos tkeron existentes
-      mkdirSync(join(currentDir, "src"), { recursive: true });
-      writeFileSync(join(currentDir, "src", "index.html"), "<h1>Old Content</h1>");
+      mkdirSync(join(currentDir, "websrc"), { recursive: true });
+      writeFileSync(join(currentDir, "websrc", "index.html"), "<h1>Old Content</h1>");
       writeFileSync(join(currentDir, "tkeron.d.ts"), "// old declarations");
 
       const originalCwd = process.cwd();
@@ -718,8 +718,8 @@ describe("init", () => {
         await init({ projectName: ".", force: true });
 
         // Verificar que se sobrescribieron los archivos sin preguntar
-        expect(existsSync(join(currentDir, "src", "index.html"))).toBe(true);
-        const newContent = readFileSync(join(currentDir, "src", "index.html"), "utf-8");
+        expect(existsSync(join(currentDir, "websrc", "index.html"))).toBe(true);
+        const newContent = readFileSync(join(currentDir, "websrc", "index.html"), "utf-8");
         expect(newContent).not.toContain("Old Content");
         expect(consoleLogSpy).toHaveBeenCalledWith("✓ Cleaned existing tkeron files");
       } finally {
@@ -775,8 +775,8 @@ describe("init", () => {
     try {
       const currentDir = join(TEST_DIR, "current");
       mkdirSync(currentDir, { recursive: true });
-      mkdirSync(join(currentDir, "src"), { recursive: true });
-      writeFileSync(join(currentDir, "src", "index.html"), "<h1>Old</h1>");
+      mkdirSync(join(currentDir, "websrc"), { recursive: true });
+      writeFileSync(join(currentDir, "websrc", "index.html"), "<h1>Old</h1>");
       writeFileSync(join(currentDir, "tkeron.d.ts"), "// old");
 
       const originalCwd = process.cwd();
@@ -811,8 +811,8 @@ describe("init", () => {
     try {
       const currentDir = join(TEST_DIR, "current");
       mkdirSync(currentDir, { recursive: true });
-      mkdirSync(join(currentDir, "src"), { recursive: true });
-      writeFileSync(join(currentDir, "src", "index.html"), "<h1>Old</h1>");
+      mkdirSync(join(currentDir, "websrc"), { recursive: true });
+      writeFileSync(join(currentDir, "websrc", "index.html"), "<h1>Old</h1>");
       writeFileSync(join(currentDir, "tkeron.d.ts"), "// old");
 
       const originalCwd = process.cwd();
@@ -824,8 +824,8 @@ describe("init", () => {
 
         await init({ projectName: ".", promptFn: mockPrompt });
 
-        expect(existsSync(join(currentDir, "src", "index.html"))).toBe(true);
-        const newContent = readFileSync(join(currentDir, "src", "index.html"), "utf-8");
+        expect(existsSync(join(currentDir, "websrc", "index.html"))).toBe(true);
+        const newContent = readFileSync(join(currentDir, "websrc", "index.html"), "utf-8");
         expect(newContent).not.toContain("Old");
         expect(consoleLogSpy).toHaveBeenCalledWith("✓ Cleaned existing tkeron files");
       } finally {
@@ -888,7 +888,7 @@ describe("init", () => {
         // Should not include "cd projectName" step
         const calls = consoleLogSpy.mock.calls.map(c => c[0]);
         expect(calls.some(c => c?.includes("Next steps:"))).toBe(true);
-        expect(calls.some(c => c?.includes("tk dev src"))).toBe(true);
+        expect(calls.some(c => c?.includes("tk dev websrc"))).toBe(true);
         expect(calls.some(c => c?.includes("cd "))).toBe(false);
       } finally {
         process.chdir(originalCwd);
@@ -915,7 +915,7 @@ describe("init", () => {
       const calls = consoleLogSpy.mock.calls.map(c => c[0]);
       expect(calls.some(c => c?.includes("Next steps:"))).toBe(true);
       expect(calls.some(c => c?.includes(`cd ${projectPath}`))).toBe(true);
-      expect(calls.some(c => c?.includes("tk dev src"))).toBe(true);
+      expect(calls.some(c => c?.includes("tk dev websrc"))).toBe(true);
     } finally {
       consoleLogSpy?.mockRestore();
       consoleErrorSpy?.mockRestore();
@@ -934,7 +934,7 @@ describe("init", () => {
     try {
       const currentDir = join(TEST_DIR, "current");
       mkdirSync(currentDir, { recursive: true });
-      mkdirSync(join(currentDir, "src"), { recursive: true });
+      mkdirSync(join(currentDir, "websrc"), { recursive: true });
 
       const originalCwd = process.cwd();
       process.chdir(currentDir);
@@ -950,7 +950,7 @@ describe("init", () => {
         const calls = consoleLogSpy.mock.calls.map(c => c[0]);
         expect(calls.some(c => c?.includes("⚠️"))).toBe(true);
         expect(calls.some(c => c?.includes("tkeron files already exist"))).toBe(true);
-        expect(calls.some(c => c?.includes("src"))).toBe(true);
+        expect(calls.some(c => c?.includes("websrc"))).toBe(true);
       } finally {
         process.chdir(originalCwd);
       }
@@ -1012,7 +1012,7 @@ describe("init", () => {
     try {
       const currentDir = join(TEST_DIR, "current");
       mkdirSync(currentDir, { recursive: true });
-      mkdirSync(join(currentDir, "src"), { recursive: true });
+      mkdirSync(join(currentDir, "websrc"), { recursive: true });
       writeFileSync(join(currentDir, "tkeron.d.ts"), "// old");
 
       const originalCwd = process.cwd();
@@ -1029,7 +1029,7 @@ describe("init", () => {
         const calls = consoleLogSpy.mock.calls.map(c => c[0]);
         const warningCall = calls.find(c => c?.includes("tkeron files already exist"));
         expect(warningCall).toBeDefined();
-        expect(warningCall).toContain("src");
+        expect(warningCall).toContain("websrc");
         expect(warningCall).toContain("tkeron.d.ts");
       } finally {
         process.chdir(originalCwd);
