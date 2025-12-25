@@ -1,5 +1,5 @@
 export async function showBanner() {
-  const packageJson = await Bun.file("package.json").json();
+  const packageJson = await import("../package.json");
   console.log(`\x1b[34m
    _______  _  __  _____  ____    ___   _   _
   |__   __|| |/ / |  ___||    \\  /   \\ | \\ | |
