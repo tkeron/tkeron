@@ -29,7 +29,7 @@ jobs:
 
       - name: Publish to npm
         if: steps.check.outcome == 'success'
-        run: npm publish --access public --tag alpha
+        run: npm publish --access public --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 

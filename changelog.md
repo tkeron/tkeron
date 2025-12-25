@@ -1,3 +1,21 @@
+# v4.0.0-beta.1
+
+## Milestone: Beta Release 🎉
+- **Transition from alpha to beta**
+  - All core features implemented and stable
+  - 143 tests passing with comprehensive coverage
+  - Complete documentation and examples
+  - Ready for wider testing and feedback
+
+## Core Features (Stable)
+- ✅ Project initialization with `tk init`
+- ✅ Build system with TypeScript bundling
+- ✅ Development server with hot reload
+- ✅ Pre-rendering with `.pre.ts` files
+- ✅ HTML components with `.com.html` files
+- ✅ TypeScript components with `.com.ts` files
+- ✅ 7 comprehensive examples
+
 # v4.0.0-alpha.10
 
 ## New Features

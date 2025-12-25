@@ -1,9 +1,9 @@
 # tkeron
 
-⚠️ **v4.0.0-alpha.10 - Early Alpha Release**
+🚀 **v4.0.0-beta.1 - Beta Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
-**Core functionality available:** build system, development server, pre-rendering, and HTML components. More features coming soon.
+**All core features are complete and stable:** build system, development server, pre-rendering, HTML components, and TypeScript components.
 
 ---
 
@@ -15,7 +15,7 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
 - **'No magic' philosophy:** Explicit behavior controlled by the developer
 - **Bun-powered:** Fast builds and modern tooling
 
-## What's Available Now (v4 Alpha)
+## Features
 
 - ✅ **Project initialization:**
   ```bash

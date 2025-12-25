@@ -1,0 +1,29 @@
+# Development examples (not needed in published package)
+examples/basic_build/
+examples/with_assets/
+examples/with_com_html_priority/
+examples/with_com_mixed_priority/
+examples/with_com_ts/
+examples/with_com_ts_priority/
+examples/with_pre/
+
+# Test files
+src/**/*.test.ts
+src/test-helpers.ts
+*.test.ts
+
+# Development scripts
+check-versions.ts
+
+# Configuration files
+tsconfig.json
+.gitignore
+
+# CI/CD
+.github/
+
+# Generated directories
+**/web/
+**/node_modules/
+coverage/
+local_test/
