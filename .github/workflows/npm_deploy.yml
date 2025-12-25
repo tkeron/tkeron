@@ -20,9 +20,15 @@ jobs:
         run: bun i
 
       - name: Run tests
-        run: bun test
+        run: bun test --concurrent
+
+      - name: Check version
+        id: check
+        run: bun check-versions.ts
+        continue-on-error: true
 
       - name: Publish to npm
+        if: steps.check.outcome == 'success'
         run: npm publish --access public --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
