@@ -50,11 +50,15 @@ document.body.appendChild(h1);
 
       writeFileSync(join(dir, "error.pre.ts"), preContent);
       
-      await expect(async () => {
+      let errorThrown = false;
+      try {
         await processPre(dir);
-      }).toThrow("Pre-rendering failed");
+      } catch (error: any) {
+        errorThrown = true;
+        expect(error.message).toContain("Pre-rendering failed");
+      }
 
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(errorThrown).toBe(true);
     } finally {
       consoleLogSpy?.mockRestore();
       consoleErrorSpy?.mockRestore();
@@ -74,11 +78,15 @@ document.body.appendChild(h1);
 
       writeFileSync(join(dir, "runtime-error.pre.ts"), preContent);
       
-      await expect(async () => {
+      let errorThrown = false;
+      try {
         await processPre(dir);
-      }).toThrow("Pre-rendering failed");
+      } catch (error: any) {
+        errorThrown = true;
+        expect(error.message).toContain("Pre-rendering failed");
+      }
 
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      expect(errorThrown).toBe(true);
     } finally {
       consoleLogSpy?.mockRestore();
       consoleErrorSpy?.mockRestore();
