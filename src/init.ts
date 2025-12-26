@@ -33,37 +33,42 @@ export async function init(options: InitOptions) {
   const targetPath = resolve(process.cwd(), projectName);
   const isCurrentDir = projectName === "." || targetPath === process.cwd();
   
-  // Check if directory exists and has tkeron files
   if (existsSync(targetPath)) {
     if (!isCurrentDir) {
-      throw new Error(`Directory "${projectName}" already exists`);
-    }
-    
-    // Check if tkeron files already exist (web is not included - it's a generated directory)
-    const tkeronFiles = ['websrc', 'tkeron.d.ts'];
-    const existingTkeronFiles = tkeronFiles.filter(f => existsSync(join(targetPath, f)));
-    
-    if (existingTkeronFiles.length > 0) {
       if (!force) {
-        console.log(`\n⚠️  The following tkeron files already exist: ${existingTkeronFiles.join(', ')}`);
-        const prompt = options.promptFn || promptUser;
-        const shouldContinue = await prompt(
-          "\nDo you want to overwrite them? (y/N): "
-        );
-        
-        if (!shouldContinue) {
-          console.log("\n❌ Operation cancelled.");
-          process.exit(0);
+        const files = readdirSync(targetPath);
+        if (files.length > 0) {
+          throw new Error(`Directory "${projectName}" already exists`);
         }
+      } else {
+        rmSync(targetPath, { recursive: true, force: true });
+        console.log(`✓ Removed existing directory "${projectName}"`);
       }
+    } else {
+      const tkeronFiles = ['websrc', 'tkeron.d.ts'];
+      const existingTkeronFiles = tkeronFiles.filter(f => existsSync(join(targetPath, f)));
       
-      // Remove existing tkeron files
-      existingTkeronFiles.forEach(file => {
-        const filePath = join(targetPath, file);
-        rmSync(filePath, { recursive: true, force: true });
-      });
-      
-      console.log("✓ Cleaned existing tkeron files");
+      if (existingTkeronFiles.length > 0) {
+        if (!force) {
+          console.log(`\n⚠️  The following tkeron files already exist: ${existingTkeronFiles.join(', ')}`);
+          const prompt = options.promptFn || promptUser;
+          const shouldContinue = await prompt(
+            "\nDo you want to overwrite them? (y/N): "
+          );
+          
+          if (!shouldContinue) {
+            console.log("\n❌ Operation cancelled.");
+            process.exit(0);
+          }
+        }
+        
+        existingTkeronFiles.forEach(file => {
+          const filePath = join(targetPath, file);
+          rmSync(filePath, { recursive: true, force: true });
+        });
+        
+        console.log("✓ Cleaned existing tkeron files");
+      }
     }
   }
 

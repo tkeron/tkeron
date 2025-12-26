@@ -1,3 +1,47 @@
+# v4.0.0-beta.3
+
+## New Features
+- **Force flag for init command**
+  - Added `force=true` option to `tk init` command
+  - Allows overwriting existing directories without prompts
+  - Usage: `tk init example force=true`
+  - Removes and recreates the entire directory when specified
+  - Prevents errors when directory already exists
+  - Useful for resetting projects or automation scripts
+
+## Improvements
+- **Enhanced directory handling in init**
+  - Empty directories are now allowed without force flag
+  - Only non-empty directories require `force=true` to overwrite
+  - Better error messages indicating the correct syntax
+  - Current directory (`.`) behavior unchanged - only removes tkeron files
+
+- **Enhanced pre-rendering capabilities**
+  - Added cryptocurrency price fetching example (Bitcoin, Ethereum, Solana)
+  - Demonstrates real-time API data fetching at build time
+  - Added build metadata with tkeron version and Bun runtime info
+  - Shows practical use case of external API integration during pre-rendering
+
+- **Improved build system**
+  - Changed temp directory location from system `/tmp` to project-sibling `.tmp_*`
+  - Preserves relative imports to files outside websrc
+  - Enables natural module resolution for external dependencies
+  - Added `.tmp_*` to .gitignore
+  - Implemented robust cleanup with try-finally to prevent orphaned temp directories
+
+- **Better hot reload**
+  - Enhanced EventSource client with automatic reconnection on errors
+  - Added error handling to prevent connection failures
+  - Improved reliability for consecutive file changes
+  - Added console logging for better debugging experience
+
+## Template Updates
+- New cryptocurrency prices section in init_sample
+- Real-time price display with color-coded 24h changes (green ▲ / red ▼)
+- Responsive grid layout for asset cards
+- Build metadata footer showing tkeron version, Bun runtime, platform
+- Updated quote section with improved styling
+
 # v4.0.0-beta.2
 
 ## Bug Fixes

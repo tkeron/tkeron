@@ -154,6 +154,49 @@
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       }
+      .crypto-prices-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+      }
+      .crypto-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 1.25rem;
+        border-radius: 12px;
+        color: white;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        transition: transform 0.2s;
+      }
+      .crypto-card:hover {
+        transform: translateY(-4px);
+      }
+      .crypto-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+      }
+      .crypto-name {
+        font-weight: 600;
+        font-size: 1rem;
+      }
+      .crypto-symbol {
+        background: rgba(255,255,255,0.2);
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 700;
+      }
+      .crypto-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+      }
+      .crypto-change {
+        font-size: 0.9rem;
+        font-weight: 600;
+      }
     </style>
   </head>
   <body>
@@ -164,6 +207,13 @@
         <html-components-card></html-components-card>
         <ts-components-card></ts-components-card>
         <counter-card></counter-card>
+        
+        <!-- Crypto Prices - fetched at build time -->
+        <section style="grid-column: span 3;">
+          <h2>💰 Asset Prices (Build Time)</h2>
+          <p style="font-size: 0.85rem; margin-bottom: 0.75rem;">Real cryptocurrency prices fetched from CoinGecko API at build time:</p>
+          <div id="crypto-prices" class="crypto-prices-container"></div>
+        </section>
         
         <!-- Pre-rendered content with external API data -->
         <section style="grid-column: span 3;">

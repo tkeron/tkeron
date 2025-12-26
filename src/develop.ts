@@ -83,7 +83,25 @@ export const develop = async (
           const html = await file.text();
           const injectedHtml = html.replace(
             "</body>",
-            `<script>new EventSource('/dev-reload').onmessage=e=>{if(e.data==='reload')location.reload()}</script></body>`
+            `<script>
+(function() {
+  let es;
+  function connect() {
+    es = new EventSource('/dev-reload');
+    es.onmessage = function(e) {
+      if (e.data === 'reload') {
+        console.log('🔄 Reloading page...');
+        location.reload();
+      }
+    };
+    es.onerror = function() {
+      es.close();
+      setTimeout(connect, 1000);
+    };
+  }
+  connect();
+})();
+</script></body>`
           );
           return new Response(injectedHtml, {
             headers: { "Content-Type": "text/html" },

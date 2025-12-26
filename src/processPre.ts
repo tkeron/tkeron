@@ -1,6 +1,11 @@
 import { join, dirname } from "path";
 import { getFilePaths } from "@tkeron/tools";
 
+// Read tkeron version from package.json
+const packageJsonPath = join(import.meta.dir, "..", "package.json");
+const packageJson = await Bun.file(packageJsonPath).json();
+const TKERON_VERSION = packageJson.version;
+
 const DEFAULT_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,6 +58,10 @@ await Bun.write(htmlPath, htmlOutput);
             cwd: dirname(preFile),
             stdout: "pipe",
             stderr: "pipe",
+            env: {
+                ...process.env,
+                TKERON_VERSION,
+            },
         });
         
         await proc.exited;

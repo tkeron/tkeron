@@ -242,7 +242,7 @@ describe("init", () => {
     }
   });
 
-  it("should throw error if directory already exists", async () => {
+  it("should throw error if non-empty directory already exists", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-throw-error-if-directory-already-exists");
     const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
     const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
@@ -252,6 +252,8 @@ describe("init", () => {
       const projectName = "existing-project";
       const projectPath = join(TEST_DIR, projectName);
       mkdirSync(projectPath, { recursive: true });
+      // Add a file to make it non-empty
+      writeFileSync(join(projectPath, "something.txt"), "content");
   
       expect(async () => {
         await init({
@@ -506,6 +508,35 @@ describe("init", () => {
       } finally {
         process.chdir(originalCwd);
       }
+    } finally {
+      consoleLogSpy?.mockRestore();
+      consoleErrorSpy?.mockRestore();
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should overwrite existing directory when force option is provided for non-current directory", async () => {
+    const { dir: TEST_DIR } = getTestResources("init-should-overwrite-existing-directory-when-force-option-is-provided");
+    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+
+    try {
+      // Create existing directory with some files
+      const projectName = "example";
+      const projectPath = join(TEST_DIR, projectName);
+      mkdirSync(projectPath, { recursive: true });
+      writeFileSync(join(projectPath, "old-file.txt"), "old content");
+  
+      // Init with force should remove the directory and create new project
+      await init({ projectName: join(TEST_DIR, projectName), force: true });
+  
+      // Should have new tkeron structure
+      expect(existsSync(join(projectPath, "websrc"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "index.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "tkeron.d.ts"))).toBe(true);
+      
+      // Old file should be gone
+      expect(existsSync(join(projectPath, "old-file.txt"))).toBe(false);
     } finally {
       consoleLogSpy?.mockRestore();
       consoleErrorSpy?.mockRestore();

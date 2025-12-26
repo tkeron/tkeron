@@ -1,6 +1,6 @@
 # tkeron
 
-🚀 **v4.0.0-beta.1 - Beta Release**
+🚀 **v4.0.0-beta.3 - Beta Release**
 
 This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
 **All core features are complete and stable:** build system, development server, pre-rendering, HTML components, and TypeScript components.
@@ -44,6 +44,8 @@ This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime.
   - Live server with automatic rebuild on file changes
   - File system watcher for instant updates
   - Serves built files from output directory
+  - **Automatic reconnection** on connection errors
+  - No manual refresh needed during development
   
 - ✅ **Pre-processing and pre-rendering with `.pre.ts` files:** 
   - Generate complete HTML pages from TypeScript
@@ -90,8 +92,8 @@ tk dev websrc
 mkdir my-project && cd my-project
 tk init .
 
-# Force overwrite if tkeron files already exist
-tk init . force=true
+# Force overwrite existing directory
+tk init example force=true
 ```
 
 This creates a complete project with examples of all tkeron features:
@@ -101,7 +103,9 @@ This creates a complete project with examples of all tkeron features:
 - Interactive counter example
 - Ready-to-use development setup
 
-**Note:** When initializing in a directory with existing tkeron files (`websrc/`, `tkeron.d.ts`), you'll be prompted to confirm overwriting. Use `force=true` to skip the prompt. Other files in the directory are preserved.
+**Note:** 
+- When initializing a **new directory**: If it already exists and contains files, you'll get an error. Use `force=true` to remove and recreate it.
+- When initializing in **current directory** (`.`): If tkeron files exist (`websrc/`, `tkeron.d.ts`), you'll be prompted to confirm overwriting. Use `force=true` to skip the prompt. Other files in the directory are preserved.
 
 Open `http://localhost:8080` to see your app!
 
@@ -109,7 +113,12 @@ Open `http://localhost:8080` to see your app!
 
 The `examples/` directory contains working examples:
 
-- **`init_sample/`** - Complete template used by `tk init` command (all features)
+- **`init_sample/`** - Complete template used by `tk init` command
+  - Pre-rendering with external API calls (cryptocurrency prices, random quotes)
+  - Build metadata injection (version, runtime, timestamp)
+  - HTML components (`.com.html`)
+  - TypeScript components (`.com.ts`)
+  - Interactive counter example
 - **`basic_build/`** - Simple TypeScript + HTML project
 - **`with_assets/`** - Project with nested directories and assets
 - **`with_pre/`** - Demonstrates `.pre.ts` preprocessing capabilities
@@ -134,7 +143,9 @@ img.setAttribute('src', './generated-image.png');
 - Can use standard DOM APIs: `querySelector`, `setAttribute`, `createElement`, etc.
 - Output static `.html` files that get bundled
 - Can generate complete HTML pages without a corresponding `.html` file
-- You can use any npm packages or TypeScript libraries you want
+- **You can import and use any TypeScript modules or npm packages**
+- **Fetch data from external APIs** at build time for static content
+- **Read project files** to include version info and metadata
 
 **Key concept:** `.pre.ts` is for generating static HTML at build time, not for browser interactivity. Use regular `.ts` files for client-side JavaScript.
 
@@ -145,6 +156,47 @@ img.setAttribute('src', './generated-image.png');
 - Process markdown to HTML
 - Generate static content from CMS or external sources
 - Build entire static sites programmatically
+- **Fetch real-time data** (cryptocurrency prices, weather, news) at build time
+- **Include build metadata** (version, runtime, timestamp) in your pages
+
+**Example - Fetching external data at build time:**
+```typescript
+// api-service.ts - A reusable module
+export async function getCryptoPrices() {
+  const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');
+  return res.json();
+}
+
+export function getBuildMetadata() {
+  const pkg = require('../package.json');
+  return {
+    timestamp: new Date().toLocaleString(),
+    version: pkg.version,
+    runtime: `Bun ${Bun.version}`,
+    platform: process.platform
+  };
+}
+```
+
+```typescript
+// index.pre.ts - Use the module in pre-rendering
+import { getCryptoPrices, getBuildMetadata } from './api-service';
+
+// Fetch crypto prices at build time
+const prices = await getCryptoPrices();
+const cryptoSection = document.querySelector('#crypto-prices');
+cryptoSection!.innerHTML = `
+  <div>Bitcoin: $${prices.bitcoin.usd}</div>
+  <div>Ethereum: $${prices.ethereum.usd}</div>
+`;
+
+// Add build metadata to footer
+const metadata = getBuildMetadata();
+const footer = document.querySelector('footer');
+footer!.innerHTML = `Built: ${metadata.timestamp} | tkeron: ${metadata.version} | Runtime: ${metadata.runtime}`;
+```
+
+This generates **static HTML** with the latest data at build time. The `fetch` happens on the server during build, not in the browser.
 
 ### Using `.com.html` Files (HTML Components)
 

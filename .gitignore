@@ -3,4 +3,5 @@ coverage
 web
 local_test
 **/web/
+.tmp_*
 

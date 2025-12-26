@@ -13,7 +13,7 @@ export async function initWrapper(options: any) {
     } else if (msg.includes("already exists")) {
       const projectName = msg.split('"')[1];
       console.error(`\n❌ Error: Directory "${projectName}" already exists.`);
-      console.error(`\n💡 Tip: Choose a different name, use '.' for current directory, or use --force to overwrite.\n`);
+      console.error(`\n💡 Tip: Choose a different name, use '.' for current directory, or use force=true to overwrite.\n`);
     } else if (msg === "Template directory not found") {
       console.error("\n❌ Error: Template directory not found.");
       console.error("\n💡 This might be a tkeron installation issue.");
