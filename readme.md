@@ -1,311 +1,131 @@
-# tkeron
+# Tkeron
 
-🚀 **v4.0.0-beta.3 - Beta Release**
+CLI build tool for vanilla web development. TypeScript compilation, component organization, zero runtime.
 
-This is a complete rewrite of tkeron, migrating from Node.js to Bun runtime. 
-**All core features are complete and stable:** build system, development server, pre-rendering, HTML components, and TypeScript components.
+Powered by [Bun](https://bun.sh).
 
----
+## Install
 
-**tkeron** is a CLI tool for web development with TypeScript that enables a backend-driven frontend approach:
+```bash
+# Install Bun first
+curl -fsSL https://bun.sh/install | bash
 
-- **Build-time HTML generation:** Use TypeScript to generate static HTML during the build process
-- **Pre-rendering capabilities:** Manipulate and create HTML pages programmatically before deployment
-- **Simplicity:** Pure TypeScript, HTML, and CSS - no new syntax to learn
-- **'No magic' philosophy:** Explicit behavior controlled by the developer
-- **Bun-powered:** Fast builds and modern tooling
+# Install Tkeron
+bun install -g tkeron
+```
 
 ## Features
 
-- ✅ **Project initialization:**
-  ```bash
-  tk init <projectName>
-  # or using alias
-  tk i my-app
-  ```
-  - Creates new project with complete template
-  - Includes examples of all tkeron features
-  - Ready-to-use development setup
+- TypeScript → vanilla JavaScript
+- HTML components (`.com.html`) - inline at build time
+- TypeScript components (`.com.ts`) - dynamic generation
+- Pre-rendering (`.pre.ts`) - DOM manipulation at build time
+- Dev server with hot reload
+- Zero config
 
-- ✅ **Build command:** Bundle TypeScript and process HTML files
-  ```bash
-  tk build <sourceDir> <targetDir>
-  # or using alias
-  tk b <sourceDir>
-  ```
-  
-- ✅ **Development server with hot reload:**
-  ```bash
-  tk develop <sourceDir> <targetDir> <port> <host>
-  # or using aliases
-  tk dev <sourceDir>
-  tk d <sourceDir>
-  ```
-  - Live server with automatic rebuild on file changes
-  - File system watcher for instant updates
-  - Serves built files from output directory
-  - **Automatic reconnection** on connection errors
-  - No manual refresh needed during development
-  
-- ✅ **Pre-processing and pre-rendering with `.pre.ts` files:** 
-  - Generate complete HTML pages from TypeScript
-  - Manipulate existing HTML programmatically before build
-  - Use TypeScript to modify DOM elements
-  - Generate dynamic content and inject data
-  - Full DOM manipulation with `@tkeron/html-parser`
-  - Create pages without base HTML files (pure pre-rendering)
-
-- ✅ **HTML Components with `.com.html` files:**
-  - Create reusable HTML components
-  - Custom elements automatically replaced with component content
-  - Support for nested components
-  - Local and root component resolution
-
-- ✅ **TypeScript Components with `.com.ts` files:**
-  - Dynamic components with full TypeScript logic
-  - Access to element attributes and content
-  - Generate HTML programmatically at build time
-  - Use TypeScript features: types, functions, conditionals, loops
-  - Import external libraries and modules
-
-## Installation
-
-Install **tkeron** globally using npm:
+## Usage
 
 ```bash
-npm i -g tkeron
+tk init my-site    # Create project
+tk dev             # Dev server (localhost:3000)
+tk build           # Build to web/
 ```
-
-**Requirements:** Bun runtime (Node.js support coming later)
-
-## Quick Start
-
-Create a new project with the `init` command:
-
-```bash
-# Create new project in a subdirectory
-tk init my-project
-cd my-project
-tk dev websrc
-
-# Or initialize in current directory
-mkdir my-project && cd my-project
-tk init .
-
-# Force overwrite existing directory
-tk init example force=true
-```
-
-This creates a complete project with examples of all tkeron features:
-- Pre-rendering with `.pre.ts`
-- HTML components with `.com.html`
-- TypeScript components with `.com.ts`
-- Interactive counter example
-- Ready-to-use development setup
-
-**Note:** 
-- When initializing a **new directory**: If it already exists and contains files, you'll get an error. Use `force=true` to remove and recreate it.
-- When initializing in **current directory** (`.`): If tkeron files exist (`websrc/`, `tkeron.d.ts`), you'll be prompted to confirm overwriting. Use `force=true` to skip the prompt. Other files in the directory are preserved.
-
-Open `http://localhost:8080` to see your app!
 
 ## Examples
 
-The `examples/` directory contains working examples:
-
-- **`init_sample/`** - Complete template used by `tk init` command
-  - Pre-rendering with external API calls (cryptocurrency prices, random quotes)
-  - Build metadata injection (version, runtime, timestamp)
-  - HTML components (`.com.html`)
-  - TypeScript components (`.com.ts`)
-  - Interactive counter example
-- **`basic_build/`** - Simple TypeScript + HTML project
-- **`with_assets/`** - Project with nested directories and assets
-- **`with_pre/`** - Demonstrates `.pre.ts` preprocessing capabilities
-- **`with_com_html_priority/`** - HTML component resolution (local vs root)
-- **`with_com_ts/`** - TypeScript components with dynamic logic
-- **`with_com_ts_priority/`** - TypeScript component priority demonstration
-- **`with_com_mixed_priority/`** - Mixed `.com.html` and `.com.ts` priority handling
-
-### Using `.pre.ts` Files (Backend Pre-rendering)
-
-Create `.pre.ts` files to generate or manipulate HTML during the **build process** (backend/build-time, not browser runtime):
-
-```typescript
-// section/index.pre.ts
-const img = <HTMLImageElement>document.querySelector('.my-image');
-img.setAttribute('src', './generated-image.png');
+**HTML Component:**
+```html
+<!-- counter-card.com.html -->
+<section>
+  <h2>Counter</h2>
+  <button id="increment">Click me!</button>
+  <div>Clicks: <span id="count">0</span></div>
+</section>
 ```
 
-**How `.pre.ts` files work:**
-- Execute at **build time** on the server/local machine (backend)
-- Have access to a `document` global representing the HTML file
-- Can use standard DOM APIs: `querySelector`, `setAttribute`, `createElement`, etc.
-- Output static `.html` files that get bundled
-- Can generate complete HTML pages without a corresponding `.html` file
-- **You can import and use any TypeScript modules or npm packages**
-- **Fetch data from external APIs** at build time for static content
-- **Read project files** to include version info and metadata
-
-**Key concept:** `.pre.ts` is for generating static HTML at build time, not for browser interactivity. Use regular `.ts` files for client-side JavaScript.
-
-**Powerful use cases:**
-- Generate pages from data files (JSON, databases, APIs)
-- Create sitemaps and RSS feeds automatically
-- Inject build timestamps and environment variables
-- Process markdown to HTML
-- Generate static content from CMS or external sources
-- Build entire static sites programmatically
-- **Fetch real-time data** (cryptocurrency prices, weather, news) at build time
-- **Include build metadata** (version, runtime, timestamp) in your pages
-
-**Example - Fetching external data at build time:**
+**TypeScript Component:**
 ```typescript
-// api-service.ts - A reusable module
-export async function getCryptoPrices() {
-  const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd&include_24hr_change=true');
-  return res.json();
+// user-badge.com.ts
+const count = com.getAttribute('count') || '3';
+const items = [];
+for (let i = 1; i <= parseInt(count); i++) {
+  items.push(`<li>Item ${i}</li>`);
 }
+com.innerHTML = `<ul>${items.join('')}</ul>`;
+```
 
-export function getBuildMetadata() {
-  const pkg = require('../package.json');
-  return {
-    timestamp: new Date().toLocaleString(),
-    version: pkg.version,
-    runtime: `Bun ${Bun.version}`,
-    platform: process.platform
-  };
+**Pre-rendering:**
+```typescript
+// index.pre.ts
+const response = await fetch('https://api.quotable.io/random');
+const data = await response.json();
+document.getElementById('quote').textContent = data.content;
+```
+
+## Documentation
+
+📖 **[Full Documentation](./docs/overview.md)**
+
+- **[Getting Started](./docs/getting-started.md)** - Installation and first steps
+- **[HTML Components](./docs/components-html.md)** - Reusable markup with `.com.html`
+- **[TypeScript Components](./docs/components-typescript.md)** - Dynamic components with `.com.ts`
+- **[Pre-rendering](./docs/pre-rendering.md)** - Build-time HTML transformation
+- **[CLI Reference](./docs/cli-reference.md)** - All commands and options
+- **[Best Practices](./docs/best-practices.md)** - Patterns, limits, and anti-patterns
+
+## Commands
+
+```bash
+tk init <name>           # Initialize new project
+tk build [src] [out]     # Build project (default: websrc → web)
+tk dev [src] [out]       # Dev server with hot reload (port 3000)
+```
+
+**Aliases:** `tk i`, `tk b`, `tk d`
+
+See [CLI Reference](./docs/cli-reference.md) for all options.
+
+## MCP Server (AI Integration)
+
+Tkeron includes a Model Context Protocol server for AI agents.
+
+**Setup:**
+```bash
+bun install -g tkeron
+```
+
+**Configure in VS Code** (`~/.config/Code/User/mcp.json`):
+```json
+{
+  "servers": {
+    "tkeron": {
+      "command": "tkeron-mcp"
+    }
+  }
 }
 ```
 
-```typescript
-// index.pre.ts - Use the module in pre-rendering
-import { getCryptoPrices, getBuildMetadata } from './api-service';
+**Note:** Other editors may use different configuration formats.
 
-// Fetch crypto prices at build time
-const prices = await getCryptoPrices();
-const cryptoSection = document.querySelector('#crypto-prices');
-cryptoSection!.innerHTML = `
-  <div>Bitcoin: $${prices.bitcoin.usd}</div>
-  <div>Ethereum: $${prices.ethereum.usd}</div>
-`;
+See [MCP Documentation](./docs/mcp-server.md) for details.
 
-// Add build metadata to footer
-const metadata = getBuildMetadata();
-const footer = document.querySelector('footer');
-footer!.innerHTML = `Built: ${metadata.timestamp} | tkeron: ${metadata.version} | Runtime: ${metadata.runtime}`;
-```
+## Requirements
 
-This generates **static HTML** with the latest data at build time. The `fetch` happens on the server during build, not in the browser.
+- **[Bun](https://bun.sh)** runtime (Node.js not supported)
+- Linux, macOS, or Windows (WSL)
 
-### Using `.com.html` Files (HTML Components)
+## Examples
 
-Create reusable HTML components with `.com.html` files. Any custom element (tag with a hyphen) will be automatically replaced with the component's content during build:
+Check the [`examples/`](./examples/) directory for working projects:
+- `init_sample/` - Template with all features
+- `with_pre/` - Pre-rendering examples
+- `with_com_html_priority/` - Component resolution
+- `with_com_ts/` - TypeScript components
 
-```html
-<!-- my-component.com.html -->
-<div class="my-component">
-  <h1>Component Title</h1>
-  <p>Reusable content</p>
-</div>
-```
+## License
 
-```html
-<!-- index.html -->
-<body>
-  <my-component></my-component>
-</body>
-```
+MIT
 
-**Result after build:**
-```html
-<body>
-  <div class="my-component">
-    <h1>Component Title</h1>
-    <p>Reusable content</p>
-  </div>
-</body>
-```
+---
 
-**Component features:**
-- **Complete substitution:** The component replaces the entire custom element tag
-- **Nested components:** Components can include other components
-- **Local resolution:** Components in the same directory take priority over root components
-- **No runtime overhead:** All substitution happens at build time
-- **Circular dependency detection:** Prevents infinite loops
-
-**Use cases:**
-- Reusable headers, footers, and navigation bars
-- Consistent UI elements across multiple pages
-- Building design systems with pure HTML
-- DRY principle for HTML structure
-
-### Using `.com.ts` Files (TypeScript Components)
-
-Create dynamic HTML components with full TypeScript logic using `.com.ts` files. These components execute at build time and have access to a `com` variable representing the HTML element:
-
-```typescript
-// user-card.com.ts
-const name = com.getAttribute("data-name") || "Unknown";
-const role = com.getAttribute("data-role") || "N/A";
-
-// Use TypeScript logic
-com.innerHTML = `
-  <div class="user-card">
-    <h3>${name}</h3>
-    <p>Role: ${role}</p>
-  </div>
-`;
-```
-
-```html
-<!-- index.html -->
-<body>
-  <user-card data-name="Alice" data-role="Developer"></user-card>
-  <user-card data-name="Bob" data-role="Designer"></user-card>
-</body>
-```
-
-**Result after build:**
-```html
-<body>
-  <div class="user-card">
-    <h3>Alice</h3>
-    <p>Role: Developer</p>
-  </div>
-  <div class="user-card">
-    <h3>Bob</h3>
-    <p>Role: Designer</p>
-  </div>
-</body>
-```
-
-**TypeScript component features:**
-- **Full TypeScript support:** Use types, functions, classes, and all TypeScript features
-- **Attribute access:** Read custom attributes from the element using `com.getAttribute()`
-- **Content access:** Read inner content with `com.innerHTML` or `com.querySelector()`
-- **Import libraries:** Use npm packages and external modules
-- **Build-time execution:** All logic runs during build, no runtime JavaScript overhead
-- **Priority over `.com.html`:** If both `.com.ts` and `.com.html` exist, `.com.ts` takes priority
-
-**Use cases:**
-- Generate cards from data attributes
-- Create lists with TypeScript array methods
-- Conditional rendering based on attributes
-- Date/time formatting and calculations
-- Complex data transformations
-- Reading from files or APIs at build time
-- Template-based HTML generation with type safety
-
-**Example with logic:**
-```typescript
-// product-list.com.ts
-const products = ["Apple", "Banana", "Cherry", "Date"];
-
-const items = products
-  .filter(p => p.length > 5)
-  .map((p, i) => `<li>${i + 1}. ${p}</li>`)
-  .join("\n");
-
-com.innerHTML = `<ul>${items}</ul>`;
-```
+**[📖 Read the full documentation](./docs/overview.md)** to learn everything about Tkeron.

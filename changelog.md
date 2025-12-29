@@ -1,3 +1,16 @@
+# v4.0.0-beta.4
+
+## New Features
+- **MCP Server Integration**
+  - Added Model Context Protocol (MCP) server for AI agent integration
+  - New `tkeron-mcp` binary command
+  - Exposes all documentation via MCP protocol
+  - Enables AI assistants to provide accurate help with Tkeron projects
+  - Full setup documentation in `docs/mcp-server.md`
+
+## Dependencies
+- Added `@modelcontextprotocol/sdk` ^1.25.1 for MCP server functionality
+
 # v4.0.0-beta.3
 
 ## New Features
