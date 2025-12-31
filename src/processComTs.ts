@@ -14,12 +14,15 @@ function ensureHtmlDocument(html: string): string {
 /**
  * Process .com.ts files and replace custom elements with dynamically generated content
  * @param tempDir - Temporary directory containing the source files
+ * @returns true if any components were processed, false otherwise
  */
-export const processComTs = async (tempDir: string) => {
+export const processComTs = async (tempDir: string): Promise<boolean> => {
   // Find all .html files (excluding .com.html)
   const htmlFiles = getFilePaths(tempDir, "**/*.html", true).filter(
     (p) => !p.endsWith(".com.html")
   );
+
+  let hasChanges = false;
 
   for (const htmlFile of htmlFiles) {
     // Read HTML content
@@ -29,7 +32,8 @@ export const processComTs = async (tempDir: string) => {
     // Process TypeScript components recursively
     const body = document.querySelector("body") || document.body;
     if (body) {
-      await processComponentsTs(body, dirname(htmlFile), tempDir, []);
+      const changed = await processComponentsTs(body, dirname(htmlFile), tempDir, []);
+      hasChanges = hasChanges || changed;
     }
 
     // Save modified HTML
@@ -37,6 +41,8 @@ export const processComTs = async (tempDir: string) => {
     const output = DOCTYPE + (htmlElement?.outerHTML || document.documentElement?.outerHTML || "");
     await Bun.write(htmlFile, output);
   }
+
+  return hasChanges;
 };
 
 /**
@@ -46,6 +52,7 @@ export const processComTs = async (tempDir: string) => {
  * @param rootDir - Root directory of the project
  * @param componentStack - Stack of component names to detect circular dependencies
  * @param depth - Current recursion depth (to prevent infinite loops)
+ * @returns true if any components were processed, false otherwise
  */
 async function processComponentsTs(
   element: any,
@@ -53,12 +60,13 @@ async function processComponentsTs(
   rootDir: string,
   componentStack: string[],
   depth: number = 0
-): Promise<void> {
+): Promise<boolean> {
+  let hasChanges = false;
   // Prevent infinite recursion
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
     console.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
-    return;
+    return hasChanges;
   }
 
   // Get all child elements
@@ -82,6 +90,8 @@ async function processComponentsTs(
       }
 
       if (componentPath) {
+        hasChanges = true;
+        
         // Check for circular dependencies
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
@@ -198,7 +208,8 @@ await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.i
           for (const node of nodesToInsert) {
             if ((node as any).nodeType === 1) {
               // Element node
-              await processComponentsTs(node, nextCurrentDir, rootDir, nextStack, depth + 1);
+              const nestedChanged = await processComponentsTs(node, nextCurrentDir, rootDir, nextStack, depth + 1);
+              hasChanges = hasChanges || nestedChanged;
             }
           }
         } finally {
@@ -215,11 +226,15 @@ await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.i
         }
       } else {
         // Component not found, recurse into children
-        await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1);
+        const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1);
+        hasChanges = hasChanges || childChanged;
       }
     } else {
       // Not a custom element, recurse into children
-      await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1);
+      const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1);
+      hasChanges = hasChanges || childChanged;
     }
   }
+
+  return hasChanges;
 }

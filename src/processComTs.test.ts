@@ -830,8 +830,8 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
   });
 
   describe(".com.ts vs .com.html priority", () => {
-    it("should use .com.ts over .com.html when both exist", async () => {
-      const { dir: TEST_DIR } = getTestResources("processComTs-should-use-com-ts-over-com-html-when-both-exist");
+    it("should show .com.html processes first, then .com.ts", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-com-html-processes-first");
 
       try {
         mkdirSync(TEST_DIR, { recursive: true });
@@ -849,19 +849,19 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
       writeFileSync(join(TEST_DIR, "both-comp.com.html"), htmlComponent);
       writeFileSync(join(TEST_DIR, "both-comp.com.ts"), tsComponent);
 
-      // This test follows the actual build flow: .com.ts is processed first, then .com.html
-      // First process .com.ts (higher priority)
-      await processComTs(TEST_DIR);
-
-      // Then process .com.html (fallback for components without .com.ts)
+      // This test follows the actual build flow: .com.html is processed first, then .com.ts
+      // First process .com.html
       const { processCom } = await import("./processCom");
       await processCom(TEST_DIR);
 
+      // Then process .com.ts (but component already replaced, so .com.ts won't find it)
+      await processComTs(TEST_DIR);
+
       const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
       
-      // Should have TS version, not HTML version
-      expect(result).toContain("<div>From TS</div>");
-      expect(result).not.toContain("<div>From HTML</div>");
+      // Should have HTML version since it was processed first
+      expect(result).toContain("<div>From HTML</div>");
+      expect(result).not.toContain("<div>From TS</div>");
       expect(result).not.toContain("<both-comp>");
           } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });

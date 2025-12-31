@@ -15,11 +15,13 @@ function ensureHtmlDocument(html: string): string {
  * Process .com.html files and replace custom elements with component content
  * @param tempDir - Temporary directory containing the source files
  */
-export const processCom = async (tempDir: string) => {
+export const processCom = async (tempDir: string): Promise<boolean> => {
   // Find all .html files
   const htmlFiles = getFilePaths(tempDir, "**/*.html", true).filter(
     (p) => !p.endsWith(".com.html")
   );
+
+  let hasChanges = false;
 
   for (const htmlFile of htmlFiles) {
     // Read HTML content
@@ -29,7 +31,8 @@ export const processCom = async (tempDir: string) => {
     // Process components recursively
     const body = document.querySelector("body") || document.body;
     if (body) {
-      await processComponents(body, dirname(htmlFile), tempDir, []);
+      const changed = await processComponents(body, dirname(htmlFile), tempDir, []);
+      hasChanges = hasChanges || changed;
     }
 
     // Save modified HTML
@@ -37,6 +40,8 @@ export const processCom = async (tempDir: string) => {
     const output = DOCTYPE + (htmlElement?.outerHTML || document.documentElement?.outerHTML || "");
     await Bun.write(htmlFile, output);
   }
+
+  return hasChanges;
 };
 
 /**
@@ -45,6 +50,7 @@ export const processCom = async (tempDir: string) => {
  * @param currentDir - Directory of the current HTML file
  * @param rootDir - Root directory of the project
  * @param depth - Current recursion depth (to prevent infinite loops)
+ * @returns true if any components were processed, false otherwise
  */
 async function processComponents(
   element: any,
@@ -52,12 +58,13 @@ async function processComponents(
   rootDir: string,
   componentStack: string[],
   depth: number = 0
-): Promise<void> {
+): Promise<boolean> {
+  let hasChanges = false;
   // Prevent infinite recursion
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
     console.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
-    return;
+    return hasChanges;
   }
 
   // Get all child elements
@@ -81,6 +88,8 @@ async function processComponents(
       }
 
       if (componentPath) {
+        hasChanges = true;
+        
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
           console.error(`\n❌ Error: Circular component dependency detected.`);
@@ -136,16 +145,21 @@ async function processComponents(
         for (const node of nodesToInsert) {
           if ((node as any).nodeType === 1) {
             // Element node
-            await processComponents(node, nextCurrentDir, rootDir, nextStack, depth + 1);
+            const nestedChanged = await processComponents(node, nextCurrentDir, rootDir, nextStack, depth + 1);
+            hasChanges = hasChanges || nestedChanged;
           }
         }
       } else {
         // Component not found, recurse into children
-        await processComponents(child, currentDir, rootDir, componentStack, depth + 1);
+        const childChanged = await processComponents(child, currentDir, rootDir, componentStack, depth + 1);
+        hasChanges = hasChanges || childChanged;
       }
     } else {
       // Not a custom element, recurse into children
-      await processComponents(child, currentDir, rootDir, componentStack, depth + 1);
+      const childChanged = await processComponents(child, currentDir, rootDir, componentStack, depth + 1);
+      hasChanges = hasChanges || childChanged;
     }
   }
+
+  return hasChanges;
 }

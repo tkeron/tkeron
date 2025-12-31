@@ -15,7 +15,8 @@ describe("Examples Build Tests", () => {
       "with_pre",
       "with_com_html_priority",
       "with_com_ts_priority",
-      "with_com_mixed_priority"
+      "with_com_mixed_priority",
+      "with_component_iteration"
     ];
 
     await Promise.all(
@@ -334,57 +335,123 @@ describe("Examples Build Tests", () => {
       expect(htmlContent).not.toContain("<footer-info>");
     });
 
-    it("dashboard/main.html should use local .com.ts override of root .com.html", () => {
+    it("dashboard/main.html should use root .com.html since it processes first", () => {
       const htmlContent = readFileSync(join(outDir, "dashboard/main.html"), "utf-8");
       
-      // Should have local TS header (overrides root HTML)
-      expect(htmlContent).toContain("Dashboard Header (Local TS Override)");
-      expect(htmlContent).toContain("TypeScript component overrides the root HTML component");
-      expect(htmlContent).not.toContain("Root Header (HTML Component)");
+      // Should have root HTML header (processed first, so local .com.ts doesn't find the component)
+      expect(htmlContent).toContain("Root Header (HTML Component)");
+      expect(htmlContent).toContain("This is a static HTML component from root");
+      expect(htmlContent).not.toContain("Dashboard Header (Local TS Override)");
       
-      // Should have dashboard stats widget (local)
+      // Should have dashboard stats widget (local .com.ts, no .com.html conflict)
       expect(htmlContent).toContain("Dashboard Stats");
       expect(htmlContent).toContain("1523");
+      
+      // Should have feature-card (root .com.ts, no .com.html exists)
+      expect(htmlContent).toContain("Dashboard Feature");
       
       // Should not have custom elements
       expect(htmlContent).not.toContain("<page-header>");
       expect(htmlContent).not.toContain("<stats-widget>");
+      expect(htmlContent).not.toContain("<feature-card>");
     });
 
-    it("users/profiles/view.html should demonstrate deep nesting", () => {
+    it("users/profiles/view.html should demonstrate deep nesting with mixed types", () => {
       const htmlContent = readFileSync(join(outDir, "users/profiles/view.html"), "utf-8");
       
-      // Should have deep local HTML header
+      // Should have deep local HTML header (local .com.html)
       expect(htmlContent).toContain("Profile Header (Deep Local HTML Override)");
       expect(htmlContent).toContain("users/profiles/ directory");
       
-      // Should have local TS user profile with nested HTML component
+      // Should have user profile content from local .com.ts
       expect(htmlContent).toContain("Jane Doe");
       expect(htmlContent).toContain("jane@example.com");
+      
+      // Should have nested profile-actions from local .com.html (inside user-profile)
       expect(htmlContent).toContain("Edit Profile");
       expect(htmlContent).toContain("View Activity");
       
-      // Should have activity feed (local TS)
+      // Should have activity feed (local .com.ts, no .com.html conflict)
       expect(htmlContent).toContain("Recent Activity (Local TS Component)");
       expect(htmlContent).toContain("Updated profile");
       
-      // Should not have custom elements
+      // Should not have custom elements at top level
       expect(htmlContent).not.toContain("<user-profile>");
-      expect(htmlContent).not.toContain("<profile-actions>");
       expect(htmlContent).not.toContain("<activity-feed>");
     });
 
-    it("settings/config.html should prove .com.ts priority over .com.html in same directory", () => {
+    it("settings/config.html should show .com.html processes first", () => {
       const htmlContent = readFileSync(join(outDir, "settings/config.html"), "utf-8");
       
-      // Should use TS component (not HTML)
-      expect(htmlContent).toContain("TypeScript Component Wins!");
-      expect(htmlContent).toContain(".com.ts has priority over .com.html");
-      expect(htmlContent).not.toContain("This is the HTML component");
-      expect(htmlContent).not.toContain("If you see this, the .com.ts version was NOT used");
+      // Should use HTML component (processed first, so .com.ts doesn't find the component)
+      expect(htmlContent).toContain("This is the HTML component");
+      expect(htmlContent).toContain("If you see this, the .com.ts version was NOT used");
+      expect(htmlContent).not.toContain("TypeScript Component Wins!");
+      expect(htmlContent).not.toContain(".com.ts has priority over .com.html");
+      
+      // Should have feature-card from root .com.ts (no .com.html conflict)
+      expect(htmlContent).toContain("Settings Feature");
       
       // Should not have custom elements
       expect(htmlContent).not.toContain("<priority-test>");
+      expect(htmlContent).not.toContain("<feature-card>");
+    });
+  });
+
+  describe("with_component_iteration", () => {
+    const srcDir = join(EXAMPLES_DIR, "with_component_iteration/src");
+    const outDir = join(EXAMPLES_DIR, "with_component_iteration/web");
+
+    it("should generate index.html and index.js", () => {
+      expect(existsSync(join(outDir, "index.html"))).toBe(true);
+      expect(existsSync(join(outDir, "index.js"))).toBe(true);
+    });
+
+    it("should not include component files in output", () => {
+      expect(existsSync(join(outDir, "card-list.com.ts"))).toBe(false);
+      expect(existsSync(join(outDir, "user-card.com.ts"))).toBe(false);
+      expect(existsSync(join(outDir, "status-badge.com.ts"))).toBe(false);
+      expect(existsSync(join(outDir, "engagement-meter.com.ts"))).toBe(false);
+      expect(existsSync(join(outDir, "note-box.com.html"))).toBe(false);
+    });
+
+    it("index.html should demonstrate component iteration", () => {
+      const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
+      
+      // Should have processed status badges with emojis (iteration 3)
+      expect(htmlContent).toContain("🟢"); // online status
+      expect(htmlContent).toContain("🟡"); // recent status
+      
+      // Should have engagement labels from .com.ts logic (iteration 3)
+      expect(htmlContent).toContain("🔥 Active");
+      expect(htmlContent).toContain("📊 Moderate");
+      
+      // Should have processed note-box from .com.html (iteration 3)
+      expect(htmlContent).toContain("📝 Note Container");
+      
+      // Should have user names from card-list.com.ts data (iteration 1)
+      expect(htmlContent).toContain("Alice Johnson");
+      expect(htmlContent).toContain("Bob Smith");
+      expect(htmlContent).toContain("Carol White");
+      
+      // Should have role labels formatted by user-card.com.ts (iteration 2)
+      expect(htmlContent).toContain("👑 Admin");
+      expect(htmlContent).toContain("🛡️ Moderator");
+      expect(htmlContent).toContain("👤 User");
+      
+      // Should not have unprocessed custom elements
+      expect(htmlContent).not.toContain("<card-list>");
+      expect(htmlContent).not.toContain("<user-card>");
+      expect(htmlContent).not.toContain("<status-badge>");
+      expect(htmlContent).not.toContain("<engagement-meter>");
+      expect(htmlContent).not.toContain("<note-box>");
+    });
+
+    it("should show iteration markers from components", () => {
+      const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
+      
+      // Iteration 2 marker from user-card.com.ts
+      expect(htmlContent).toContain("Iteration 2: user-card.com.ts passes data to nested components");
     });
   });
 
