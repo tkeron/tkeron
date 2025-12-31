@@ -1,3 +1,54 @@
+# v4.0.0-beta.5
+
+## New Features
+
+### Component Iteration System
+- **Dynamic data processing in components**
+  - Components can now iterate and generate multiple instances with TypeScript logic
+  - Added new example: `with_component_iteration` demonstrating:
+    - Data fetching and processing in `.com.ts` files
+    - Nested component rendering with dynamic attributes
+    - Real TypeScript calculations (engagement scores, statistics)
+    - Multi-level component iteration (3 levels deep)
+  - Components can perform calculations and conditional logic at build time
+  - Enables complex data transformations before rendering
+
+### Enhanced MCP Server Capabilities
+- **Example project management tools**
+  - New `list_examples` tool: Lists all available Tkeron example projects
+  - New `get_example` tool: Retrieves source code and structure of examples
+  - New `tkeron_init` tool: Initialize Tkeron projects via MCP
+  - New `tkeron_build` tool: Build Tkeron projects via MCP
+  - New `tkeron_develop` tool: Start development server via MCP
+  - AI assistants can now create, build, and run Tkeron projects directly
+  
+- **Example projects now included in npm package**
+  - Removed examples from `.npmignore`
+  - All example projects ship with the package
+  - Makes it easier for users to explore and learn from examples
+  - Enables MCP tools to access and share example code
+
+## Improvements
+
+### Build System
+- **Refactored component processing pipeline**
+  - Better separation of concerns between HTML and TypeScript components
+  - Improved error handling and reporting
+  - Cleaner code structure with fewer side effects
+
+### Development Server  
+- **Test suite cleanup**
+  - Removed unnecessary `setupSigintHandler` test (implementation detail)
+  - All 14 remaining tests verify real server behavior
+  - Tests use unique ports and directories for parallel execution
+  - Improved test reliability and maintainability
+
+### Code Quality
+- **Better TypeScript processing**
+  - Enhanced pre-rendering with cleaner temp directory handling
+  - Improved component substitution logic
+  - More robust error handling throughout the codebase
+
 # v4.0.0-beta.4
 
 ## New Features
