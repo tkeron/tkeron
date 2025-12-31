@@ -12,7 +12,7 @@ export interface TkeronDevOptions {
 const reloadClients = new Set<ReadableStreamDefaultController>();
 
 export interface DevelopServer {
-  stop: () => void;
+  stop: () => Promise<void>;
   port: number;
   host: string;
 }
@@ -137,10 +137,12 @@ export const develop = async (
     }
   );
 
-  const stop = () => {
+  const stop = async () => {
     console.log("\n👋 Shutting down server...");
     watcher.close();
     server.stop();
+    // Wait for connections to close
+    await new Promise(resolve => setTimeout(resolve, 100));
   };
 
   setupSigintHandler(stop);
@@ -152,9 +154,9 @@ export const develop = async (
   };
 };
 
-export function setupSigintHandler(stopCallback: () => void) {
-  process.on("SIGINT", () => {
-    stopCallback();
+export function setupSigintHandler(stopCallback: () => Promise<void>) {
+  process.on("SIGINT", async () => {
+    await stopCallback();
     process.exit(0);
   });
 }

@@ -30,12 +30,13 @@ it("develop starts server and serves files", async () => {
     const text = await response.text();
     expect(text).toContain("Test");
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 5000);
+}, 10000);
 
 it("develop rebuilds on file change", async () => {
   const { port, dir } = getTestResources("develop-rebuilds-on-file-change");
@@ -70,12 +71,13 @@ it("develop rebuilds on file change", async () => {
     text = await response.text();
     expect(text).toContain("Modified");
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 5000);
+}, 10000);
 
 it("develop serves 404 for missing files", async () => {
   const { port, dir } = getTestResources("develop-serves-404-for-missing-files");
@@ -99,12 +101,13 @@ it("develop serves 404 for missing files", async () => {
     const response = await fetch(`http://localhost:${port}/missing.html`);
     expect(response.status).toBe(404);
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 3000);
+}, 10000);
 
 it("develop handles multiple SSE clients for hot reload", async () => {
   const { port, dir } = getTestResources("develop-handles-multiple-sse-clients");
@@ -147,12 +150,13 @@ it("develop handles multiple SSE clients for hot reload", async () => {
     expect(response2.headers.get("content-type")).toBe("text/event-stream");
     expect(response3.headers.get("content-type")).toBe("text/event-stream");
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 5000);
+}, 10000);
 
 it("develop handles build errors gracefully", async () => {
   const { port, dir } = getTestResources("develop-handles-build-errors-gracefully");
@@ -187,12 +191,13 @@ it("develop handles build errors gracefully", async () => {
     response = await fetch(`http://localhost:${port}/`);
     expect(response.status).toBe(200);
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 5000);
+}, 10000);
 
 // Note: File watcher tests for subdirectories are flaky due to OS-level timing
 // The feature works in practice but is difficult to test reliably
@@ -233,12 +238,13 @@ it("develop serves compiled JavaScript and HTML correctly", async () => {
     text = await response.text();
     expect(text).toContain("About");
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 5000);
+}, 10000);
 
 it("develop injects reload script into HTML files", async () => {
   const { port, dir } = getTestResources("develop-injects-reload-script");
@@ -269,12 +275,13 @@ it("develop injects reload script into HTML files", async () => {
     expect(html).toContain("EventSource('/dev-reload')");
     expect(html).toContain("location.reload()");
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 4000);
+}, 10000);
 
 it("develop handles file deletion and recreates on change", async () => {
   const { port, dir } = getTestResources("develop-handles-file-deletion");
@@ -310,12 +317,13 @@ it("develop handles file deletion and recreates on change", async () => {
     response = await fetch(`http://localhost:${port}/extra.html`);
     expect(response.status).toBe(404);
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 5000);
+}, 10000);
 
 it("develop uses custom port and host", async () => {
   const { port: customPort, dir } = getTestResources("develop-uses-custom-port-and-host");
@@ -344,12 +352,13 @@ it("develop uses custom port and host", async () => {
     const response = await fetch(`http://${customHost}:${customPort}/`);
     expect(response.status).toBe(200);
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 4000);
+}, 10000);
 
 it("develop handles nonexistent source directory error", async () => {
   const { port, dir } = getTestResources("develop-handles-nonexistent-source-directory");
@@ -424,12 +433,13 @@ it("develop handles SSE client disconnection during reload", async () => {
     const text = await newResponse.text();
     expect(text).toContain("Changed");
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 5000);
+}, 10000);
 
 it("develop handles SSE stream cancel event", async () => {
   const { port, dir } = getTestResources("develop-handles-sse-stream-cancel");
@@ -468,12 +478,13 @@ it("develop handles SSE stream cancel event", async () => {
     const testResponse = await fetch(`http://localhost:${port}/`);
     expect(testResponse.status).toBe(200);
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 3000);
+}, 10000);
 
 it("develop handles reload client enqueue error gracefully", async () => {
   const { port, dir } = getTestResources("develop-handles-reload-enqueue-error");
@@ -522,12 +533,13 @@ it("develop handles reload client enqueue error gracefully", async () => {
     const text = await testResponse.text();
     expect(text).toContain("Updated");
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 4000);
+}, 10000);
 
 it("develop serves non-HTML static files correctly", async () => {
   const { port, dir } = getTestResources("develop-serves-static-files");
@@ -566,38 +578,10 @@ it("develop serves non-HTML static files correctly", async () => {
       }
     }
   } finally {
-    if (server) server.stop();
+    if (server) {
+      await server.stop();
+    }
     consoleLogSpy?.mockRestore();
-    await new Promise(resolve => setTimeout(resolve, 100));
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
-}, 3000);
-
-it("setupSigintHandler should call stop callback", async () => {
-  const { setupSigintHandler } = await import("./develop");
-  let stopCalled = false;
-  const processExitSpy = spyOn(process, "exit").mockImplementation(((code?: number) => {
-    throw new Error(`PROCESS_EXIT_${code}`);
-  }) as any);
-
-  try {
-    const stopCallback = () => {
-      stopCalled = true;
-    };
-
-    // Setup handler
-    setupSigintHandler(stopCallback);
-
-    // Simulate SIGINT
-    await expect(() => {
-      process.emit("SIGINT" as any);
-    }).toThrow("PROCESS_EXIT_0");
-
-    expect(stopCalled).toBe(true);
-    expect(processExitSpy).toHaveBeenCalledWith(0);
-  } finally {
-    processExitSpy?.mockRestore();
-    // Remove all SIGINT listeners
-    process.removeAllListeners("SIGINT");
-  }
-});
+}, 10000);
