@@ -1,3 +1,19 @@
+# v4.0.0-beta.6
+
+## Bug Fixes
+- **MCP Server**
+  - Fixed `list_examples` to include `init_sample` (uses `websrc/` instead of `src/`)
+  - Fixed `get_example` to handle both `src/` and `websrc/` directories
+  - Added `init_sample` to example descriptions list
+
+## Improvements
+- **Documentation**
+  - Verified all documentation files are present and referenced correctly
+  - All MCP server documentation available in `docs/mcp-server.md`
+
+## Maintenance
+- Version bump for consistency and preparation for stable release
+
 # v4.0.0-beta.5
 
 ## New Features

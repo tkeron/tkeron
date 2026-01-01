@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "4.0.0-beta.5",
+  "version": "4.0.0-beta.6",
   "description": "CLI tool for backend-driven frontend development with TypeScript.",
   "type": "module",
   "bin": {

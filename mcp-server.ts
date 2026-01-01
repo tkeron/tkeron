@@ -134,6 +134,20 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     
     const content = readFileSync(filePath, "utf-8");
 
+    return {
+      contents: [
+        {
+          uri: doc.uri,
+          mimeType: "text/markdown",
+          text: content,
+        },
+      ],
+    };
+  } catch (error) {
+    throw error;
+  }
+});
+
 // Tools handler - provide a simple tool to keep VS Code happy
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
@@ -251,22 +265,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       }
     ]
   };
-});           enum: [
-                "overview",
-                "getting-started",
-                "components-html",
-                "components-typescript",
-                "pre-rendering",
-                "cli-reference",
-                "best-practices"
-              ]
-            }
-          },
-          required: ["topic"]
-        }
-      }
-    ]
-  };
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
@@ -305,10 +303,13 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       const examples = readdirSync(EXAMPLES_DIR)
         .filter(name => {
           const examplePath = join(EXAMPLES_DIR, name);
-          return statSync(examplePath).isDirectory() && existsSync(join(examplePath, "src"));
+          // Accept both src/ and websrc/ directories (init_sample uses websrc/)
+          return statSync(examplePath).isDirectory() && 
+                 (existsSync(join(examplePath, "src")) || existsSync(join(examplePath, "websrc")));
         });
       
       const exampleDescriptions: { [key: string]: string } = {
+        "init_sample": "Complete starter template with all features (used by 'tk init')",
         "basic_build": "Simple HTML + TypeScript bundling",
         "with_assets": "HTML in multiple directories with asset references",
         "with_pre": "Pre-rendering HTML at build time with .pre.ts files",
@@ -360,14 +361,18 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
     }
     
     try {
-      const srcPath = join(examplePath, "src");
+      // init_sample uses websrc/, others use src/
+      let srcPath = join(examplePath, "src");
+      if (!existsSync(srcPath)) {
+        srcPath = join(examplePath, "websrc");
+      }
       
       if (!existsSync(srcPath)) {
         return {
           content: [
             {
               type: "text",
-              text: `Example ${exampleName} does not have a src directory`
+              text: `Example ${exampleName} does not have a src or websrc directory`
             }
           ]
         };
