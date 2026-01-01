@@ -20,6 +20,10 @@ export interface DevelopServer {
 export const develop = async (
   options: TkeronDevOptions
 ): Promise<DevelopServer> => {
+  if (!options || typeof options !== 'object') {
+    throw new Error('Invalid options provided for develop');
+  }
+
   const {
     port = 3000,
     host = "localhost",

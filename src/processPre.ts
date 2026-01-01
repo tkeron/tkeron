@@ -18,6 +18,11 @@ const DEFAULT_HTML = `<!DOCTYPE html>
 </html>`;
 
 export const processPre = async (tempDir: string): Promise<boolean> => {
+  if (!tempDir || typeof tempDir !== 'string') {
+    console.error(`\n❌ Error: Invalid tempDir provided for processPre.`);
+    return false;
+  }
+
   // Find all .pre.ts files
   const preFiles = getFilePaths(tempDir, "**/*.pre.ts", true);
 

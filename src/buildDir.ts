@@ -3,6 +3,11 @@ import { join } from "path";
 import { buildEntrypoints } from "./buildEntrypoints";
 
 export const buildDir = async (sourceDir: string, targetDir: string) => {
+    if (!sourceDir || typeof sourceDir !== 'string' || !targetDir || typeof targetDir !== 'string') {
+        console.error(`\n❌ Error: Invalid sourceDir or targetDir provided for buildDir.`);
+        return;
+    }
+
     const htmlFiles = (await getPaths(sourceDir, "**/*.html", "no", true)).filter(
         (p) => !p.endsWith(".com.html")
     );

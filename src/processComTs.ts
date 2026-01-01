@@ -17,6 +17,11 @@ function ensureHtmlDocument(html: string): string {
  * @returns true if any components were processed, false otherwise
  */
 export const processComTs = async (tempDir: string): Promise<boolean> => {
+  if (!tempDir || typeof tempDir !== 'string') {
+    console.error(`\n❌ Error: Invalid tempDir provided for processComTs.`);
+    return false;
+  }
+
   // Find all .html files (excluding .com.html)
   const htmlFiles = getFilePaths(tempDir, "**/*.html", true).filter(
     (p) => !p.endsWith(".com.html")

@@ -16,6 +16,11 @@ function ensureHtmlDocument(html: string): string {
  * @param tempDir - Temporary directory containing the source files
  */
 export const processCom = async (tempDir: string): Promise<boolean> => {
+  if (!tempDir || typeof tempDir !== 'string') {
+    console.error(`\n❌ Error: Invalid tempDir provided for processCom.`);
+    return false;
+  }
+
   // Find all .html files
   const htmlFiles = getFilePaths(tempDir, "**/*.html", true).filter(
     (p) => !p.endsWith(".com.html")

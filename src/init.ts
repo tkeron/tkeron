@@ -78,6 +78,12 @@ export async function init(options: InitOptions) {
     throw new Error("Template directory not found");
   }
 
+  // Clean template: remove web directory if it exists (shouldn't be in source template)
+  const webDirInTemplate = join(templatePath, "web");
+  if (existsSync(webDirInTemplate)) {
+    rmSync(webDirInTemplate, { recursive: true, force: true });
+  }
+
   const tkeronDtsPath = join(import.meta.dir, "..", "tkeron.d.ts");
   
   if (!existsSync(tkeronDtsPath)) {

@@ -1,6 +1,13 @@
 import { init } from "./init";
 
 export async function initWrapper(options: any) {
+  if (!options || typeof options !== 'object' || !options.projectName || typeof options.projectName !== 'string') {
+    console.error("\n❌ Error: Invalid options provided for init. Project name is required.");
+    console.error("\n💡 Usage: tk init <project-name>");
+    console.error("   Example: tk init my-app\n");
+    process.exit(1);
+  }
+
   try {
     await init(options);
   } catch (error: any) {

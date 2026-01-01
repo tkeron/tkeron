@@ -10,6 +10,11 @@ export interface BuildOptions {
   targetDir?: string;
 }
 export const build = async (options: BuildOptions) => {
+  if (!options || typeof options !== 'object') {
+    console.error(`\n❌ Error: Invalid options provided for build.`);
+    return;
+  }
+
   const source = await resolve(options.sourceDir || "websrc");
   const target = options.targetDir
     ? await resolve(options.targetDir)
