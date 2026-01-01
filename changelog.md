@@ -1,3 +1,15 @@
+# v4.0.0-beta.7
+
+## Improvements
+
+### Error Handling and Validation
+- Added comprehensive input validation to core functions (`buildEntrypoints`, `processPre`, `processCom`, `processComTs`, `buildDir`, `build`, `develop`, `initWrapper`) to prevent runtime errors from invalid parameters
+- Enhanced error messages in `build` and `develop` commands to include suggestion to use `tk init` when source directory doesn't exist
+- Improved `init` command to automatically clean output directories from the project template, ensuring only source files are copied
+
+## Maintenance
+- Version bump for new validation features and error handling improvements
+
 # v4.0.0-beta.6
 
 ## Bug Fixes
