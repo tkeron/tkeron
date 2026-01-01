@@ -62,7 +62,7 @@ export const build = async (options: BuildOptions) => {
       console.error(
         `\n❌ Error: Source directory "${sourceDir}" does not exist.`
       );
-      console.error(`\n💡 Tip: Create the directory first or check the path.`);
+      console.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
       console.error(`   Expected: ${source}\n`);
       process.exit(1);
     }
