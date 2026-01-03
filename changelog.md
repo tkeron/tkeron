@@ -1,3 +1,27 @@
+# v4.0.0-beta.8
+
+## Bug Fixes
+
+### Pre-rendering Import Resolution
+- **Fixed**: `.pre.ts` files now correctly resolve `@tkeron/html-parser` module
+- Previously, pre-rendering files executed from a temp directory couldn't find Tkeron's internal html-parser module
+- Now uses absolute path to `@tkeron/html-parser` from Tkeron's own `node_modules`
+- User project imports (relative paths like `./my-utils`) continue to work normally
+
+## Improvements
+
+### Test Stability
+- Introduced `logger` wrapper module to replace direct `console` usage in source files
+- Tests now spy on `logger` instead of global `console`, eliminating race conditions in concurrent test execution
+- All 170 tests now pass consistently without intermittent failures
+
+### Internal Refactoring
+- Migrated all `console.log/error/warn` calls to use centralized `logger` module
+- Affected modules: `build`, `develop`, `processPre`, `processCom`, `processComTs`, `buildDir`, `buildEntrypoints`, `init`, `initWrapper`, `banner`
+
+## Maintenance
+- Version bump for pre-rendering fix and test infrastructure improvements
+
 # v4.0.0-beta.7
 
 ## Improvements

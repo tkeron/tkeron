@@ -1,5 +1,6 @@
 import { cpSync, existsSync, mkdirSync, copyFileSync, readdirSync, rmSync } from "fs";
 import { join, resolve, basename } from "path";
+import { logger } from "./logger";
 
 export interface InitOptions {
   projectName: string;
@@ -42,7 +43,7 @@ export async function init(options: InitOptions) {
         }
       } else {
         rmSync(targetPath, { recursive: true, force: true });
-        console.log(`✓ Removed existing directory "${projectName}"`);
+        logger.log(`✓ Removed existing directory "${projectName}"`);
       }
     } else {
       const tkeronFiles = ['websrc', 'tkeron.d.ts'];
@@ -50,14 +51,14 @@ export async function init(options: InitOptions) {
       
       if (existingTkeronFiles.length > 0) {
         if (!force) {
-          console.log(`\n⚠️  The following tkeron files already exist: ${existingTkeronFiles.join(', ')}`);
+          logger.log(`\n⚠️  The following tkeron files already exist: ${existingTkeronFiles.join(', ')}`);
           const prompt = options.promptFn || promptUser;
           const shouldContinue = await prompt(
             "\nDo you want to overwrite them? (y/N): "
           );
           
           if (!shouldContinue) {
-            console.log("\n❌ Operation cancelled.");
+            logger.log("\n❌ Operation cancelled.");
             process.exit(0);
           }
         }
@@ -67,7 +68,7 @@ export async function init(options: InitOptions) {
           rmSync(filePath, { recursive: true, force: true });
         });
         
-        console.log("✓ Cleaned existing tkeron files");
+        logger.log("✓ Cleaned existing tkeron files");
       }
     }
   }
@@ -95,10 +96,10 @@ export async function init(options: InitOptions) {
   copyFileSync(tkeronDtsPath, join(targetPath, "tkeron.d.ts"));
 
   const projectDisplayName = isCurrentDir ? basename(targetPath) : projectName;
-  console.log(`✓ Created project "${projectDisplayName}"`);
-  console.log(`\nNext steps:`);
+  logger.log(`✓ Created project "${projectDisplayName}"`);
+  logger.log(`\nNext steps:`);
   if (!isCurrentDir) {
-    console.log(`  cd ${projectName}`);
+    logger.log(`  cd ${projectName}`);
   }
-  console.log(`  tk dev websrc`);
+  logger.log(`  tk dev websrc`);
 }

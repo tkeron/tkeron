@@ -4,6 +4,7 @@ import { processPre } from "./processPre";
 import { processCom } from "./processCom";
 import { processComTs } from "./processComTs";
 import { rm, exists, mkdir, cp } from "fs/promises";
+import { logger } from "./logger";
 
 export interface BuildOptions {
   sourceDir?: string;
@@ -11,7 +12,7 @@ export interface BuildOptions {
 }
 export const build = async (options: BuildOptions) => {
   if (!options || typeof options !== 'object') {
-    console.error(`\n❌ Error: Invalid options provided for build.`);
+    logger.error(`\n❌ Error: Invalid options provided for build.`);
     return;
   }
 
@@ -59,11 +60,11 @@ export const build = async (options: BuildOptions) => {
   } catch (error: any) {
     if (error.code === "ENOENT") {
       const sourceDir = options.sourceDir || "websrc";
-      console.error(
+      logger.error(
         `\n❌ Error: Source directory "${sourceDir}" does not exist.`
       );
-      console.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
-      console.error(`   Expected: ${source}\n`);
+      logger.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
+      logger.error(`   Expected: ${source}\n`);
       process.exit(1);
     }
     throw error;
@@ -73,7 +74,7 @@ export const build = async (options: BuildOptions) => {
     try {
       await rm(tempDir, { recursive: true, force: true });
     } catch (cleanupError) {
-      console.warn(`Warning: Failed to cleanup temp directory ${tempDir}`);
+      logger.warn(`Warning: Failed to cleanup temp directory ${tempDir}`);
     }
   }
 };

@@ -3,12 +3,13 @@ import { mkdir, writeFile, rm } from "fs/promises";
 import { join } from "path";
 import { develop, DevelopServer } from "./develop";
 import { getTestResources } from "./test-helpers";
+import { logger } from "./logger";
 
 it("develop starts server and serves files", async () => {
   const { port, dir } = getTestResources("develop-starts-server-and-serves-files");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -33,7 +34,7 @@ it("develop starts server and serves files", async () => {
     if (server) {
       await await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -42,7 +43,7 @@ it("develop rebuilds on file change", async () => {
   const { port, dir } = getTestResources("develop-rebuilds-on-file-change");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -74,7 +75,7 @@ it("develop rebuilds on file change", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -83,7 +84,7 @@ it("develop serves 404 for missing files", async () => {
   const { port, dir } = getTestResources("develop-serves-404-for-missing-files");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -104,7 +105,7 @@ it("develop serves 404 for missing files", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -113,7 +114,7 @@ it("develop handles multiple SSE clients for hot reload", async () => {
   const { port, dir } = getTestResources("develop-handles-multiple-sse-clients");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -153,7 +154,7 @@ it("develop handles multiple SSE clients for hot reload", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -162,7 +163,7 @@ it("develop handles build errors gracefully", async () => {
   const { port, dir } = getTestResources("develop-handles-build-errors-gracefully");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -194,7 +195,7 @@ it("develop handles build errors gracefully", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -206,7 +207,7 @@ it("develop serves compiled JavaScript and HTML correctly", async () => {
   const { port, dir } = getTestResources("develop-serves-compiled-javascript-and-html");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -241,7 +242,7 @@ it("develop serves compiled JavaScript and HTML correctly", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -250,7 +251,7 @@ it("develop injects reload script into HTML files", async () => {
   const { port, dir } = getTestResources("develop-injects-reload-script");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -278,7 +279,7 @@ it("develop injects reload script into HTML files", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -287,7 +288,7 @@ it("develop handles file deletion and recreates on change", async () => {
   const { port, dir } = getTestResources("develop-handles-file-deletion");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -320,7 +321,7 @@ it("develop handles file deletion and recreates on change", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -330,7 +331,7 @@ it("develop uses custom port and host", async () => {
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
   const customHost = "127.0.0.1";
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -355,7 +356,7 @@ it("develop uses custom port and host", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -364,8 +365,8 @@ it("develop handles nonexistent source directory error", async () => {
   const { port, dir } = getTestResources("develop-handles-nonexistent-source-directory");
   const sourceDir = join(dir, "nonexistent-websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
-  const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+  const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
   const processExitSpy = spyOn(process, "exit").mockImplementation((() => {
     throw new Error("PROCESS_EXIT");
   }) as any);
@@ -380,11 +381,11 @@ it("develop handles nonexistent source directory error", async () => {
       });
     }).toThrow("PROCESS_EXIT");
 
-    expect(consoleErrorSpy).toHaveBeenCalled();
+    expect(loggerErrorSpy).toHaveBeenCalled();
     expect(processExitSpy).toHaveBeenCalledWith(1);
   } finally {
-    consoleLogSpy?.mockRestore();
-    consoleErrorSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
+    loggerErrorSpy?.mockRestore();
     processExitSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
@@ -394,7 +395,7 @@ it("develop handles SSE client disconnection during reload", async () => {
   const { port, dir } = getTestResources("develop-handles-sse-client-disconnection");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -436,7 +437,7 @@ it("develop handles SSE client disconnection during reload", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -445,7 +446,7 @@ it("develop handles SSE stream cancel event", async () => {
   const { port, dir } = getTestResources("develop-handles-sse-stream-cancel");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -481,7 +482,7 @@ it("develop handles SSE stream cancel event", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -490,7 +491,7 @@ it("develop handles reload client enqueue error gracefully", async () => {
   const { port, dir } = getTestResources("develop-handles-reload-enqueue-error");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -536,7 +537,7 @@ it("develop handles reload client enqueue error gracefully", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
@@ -545,7 +546,7 @@ it("develop serves non-HTML static files correctly", async () => {
   const { port, dir } = getTestResources("develop-serves-static-files");
   const sourceDir = join(dir, "websrc");
   const outputDir = join(dir, "web");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -581,14 +582,14 @@ it("develop serves non-HTML static files correctly", async () => {
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);
 
 it("develop treats empty string sourceDir as undefined (uses 'websrc')", async () => {
   const { port, dir } = getTestResources("develop-empty-string-sourceDir");
-  const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
+  const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
   let server: DevelopServer | null = null;
 
   try {
@@ -616,7 +617,7 @@ it("develop treats empty string sourceDir as undefined (uses 'websrc')", async (
     if (server) {
       await server.stop();
     }
-    consoleLogSpy?.mockRestore();
+    loggerLogSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 10000);

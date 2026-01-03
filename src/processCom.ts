@@ -1,6 +1,7 @@
 import { parseHTML } from "@tkeron/html-parser";
 import { getFilePaths } from "@tkeron/tools";
 import { join, dirname } from "path";
+import { logger } from "./logger";
 
 const DOCTYPE = "<!doctype html>\n";
 
@@ -17,7 +18,7 @@ function ensureHtmlDocument(html: string): string {
  */
 export const processCom = async (tempDir: string): Promise<boolean> => {
   if (!tempDir || typeof tempDir !== 'string') {
-    console.error(`\n❌ Error: Invalid tempDir provided for processCom.`);
+    logger.error(`\n❌ Error: Invalid tempDir provided for processCom.`);
     return false;
   }
 
@@ -68,7 +69,7 @@ async function processComponents(
   // Prevent infinite recursion
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
-    console.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
+    logger.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
     return hasChanges;
   }
 
@@ -97,10 +98,10 @@ async function processComponents(
         
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
-          console.error(`\n❌ Error: Circular component dependency detected.`);
-          console.error(`\n💡 Component chain: ${chain}`);
-          console.error(`\n   Components cannot include themselves directly or indirectly.`);
-          console.error(`   Check your .com.html files for circular references.\n`);
+          logger.error(`\n❌ Error: Circular component dependency detected.`);
+          logger.error(`\n💡 Component chain: ${chain}`);
+          logger.error(`\n   Components cannot include themselves directly or indirectly.`);
+          logger.error(`   Check your .com.html files for circular references.\n`);
           throw new Error(`Circular dependency: ${chain}`);
         }
 

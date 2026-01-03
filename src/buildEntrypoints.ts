@@ -1,13 +1,14 @@
 import { normalize } from "path";
+import { logger } from "./logger";
 
 export const buildEntrypoints = async (filePaths: string[], root: string) => {
   if (!filePaths || !Array.isArray(filePaths) || filePaths.length === 0) {
-    console.error(`\n❌ Error: No entrypoints provided for buildEntrypoints.`);
+    logger.error(`\n❌ Error: No entrypoints provided for buildEntrypoints.`);
     return;
   }
 
   if (!root || typeof root !== 'string') {
-    console.error(`\n❌ Error: Invalid root provided for buildEntrypoints.`);
+    logger.error(`\n❌ Error: Invalid root provided for buildEntrypoints.`);
     return;
   }
 

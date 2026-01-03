@@ -1,6 +1,7 @@
 import { resolve, dirname } from "path";
 import { watch } from "fs";
 import { build } from "./build";
+import { logger } from "./logger";
 
 export interface TkeronDevOptions {
   outputDir?: string;
@@ -36,20 +37,20 @@ export const develop = async (
     ? await resolve(outputDir)
     : await resolve(dirname(source), "web");
 
-  console.log("🔨 Building project...");
+  logger.log("🔨 Building project...");
   try {
     await build({ sourceDir: source, targetDir: target });
   } catch (error: any) {
     if (error.code === "ENOENT") {
       const actualSourceDir = sourceDir || "websrc";
-      console.error(`\n❌ Error: Source directory "${actualSourceDir}" does not exist.`);
-      console.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
-      console.error(`   Expected: ${source}\n`);
+      logger.error(`\n❌ Error: Source directory "${actualSourceDir}" does not exist.`);
+      logger.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
+      logger.error(`   Expected: ${source}\n`);
       process.exit(1);
     }
     throw error;
   }
-  console.log("✅ Build complete!");
+  logger.log("✅ Build complete!");
 
   const server = Bun.serve({
     development: true,
@@ -119,17 +120,17 @@ export const develop = async (
     },
   });
 
-  console.log(`🚀 Development server running at http://${host}:${port}`);
+  logger.log(`🚀 Development server running at http://${host}:${port}`);
 
   const watcher = watch(
     source,
     { recursive: true },
     async (event, filename) => {
       if (filename) {
-        console.log(`📝 File changed: ${filename}`);
-        console.log("🔨 Rebuilding...");
+        logger.log(`📝 File changed: ${filename}`);
+        logger.log("🔨 Rebuilding...");
         await build({ sourceDir: source, targetDir: target });
-        console.log("✅ Build complete!");
+        logger.log("✅ Build complete!");
         
         reloadClients.forEach((controller) => {
           try {
@@ -143,7 +144,7 @@ export const develop = async (
   );
 
   const stop = async () => {
-    console.log("\n👋 Shutting down server...");
+    logger.log("\n👋 Shutting down server...");
     watcher.close();
     server.stop();
     // Wait for connections to close

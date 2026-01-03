@@ -102,7 +102,7 @@ tk build source output
 ```bash
 # If source directory doesn't exist
 ❌ Error: Source directory "websrc" does not exist.
-💡 Tip: Create the directory first or check the path.
+💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.
    Expected: /path/to/websrc
 ```
 
@@ -569,6 +569,7 @@ tk dev websrc web 3001
 ```bash
 # Error
 ❌ Error: Source directory "websrc" does not exist.
+💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.
 ```
 
 **Solution:**

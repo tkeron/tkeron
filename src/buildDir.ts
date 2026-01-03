@@ -1,10 +1,11 @@
 import { getPaths } from "@tkeron/tools";
 import { join } from "path";
 import { buildEntrypoints } from "./buildEntrypoints";
+import { logger } from "./logger";
 
 export const buildDir = async (sourceDir: string, targetDir: string) => {
     if (!sourceDir || typeof sourceDir !== 'string' || !targetDir || typeof targetDir !== 'string') {
-        console.error(`\n❌ Error: Invalid sourceDir or targetDir provided for buildDir.`);
+        logger.error(`\n❌ Error: Invalid sourceDir or targetDir provided for buildDir.`);
         return;
     }
 

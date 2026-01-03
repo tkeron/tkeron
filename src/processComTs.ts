@@ -2,6 +2,7 @@ import { parseHTML } from "@tkeron/html-parser";
 import { getFilePaths } from "@tkeron/tools";
 import { join, dirname } from "path";
 import { tmpdir } from "os";
+import { logger } from "./logger";
 
 const DOCTYPE = "<!doctype html>\n";
 
@@ -18,7 +19,7 @@ function ensureHtmlDocument(html: string): string {
  */
 export const processComTs = async (tempDir: string): Promise<boolean> => {
   if (!tempDir || typeof tempDir !== 'string') {
-    console.error(`\n❌ Error: Invalid tempDir provided for processComTs.`);
+    logger.error(`\n❌ Error: Invalid tempDir provided for processComTs.`);
     return false;
   }
 
@@ -70,7 +71,7 @@ async function processComponentsTs(
   // Prevent infinite recursion
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
-    console.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
+    logger.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
     return hasChanges;
   }
 
@@ -100,10 +101,10 @@ async function processComponentsTs(
         // Check for circular dependencies
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
-          console.error(`\n❌ Error: Circular component dependency detected.`);
-          console.error(`\n💡 Component chain: ${chain}`);
-          console.error(`\n   Components cannot include themselves directly or indirectly.`);
-          console.error(`   Check your .com.ts files for circular references.\n`);
+          logger.error(`\n❌ Error: Circular component dependency detected.`);
+          logger.error(`\n💡 Component chain: ${chain}`);
+          logger.error(`\n   Components cannot include themselves directly or indirectly.`);
+          logger.error(`   Check your .com.ts files for circular references.\n`);
           throw new Error(`Circular dependency: ${chain}`);
         }
 
@@ -153,9 +154,9 @@ await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.i
           // Check if execution was successful
           if (proc.exitCode !== 0) {
             const stderr = await new Response(proc.stderr).text();
-            console.error(`\n❌ Error: Component <${tagName}> failed to execute.`);
-            console.error(`\n💡 Component file: ${componentPath}`);
-            console.error(`\nError details:\n${stderr}\n`);
+            logger.error(`\n❌ Error: Component <${tagName}> failed to execute.`);
+            logger.error(`\n💡 Component file: ${componentPath}`);
+            logger.error(`\nError details:\n${stderr}\n`);
             throw new Error(`Component ${tagName} execution failed`);
           }
 

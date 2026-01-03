@@ -1,14 +1,15 @@
 import { describe, it, expect, spyOn } from "bun:test";
 import { processPre } from "./processPre";
-import { rmSync, mkdirSync, writeFileSync, existsSync, readFileSync } from "fs";
+import { rmSync, mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
 import { getTestResources } from "./test-helpers";
+import { logger } from "./logger";
 
 describe("processPre", () => {
   it("should successfully process valid .pre.ts file", async () => {
     const { dir } = getTestResources("processPre-valid-file");
-    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
-    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
       mkdirSync(dir, { recursive: true });
@@ -32,16 +33,16 @@ document.body.appendChild(h1);
       expect(outputHtml).toContain("Test Title");
       expect(outputHtml).toContain("Test Content");
     } finally {
-      consoleLogSpy?.mockRestore();
-      consoleErrorSpy?.mockRestore();
+      loggerLogSpy?.mockRestore();
+      loggerErrorSpy?.mockRestore();
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
   it("should handle .pre.ts file with syntax error", async () => {
     const { dir } = getTestResources("processPre-syntax-error");
-    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
-    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
       mkdirSync(dir, { recursive: true });
@@ -60,16 +61,16 @@ document.body.appendChild(h1);
 
       expect(errorThrown).toBe(true);
     } finally {
-      consoleLogSpy?.mockRestore();
-      consoleErrorSpy?.mockRestore();
+      loggerLogSpy?.mockRestore();
+      loggerErrorSpy?.mockRestore();
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
   it("should handle .pre.ts file with runtime error", async () => {
     const { dir } = getTestResources("processPre-runtime-error");
-    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
-    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
       mkdirSync(dir, { recursive: true });
@@ -88,16 +89,16 @@ document.body.appendChild(h1);
 
       expect(errorThrown).toBe(true);
     } finally {
-      consoleLogSpy?.mockRestore();
-      consoleErrorSpy?.mockRestore();
+      loggerLogSpy?.mockRestore();
+      loggerErrorSpy?.mockRestore();
       rmSync(dir, { recursive: true, force: true });
     }
   });
 
   it("should process multiple .pre.ts files independently", async () => {
     const { dir } = getTestResources("processPre-multiple-files");
-    const consoleLogSpy = spyOn(console, "log").mockImplementation(() => {});
-    const consoleErrorSpy = spyOn(console, "error").mockImplementation(() => {});
+    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
       mkdirSync(dir, { recursive: true });
@@ -127,8 +128,100 @@ document.body.appendChild(h1);
       expect(output1).toContain("Page 1");
       expect(output2).toContain("Page 2");
     } finally {
-      consoleLogSpy?.mockRestore();
-      consoleErrorSpy?.mockRestore();
+      loggerLogSpy?.mockRestore();
+      loggerErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("should use existing .html file as base when present", async () => {
+    const { dir } = getTestResources("processPre-existing-html");
+    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+
+    try {
+      mkdirSync(dir, { recursive: true });
+
+      const htmlContent = `<!DOCTYPE html>
+<html>
+<head><title>Original Title</title></head>
+<body><div id="content">Original</div></body>
+</html>`;
+      writeFileSync(join(dir, "page.html"), htmlContent);
+
+      const preContent = `
+const content = document.getElementById("content");
+if (content) content.textContent = "Modified by pre";
+`;
+      writeFileSync(join(dir, "page.pre.ts"), preContent);
+
+      await processPre(dir);
+
+      const outputHtml = readFileSync(join(dir, "page.html"), "utf-8");
+      expect(outputHtml).toContain("Original Title");
+      expect(outputHtml).toContain("Modified by pre");
+    } finally {
+      loggerLogSpy?.mockRestore();
+      loggerErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("should create default HTML when no .html file exists", async () => {
+    const { dir } = getTestResources("processPre-default-html");
+    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+
+    try {
+      mkdirSync(dir, { recursive: true });
+
+      const preContent = `
+const h1 = document.createElement("h1");
+h1.textContent = "Created from default";
+document.body.appendChild(h1);
+`;
+      writeFileSync(join(dir, "page.pre.ts"), preContent);
+
+      await processPre(dir);
+
+      expect(existsSync(join(dir, "page.html"))).toBe(true);
+      const outputHtml = readFileSync(join(dir, "page.html"), "utf-8");
+      expect(outputHtml).toContain("<!DOCTYPE html>");
+      expect(outputHtml).toContain("Created from default");
+    } finally {
+      loggerLogSpy?.mockRestore();
+      loggerErrorSpy?.mockRestore();
+      rmSync(dir, { recursive: true, force: true });
+    }
+  });
+
+  it("should resolve relative imports within temp directory", async () => {
+    const { dir } = getTestResources("processPre-resolve-imports");
+    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
+    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+
+    try {
+      mkdirSync(dir, { recursive: true });
+
+      writeFileSync(join(dir, "my-utils.ts"), `export const greeting = "Hello from local module";`);
+
+      const preContent = `
+import { greeting } from "./my-utils";
+
+const h1 = document.createElement("h1");
+h1.textContent = greeting;
+document.body.appendChild(h1);
+`;
+      writeFileSync(join(dir, "page.pre.ts"), preContent);
+
+      await processPre(dir);
+
+      expect(existsSync(join(dir, "page.html"))).toBe(true);
+      const outputHtml = readFileSync(join(dir, "page.html"), "utf-8");
+      expect(outputHtml).toContain("Hello from local module");
+    } finally {
+      loggerLogSpy?.mockRestore();
+      loggerErrorSpy?.mockRestore();
       rmSync(dir, { recursive: true, force: true });
     }
   });

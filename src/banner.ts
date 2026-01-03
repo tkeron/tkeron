@@ -1,6 +1,8 @@
+import { logger } from "./logger";
+
 export async function showBanner() {
   const packageJson = await import("../package.json");
-  console.log(`\x1b[34m
+  logger.log(`\x1b[34m
    _______  _  __  _____  ____    ___   _   _
   |__   __|| |/ / |  ___||    \\  /   \\ | \\ | |
      | |   |   /  |  __| |  ^ / |  ^  ||  \\| |

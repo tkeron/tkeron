@@ -1,10 +1,14 @@
 import { join, dirname } from "path";
 import { getFilePaths } from "@tkeron/tools";
+import { logger } from "./logger";
 
 // Read tkeron version from package.json
 const packageJsonPath = join(import.meta.dir, "..", "package.json");
 const packageJson = await Bun.file(packageJsonPath).json();
 const TKERON_VERSION = packageJson.version;
+
+// Absolute path to @tkeron/html-parser (from tkeron's node_modules)
+const HTML_PARSER_PATH = join(import.meta.dir, "..", "node_modules", "@tkeron", "html-parser");
 
 const DEFAULT_HTML = `<!DOCTYPE html>
 <html lang="en">
@@ -19,11 +23,11 @@ const DEFAULT_HTML = `<!DOCTYPE html>
 
 export const processPre = async (tempDir: string): Promise<boolean> => {
   if (!tempDir || typeof tempDir !== 'string') {
-    console.error(`\n❌ Error: Invalid tempDir provided for processPre.`);
+    logger.error(`\n❌ Error: Invalid tempDir provided for processPre.`);
     return false;
   }
 
-  // Find all .pre.ts files
+  // Find all .pre.ts files in temp directory
   const preFiles = getFilePaths(tempDir, "**/*.pre.ts", true);
 
   // Return true if there were any .pre.ts files to process
@@ -41,9 +45,9 @@ export const processPre = async (tempDir: string): Promise<boolean> => {
       ? await Bun.file(htmlFile).text()
       : DEFAULT_HTML;
 
-    // Create modified .pre.ts with wrapper code
+    // Create modified .pre.ts with wrapper code using absolute path to html-parser
     const modifiedCode = `
-        import { parseHTML } from "@tkeron/html-parser";
+        import { parseHTML } from "${HTML_PARSER_PATH}";
 
         const htmlPath = ${JSON.stringify(htmlFile)};
         const htmlContent = ${JSON.stringify(htmlContent)};
@@ -61,7 +65,7 @@ export const processPre = async (tempDir: string): Promise<boolean> => {
     // Overwrite .pre.ts with modified version
     await Bun.write(preFile, modifiedCode);
 
-    // Execute the modified .pre.ts
+    // Execute the modified .pre.ts from temp directory
     const proc = Bun.spawn(["bun", "run", preFile], {
       cwd: dirname(preFile),
       stdout: "pipe",
@@ -78,17 +82,17 @@ export const processPre = async (tempDir: string): Promise<boolean> => {
     if (proc.exitCode !== 0) {
       const stderr = await new Response(proc.stderr).text();
       const stdout = await new Response(proc.stdout).text();
-      console.error(
+      logger.error(
         `\n❌ Error: Pre-rendering failed for ${preFile.split("/").pop()}`
       );
-      console.error(`\n💡 File: ${preFile}`);
+      logger.error(`\n💡 File: ${preFile}`);
       if (stderr) {
-        console.error(`\nError details:\n${stderr}`);
+        logger.error(`\nError details:\n${stderr}`);
       }
       if (stdout) {
-        console.error(`\nOutput:\n${stdout}`);
+        logger.error(`\nOutput:\n${stdout}`);
       }
-      console.error();
+      logger.error();
       throw new Error(`Pre-rendering failed for ${preFile}`);
     }
   }

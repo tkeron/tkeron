@@ -3,6 +3,7 @@ import { processCom } from "./processCom";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
 import { getTestResources } from "./test-helpers";
+import { logger } from "./logger";
 
 describe("processCom - Component substitution", () => {
 
