@@ -34,15 +34,14 @@ export const processCom = async (tempDir: string): Promise<boolean> => {
     const htmlContent = await Bun.file(htmlFile).text();
     const document = parseHTML(ensureHtmlDocument(htmlContent));
 
-    // Process components recursively
-    const body = document.querySelector("body") || document.body;
-    if (body) {
-      const changed = await processComponents(body, dirname(htmlFile), tempDir, []);
+    // Process components recursively in the entire document (head and body)
+    const htmlElement = document.querySelector("html") || document.documentElement;
+    if (htmlElement) {
+      const changed = await processComponents(htmlElement, dirname(htmlFile), tempDir, []);
       hasChanges = hasChanges || changed;
     }
 
     // Save modified HTML
-    const htmlElement = document.querySelector("html") || document.documentElement;
     const output = DOCTYPE + (htmlElement?.outerHTML || document.documentElement?.outerHTML || "");
     await Bun.write(htmlFile, output);
   }

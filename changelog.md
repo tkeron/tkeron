@@ -1,3 +1,21 @@
+# v4.0.0-beta.9
+
+## Features
+
+### Component Substitution in `<head>`
+- **New**: Both `.com.html` and `.com.ts` components can now be used inside the `<head>` section of HTML documents
+- Components are now processed throughout the entire HTML document, not just in `<body>`
+- This enables modular management of meta tags, link tags, and other head elements
+- Example use cases:
+  - Reusable meta tag bundles (`<social-meta>`, `<seo-meta>`)
+  - Dynamic favicon and link configurations
+  - Shared script and style declarations
+
+## Maintenance
+
+### Dependency Updates
+- Updated `@modelcontextprotocol/sdk` from `1.25.1` to `1.25.2`
+
 # v4.0.0-beta.8
 
 ## Bug Fixes

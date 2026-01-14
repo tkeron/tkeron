@@ -684,4 +684,94 @@ describe("processCom - Component substitution", () => {
       }
     });
   });
+
+  describe("Component substitution in <head>", () => {
+    it("should replace custom elements in <head> section", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-replace-components-in-head");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <meta-tags></meta-tags>
+</head>
+<body>
+  <h1>Body content</h1>
+</body>
+</html>`;
+
+        const metaTagsHtml = `<meta name="description" content="Test description">
+<meta name="keywords" content="test, keywords">
+<meta property="og:title" content="Test Title">`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "meta-tags.com.html"), metaTagsHtml);
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        expect(result).toContain('<meta name="description" content="Test description">');
+        expect(result).toContain('<meta name="keywords" content="test, keywords">');
+        expect(result).toContain('<meta property="og:title" content="Test Title">');
+        expect(result).not.toContain("<meta-tags>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should replace custom elements in both <head> and <body>", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-should-replace-in-head-and-body");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <social-meta></social-meta>
+</head>
+<body>
+  <page-header></page-header>
+  <p>Main content</p>
+</body>
+</html>`;
+
+        const socialMetaHtml = `<meta property="og:title" content="Page Title">
+<meta property="og:description" content="Page Description">`;
+
+        const pageHeaderHtml = `<header>
+  <h1>Welcome</h1>
+  <nav>Navigation</nav>
+</header>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "social-meta.com.html"), socialMetaHtml);
+        writeFileSync(join(TEST_DIR, "page-header.com.html"), pageHeaderHtml);
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        // Check head components
+        expect(result).toContain('<meta property="og:title" content="Page Title">');
+        expect(result).toContain('<meta property="og:description" content="Page Description">');
+        expect(result).not.toContain("<social-meta>");
+        
+        // Check body components
+        expect(result).toContain("<header>");
+        expect(result).toContain("<h1>Welcome</h1>");
+        expect(result).toContain("<nav>Navigation</nav>");
+        expect(result).not.toContain("<page-header>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
 });

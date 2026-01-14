@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "4.0.0-beta.8",
+  "version": "4.0.0-beta.9",
   "description": "CLI tool for backend-driven frontend development with TypeScript.",
   "type": "module",
   "bin": {
@@ -24,7 +24,7 @@
   "author": "tkeron",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.25.1",
+    "@modelcontextprotocol/sdk": "^1.25.2",
     "@tkeron/commands": "0.3.1",
     "@tkeron/html-parser": "^0.1.5",
     "@tkeron/tools": "^0.2.2"
