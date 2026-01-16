@@ -1,14 +1,21 @@
 import { normalize } from "path";
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { silentLogger } from "./logger";
 
-export const buildEntrypoints = async (filePaths: string[], root: string) => {
+export interface BuildEntrypointsOptions {
+  logger?: Logger;
+}
+
+export const buildEntrypoints = async (filePaths: string[], root: string, options: BuildEntrypointsOptions = {}) => {
+  const log = options.logger || silentLogger;
+  
   if (!filePaths || !Array.isArray(filePaths) || filePaths.length === 0) {
-    logger.error(`\n❌ Error: No entrypoints provided for buildEntrypoints.`);
+    log.error(`\n❌ Error: No entrypoints provided for buildEntrypoints.`);
     return;
   }
 
   if (!root || typeof root !== 'string') {
-    logger.error(`\n❌ Error: Invalid root provided for buildEntrypoints.`);
+    log.error(`\n❌ Error: Invalid root provided for buildEntrypoints.`);
     return;
   }
 

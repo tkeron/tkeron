@@ -1,5 +1,11 @@
 import { tmpdir } from "os";
 import { join } from "path";
+import { createTestLogger, silentLogger } from "./logger";
+import type { Logger } from "./logger";
+
+// Re-export for convenience
+export { createTestLogger, silentLogger };
+export type { Logger };
 
 /**
  * Simple hash function to generate a deterministic number from a string

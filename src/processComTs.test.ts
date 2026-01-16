@@ -1,9 +1,8 @@
-import { describe, it, expect, spyOn } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { processComTs } from "./processComTs";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
-import { getTestResources } from "./test-helpers";
-import { logger } from "./logger";
+import { getTestResources, silentLogger, createTestLogger } from "./test-helpers";
 
 describe("processComTs - TypeScript component substitution", () => {
 
@@ -909,7 +908,7 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
   describe("Deep nesting and MAX_DEPTH", () => {
     it("should handle deep component nesting up to MAX_DEPTH", async () => {
       const { dir: TEST_DIR } = getTestResources("processComTs-should-handle-deep-nesting");
-      const consoleWarnSpy = spyOn(console, "warn").mockImplementation(() => {});
+      const testLogger = createTestLogger();
 
       try {
         mkdirSync(TEST_DIR, { recursive: true });
@@ -937,12 +936,12 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
           );
         }
 
-        await processComTs(TEST_DIR);
+        await processComTs(TEST_DIR, { logger: testLogger.logger });
 
         // Should warn about exceeding MAX_DEPTH
-        expect(consoleWarnSpy).toHaveBeenCalled();
+        expect(testLogger.warns.length).toBeGreaterThan(0);
+        expect(testLogger.warns.some(w => w.includes("Maximum component nesting depth"))).toBe(true);
       } finally {
-        consoleWarnSpy?.mockRestore();
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });
@@ -1093,6 +1092,53 @@ com.innerHTML = "";
         expect(result).toContain("<h1>Welcome</h1>");
         expect(result).toContain("<nav>Navigation</nav>");
         expect(result).not.toContain("<page-header>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
+
+  describe("Input validation", () => {
+    it("should return false and log error when tempDir is invalid", async () => {
+      const { logger, errors } = createTestLogger();
+      
+      // Test with empty string
+      const result1 = await processComTs("", { logger });
+      expect(result1).toBe(false);
+      expect(errors.some(e => e.includes("Invalid tempDir"))).toBe(true);
+      
+      // Test with null-ish value
+      const result2 = await processComTs(null as any, { logger });
+      expect(result2).toBe(false);
+    });
+  });
+
+  describe("Edge cases for empty container", () => {
+    it("should handle component that returns empty container after processing", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-empty-container-edge");
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <p>Before</p>
+  <empty-container></empty-container>
+  <p>After</p>
+</body>
+</html>`;
+
+        // Component that produces completely empty content
+        const emptyCompTs = `com.innerHTML = "";`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "empty-container.com.ts"), emptyCompTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain("<p>Before</p>");
+        expect(result).toContain("<p>After</p>");
+        expect(result).not.toContain("<empty-container>");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }

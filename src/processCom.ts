@@ -1,7 +1,8 @@
 import { parseHTML } from "@tkeron/html-parser";
 import { getFilePaths } from "@tkeron/tools";
 import { join, dirname } from "path";
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { silentLogger } from "./logger";
 
 const DOCTYPE = "<!doctype html>\n";
 
@@ -12,13 +13,19 @@ function ensureHtmlDocument(html: string): string {
   return `${DOCTYPE}<html><head></head><body>${html}</body></html>`;
 }
 
+export interface ProcessComOptions {
+  logger?: Logger;
+}
+
 /**
  * Process .com.html files and replace custom elements with component content
  * @param tempDir - Temporary directory containing the source files
  */
-export const processCom = async (tempDir: string): Promise<boolean> => {
+export const processCom = async (tempDir: string, options: ProcessComOptions = {}): Promise<boolean> => {
+  const log = options.logger || silentLogger;
+  
   if (!tempDir || typeof tempDir !== 'string') {
-    logger.error(`\n❌ Error: Invalid tempDir provided for processCom.`);
+    log.error(`\n❌ Error: Invalid tempDir provided for processCom.`);
     return false;
   }
 
@@ -37,7 +44,7 @@ export const processCom = async (tempDir: string): Promise<boolean> => {
     // Process components recursively in the entire document (head and body)
     const htmlElement = document.querySelector("html") || document.documentElement;
     if (htmlElement) {
-      const changed = await processComponents(htmlElement, dirname(htmlFile), tempDir, []);
+      const changed = await processComponents(htmlElement, dirname(htmlFile), tempDir, [], 0, log);
       hasChanges = hasChanges || changed;
     }
 
@@ -62,13 +69,14 @@ async function processComponents(
   currentDir: string,
   rootDir: string,
   componentStack: string[],
-  depth: number = 0
+  depth: number = 0,
+  log: Logger = silentLogger
 ): Promise<boolean> {
   let hasChanges = false;
   // Prevent infinite recursion
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
-    logger.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
+    log.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
     return hasChanges;
   }
 
@@ -97,10 +105,10 @@ async function processComponents(
         
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
-          logger.error(`\n❌ Error: Circular component dependency detected.`);
-          logger.error(`\n💡 Component chain: ${chain}`);
-          logger.error(`\n   Components cannot include themselves directly or indirectly.`);
-          logger.error(`   Check your .com.html files for circular references.\n`);
+          log.error(`\n❌ Error: Circular component dependency detected.`);
+          log.error(`\n💡 Component chain: ${chain}`);
+          log.error(`\n   Components cannot include themselves directly or indirectly.`);
+          log.error(`   Check your .com.html files for circular references.\n`);
           throw new Error(`Circular dependency: ${chain}`);
         }
 
@@ -150,18 +158,18 @@ async function processComponents(
         for (const node of nodesToInsert) {
           if ((node as any).nodeType === 1) {
             // Element node
-            const nestedChanged = await processComponents(node, nextCurrentDir, rootDir, nextStack, depth + 1);
+            const nestedChanged = await processComponents(node, nextCurrentDir, rootDir, nextStack, depth + 1, log);
             hasChanges = hasChanges || nestedChanged;
           }
         }
       } else {
         // Component not found, recurse into children
-        const childChanged = await processComponents(child, currentDir, rootDir, componentStack, depth + 1);
+        const childChanged = await processComponents(child, currentDir, rootDir, componentStack, depth + 1, log);
         hasChanges = hasChanges || childChanged;
       }
     } else {
       // Not a custom element, recurse into children
-      const childChanged = await processComponents(child, currentDir, rootDir, componentStack, depth + 1);
+      const childChanged = await processComponents(child, currentDir, rootDir, componentStack, depth + 1, log);
       hasChanges = hasChanges || childChanged;
     }
   }

@@ -1,6 +1,7 @@
 import { join, dirname } from "path";
 import { getFilePaths } from "@tkeron/tools";
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { silentLogger } from "./logger";
 
 // Read tkeron version from package.json
 const packageJsonPath = join(import.meta.dir, "..", "package.json");
@@ -21,9 +22,15 @@ const DEFAULT_HTML = `<!DOCTYPE html>
 </body>
 </html>`;
 
-export const processPre = async (tempDir: string): Promise<boolean> => {
+export interface ProcessPreOptions {
+  logger?: Logger;
+}
+
+export const processPre = async (tempDir: string, options: ProcessPreOptions = {}): Promise<boolean> => {
+  const log = options.logger || silentLogger;
+  
   if (!tempDir || typeof tempDir !== 'string') {
-    logger.error(`\n❌ Error: Invalid tempDir provided for processPre.`);
+    log.error(`\n❌ Error: Invalid tempDir provided for processPre.`);
     return false;
   }
 
@@ -82,17 +89,17 @@ export const processPre = async (tempDir: string): Promise<boolean> => {
     if (proc.exitCode !== 0) {
       const stderr = await new Response(proc.stderr).text();
       const stdout = await new Response(proc.stdout).text();
-      logger.error(
+      log.error(
         `\n❌ Error: Pre-rendering failed for ${preFile.split("/").pop()}`
       );
-      logger.error(`\n💡 File: ${preFile}`);
+      log.error(`\n💡 File: ${preFile}`);
       if (stderr) {
-        logger.error(`\nError details:\n${stderr}`);
+        log.error(`\nError details:\n${stderr}`);
       }
       if (stdout) {
-        logger.error(`\nOutput:\n${stdout}`);
+        log.error(`\nOutput:\n${stdout}`);
       }
-      logger.error();
+      log.error();
       throw new Error(`Pre-rendering failed for ${preFile}`);
     }
   }

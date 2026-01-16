@@ -1,11 +1,13 @@
 import { cpSync, existsSync, mkdirSync, copyFileSync, readdirSync, rmSync } from "fs";
 import { join, resolve, basename } from "path";
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { silentLogger } from "./logger";
 
 export interface InitOptions {
   projectName: string;
   force?: boolean;
   promptFn?: (question: string) => Promise<boolean>;
+  logger?: Logger;
 }
 
 export async function promptUser(question: string): Promise<boolean> {
@@ -25,7 +27,7 @@ export async function promptUser(question: string): Promise<boolean> {
 }
 
 export async function init(options: InitOptions) {
-  const { projectName, force } = options;
+  const { projectName, force, logger: log = silentLogger } = options;
   
   if (!projectName) {
     throw new Error("Project name is required");
@@ -43,7 +45,7 @@ export async function init(options: InitOptions) {
         }
       } else {
         rmSync(targetPath, { recursive: true, force: true });
-        logger.log(`✓ Removed existing directory "${projectName}"`);
+        log.log(`✓ Removed existing directory "${projectName}"`);
       }
     } else {
       const tkeronFiles = ['websrc', 'tkeron.d.ts'];
@@ -51,14 +53,14 @@ export async function init(options: InitOptions) {
       
       if (existingTkeronFiles.length > 0) {
         if (!force) {
-          logger.log(`\n⚠️  The following tkeron files already exist: ${existingTkeronFiles.join(', ')}`);
+          log.log(`\n⚠️  The following tkeron files already exist: ${existingTkeronFiles.join(', ')}`);
           const prompt = options.promptFn || promptUser;
           const shouldContinue = await prompt(
             "\nDo you want to overwrite them? (y/N): "
           );
           
           if (!shouldContinue) {
-            logger.log("\n❌ Operation cancelled.");
+            log.log("\n❌ Operation cancelled.");
             process.exit(0);
           }
         }
@@ -68,7 +70,7 @@ export async function init(options: InitOptions) {
           rmSync(filePath, { recursive: true, force: true });
         });
         
-        logger.log("✓ Cleaned existing tkeron files");
+        log.log("✓ Cleaned existing tkeron files");
       }
     }
   }
@@ -96,10 +98,10 @@ export async function init(options: InitOptions) {
   copyFileSync(tkeronDtsPath, join(targetPath, "tkeron.d.ts"));
 
   const projectDisplayName = isCurrentDir ? basename(targetPath) : projectName;
-  logger.log(`✓ Created project "${projectDisplayName}"`);
-  logger.log(`\nNext steps:`);
+  log.log(`✓ Created project "${projectDisplayName}"`);
+  log.log(`\nNext steps:`);
   if (!isCurrentDir) {
-    logger.log(`  cd ${projectName}`);
+    log.log(`  cd ${projectName}`);
   }
-  logger.log(`  tk dev websrc`);
+  log.log(`  tk dev websrc`);
 }

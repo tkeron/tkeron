@@ -2,8 +2,7 @@ import { describe, it, expect, spyOn } from "bun:test";
 import { init, promptUser } from "./init";
 import { rmSync, existsSync, readFileSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
-import { getTestResources } from "./test-helpers";
-import { logger } from "./logger";
+import { getTestResources, silentLogger, createTestLogger } from "./test-helpers";
 
 describe("promptUser", () => {
   it("should return true when user inputs 'y'", async () => {
@@ -217,8 +216,6 @@ describe("promptUser", () => {
 describe("init", () => {
   it("should create project directory with init_sample content", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-create-project-directory-with-init-sample-content");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -227,6 +224,7 @@ describe("init", () => {
   
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
   
       expect(existsSync(projectPath)).toBe(true);
@@ -237,16 +235,12 @@ describe("init", () => {
       expect(existsSync(join(projectPath, "websrc", "info-card.com.html"))).toBe(true);
       expect(existsSync(join(projectPath, "websrc", "user-badge.com.ts"))).toBe(true);
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should throw error if non-empty directory already exists", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-throw-error-if-directory-already-exists");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -259,36 +253,25 @@ describe("init", () => {
       expect(async () => {
         await init({
           projectName: join(TEST_DIR, projectName),
+          logger: silentLogger,
         });
       }).toThrow();
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should throw error if project name is not provided", async () => {
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
-
-    try {
-  
-      expect(async () => {
-        await init({
-          projectName: "",
-        });
-      }).toThrow("Project name is required");
-    } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
-    }
+    expect(async () => {
+      await init({
+        projectName: "",
+        logger: silentLogger,
+      });
+    }).toThrow("Project name is required");
   });
 
   it("should copy all files from init_sample including new components", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-copy-all-files-from-init-sample-including-new-components");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -297,6 +280,7 @@ describe("init", () => {
   
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
   
       expect(existsSync(join(projectPath, "websrc", "hero-section.com.html"))).toBe(true);
@@ -305,16 +289,12 @@ describe("init", () => {
       expect(existsSync(join(projectPath, "websrc", "ts-components-card.com.html"))).toBe(true);
       expect(existsSync(join(projectPath, "websrc", "counter-card.com.html"))).toBe(true);
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should preserve file content when copying", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-preserve-file-content-when-copying");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -323,6 +303,7 @@ describe("init", () => {
   
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
   
       const indexTs = readFileSync(join(projectPath, "websrc", "index.ts"), "utf-8");
@@ -333,16 +314,12 @@ describe("init", () => {
       expect(indexHtml).toContain("<hero-section>");
       expect(indexHtml).toContain("<counter-card>");
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should copy api-service.ts for pre-rendering with external APIs", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-copy-api-service-ts-for-pre-rendering-with-external-apis");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -351,6 +328,7 @@ describe("init", () => {
   
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
   
       // api-service.ts should be copied inside websrc
@@ -367,16 +345,12 @@ describe("init", () => {
       expect(indexPreTs).toContain("./api-service");
       expect(indexPreTs).toContain("getRandomQuote");
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should not copy web directory (it's generated by build)", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-not-copy-web-directory-it-s-generated-by-build");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -385,21 +359,18 @@ describe("init", () => {
   
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
   
       // web directory should not exist after init - it's created by build
       expect(existsSync(join(projectPath, "web"))).toBe(false);
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should copy tkeron.d.ts as sibling to project directory", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-copy-tkeron-d-ts-as-sibling-to-project-directory");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -408,6 +379,7 @@ describe("init", () => {
   
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
   
       // tkeron.d.ts should be at project root, sibling to src/
@@ -418,16 +390,12 @@ describe("init", () => {
       expect(dtsContent).toContain("*.pre.ts");
       expect(dtsContent).toContain("*.com.ts");
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should preserve tkeron.d.ts content correctly", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-preserve-tkeron-d-ts-content-correctly");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -436,22 +404,19 @@ describe("init", () => {
   
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
   
       const dtsContent = readFileSync(join(projectPath, "tkeron.d.ts"), "utf-8");
       expect(dtsContent).toContain("const document: Document");
       expect(dtsContent).toContain("const com: HTMLElement");
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should initialize in current directory when '.' is provided", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-initialize-in-current-directory-when-is-provided");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -463,7 +428,7 @@ describe("init", () => {
       process.chdir(emptyDir);
   
       try {
-        await init({ projectName: "." });
+        await init({ projectName: ".", logger: silentLogger });
   
         expect(existsSync(join(emptyDir, "websrc"))).toBe(true);
         expect(existsSync(join(emptyDir, "websrc", "index.html"))).toBe(true);
@@ -472,16 +437,12 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should overwrite files when force option is provided", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-overwrite-files-when-force-option-is-provided");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -497,7 +458,7 @@ describe("init", () => {
       process.chdir(forceDir);
   
       try {
-        await init({ projectName: ".", force: true });
+        await init({ projectName: ".", force: true, logger: silentLogger });
   
         // Should have new tkeron structure
         expect(existsSync(join(forceDir, "websrc"))).toBe(true);
@@ -510,16 +471,12 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should overwrite existing directory when force option is provided for non-current directory", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-overwrite-existing-directory-when-force-option-is-provided");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
       // Create existing directory with some files
@@ -529,7 +486,7 @@ describe("init", () => {
       writeFileSync(join(projectPath, "old-file.txt"), "old content");
   
       // Init with force should remove the directory and create new project
-      await init({ projectName: join(TEST_DIR, projectName), force: true });
+      await init({ projectName: join(TEST_DIR, projectName), force: true, logger: silentLogger });
   
       // Should have new tkeron structure
       expect(existsSync(join(projectPath, "websrc"))).toBe(true);
@@ -539,16 +496,12 @@ describe("init", () => {
       // Old file should be gone
       expect(existsSync(join(projectPath, "old-file.txt"))).toBe(false);
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should preserve non-tkeron files when overwriting", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-preserve-non-tkeron-files-when-overwriting");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -564,7 +517,7 @@ describe("init", () => {
       process.chdir(preserveDir);
   
       try {
-        await init({ projectName: ".", force: true });
+        await init({ projectName: ".", force: true, logger: silentLogger });
   
         // Non-tkeron files should still exist
         expect(existsSync(join(preserveDir, "README.md"))).toBe(true);
@@ -577,16 +530,12 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should allow initializing in directory with only ignored files", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-allow-initializing-in-directory-with-only-ignored-files");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -598,7 +547,7 @@ describe("init", () => {
       process.chdir(dirWithGit);
   
       try {
-        await init({ projectName: "." });
+        await init({ projectName: ".", logger: silentLogger });
   
         expect(existsSync(join(dirWithGit, "websrc"))).toBe(true);
         expect(existsSync(join(dirWithGit, "tkeron.d.ts"))).toBe(true);
@@ -606,16 +555,12 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should handle partial tkeron files - only src exists", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-handle-partial-tkeron-files-only-src-exists");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -628,7 +573,7 @@ describe("init", () => {
       process.chdir(partialDir);
   
       try {
-        await init({ projectName: ".", force: true });
+        await init({ projectName: ".", force: true, logger: silentLogger });
   
         // Should have new complete structure
         expect(existsSync(join(partialDir, "websrc", "index.html"))).toBe(true);
@@ -639,16 +584,12 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should handle partial tkeron files - only tkeron.d.ts exists", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-handle-partial-tkeron-files-only-tkeron-d-ts-exists");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -661,7 +602,7 @@ describe("init", () => {
       process.chdir(partialDir);
   
       try {
-        await init({ projectName: ".", force: true });
+        await init({ projectName: ".", force: true, logger: silentLogger });
   
         // Should have new structure
         expect(existsSync(join(partialDir, "websrc"))).toBe(true);
@@ -676,16 +617,12 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should handle directory with .git and tkeron files together", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-handle-directory-with-git-and-tkeron-files-together");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -699,7 +636,7 @@ describe("init", () => {
       process.chdir(mixedDir);
   
       try {
-        await init({ projectName: ".", force: true });
+        await init({ projectName: ".", force: true, logger: silentLogger });
   
         // Should have new tkeron structure
         expect(existsSync(join(mixedDir, "websrc", "index.html"))).toBe(true);
@@ -714,16 +651,12 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should handle multiple non-tkeron files with tkeron files", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-handle-multiple-non-tkeron-files-with-tkeron-files");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
   
@@ -740,7 +673,7 @@ describe("init", () => {
       process.chdir(multipleDir);
   
       try {
-        await init({ projectName: ".", force: true });
+        await init({ projectName: ".", force: true, logger: silentLogger });
   
         // Tkeron files should be new
         expect(existsSync(join(multipleDir, "websrc", "index.html"))).toBe(true);
@@ -756,16 +689,13 @@ describe("init", () => {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should handle user decline prompt with force flag bypassing prompt", async () => {
     const { dir: TEST_DIR } = getTestResources("init-should-handle-force-flag");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
 
     try {
       const currentDir = join(TEST_DIR, "current");
@@ -781,27 +711,23 @@ describe("init", () => {
 
       try {
         // Con force=true no debe pedir confirmación
-        await init({ projectName: ".", force: true });
+        await init({ projectName: ".", force: true, logger: testLogger.logger });
 
         // Verificar que se sobrescribieron los archivos sin preguntar
         expect(existsSync(join(currentDir, "websrc", "index.html"))).toBe(true);
         const newContent = readFileSync(join(currentDir, "websrc", "index.html"), "utf-8");
         expect(newContent).not.toContain("Old Content");
-        expect(loggerLogSpy).toHaveBeenCalledWith("✓ Cleaned existing tkeron files");
+        expect(testLogger.logs.some(l => l.includes("✓ Cleaned existing tkeron files"))).toBe(true);
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should throw error if template directory is not found", async () => {
     const { dir: TEST_DIR } = getTestResources("init-template-not-found");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
 
     try {
       // Mock import.meta.dir to point to a non-existent location
@@ -819,21 +745,19 @@ describe("init", () => {
 
       await init({
         projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
       });
 
       // If we get here, the template was found (normal case)
       expect(existsSync(projectPath)).toBe(true);
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should handle user declining overwrite with injectable prompt", async () => {
     const { dir: TEST_DIR } = getTestResources("init-user-declines-with-prompt");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
     const processExitSpy = spyOn(process, "exit").mockImplementation(((code?: number) => {
       throw new Error(`PROCESS_EXIT_${code}`);
     }) as any);
@@ -853,17 +777,15 @@ describe("init", () => {
         const mockPrompt = async (question: string) => false;
 
         await expect(async () => {
-          await init({ projectName: ".", promptFn: mockPrompt });
+          await init({ projectName: ".", promptFn: mockPrompt, logger: testLogger.logger });
         }).toThrow("PROCESS_EXIT_0");
 
         expect(processExitSpy).toHaveBeenCalledWith(0);
-        expect(loggerLogSpy).toHaveBeenCalledWith("\n❌ Operation cancelled.");
+        expect(testLogger.logs.some(l => l.includes("❌ Operation cancelled."))).toBe(true);
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       processExitSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -871,8 +793,7 @@ describe("init", () => {
 
   it("should handle user accepting overwrite with injectable prompt", async () => {
     const { dir: TEST_DIR } = getTestResources("init-user-accepts-with-prompt");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
 
     try {
       const currentDir = join(TEST_DIR, "current");
@@ -888,26 +809,23 @@ describe("init", () => {
         // Mock prompt to return true (user accepts)
         const mockPrompt = async (question: string) => true;
 
-        await init({ projectName: ".", promptFn: mockPrompt });
+        await init({ projectName: ".", promptFn: mockPrompt, logger: testLogger.logger });
 
         expect(existsSync(join(currentDir, "websrc", "index.html"))).toBe(true);
         const newContent = readFileSync(join(currentDir, "websrc", "index.html"), "utf-8");
         expect(newContent).not.toContain("Old");
-        expect(loggerLogSpy).toHaveBeenCalledWith("✓ Cleaned existing tkeron files");
+        expect(testLogger.logs.some(l => l.includes("✓ Cleaned existing tkeron files"))).toBe(true);
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should display correct project name when initializing in current directory", async () => {
     const { dir: TEST_DIR } = getTestResources("init-display-name-current-dir");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
 
     try {
       const currentDir = join(TEST_DIR, "my-project-name");
@@ -917,29 +835,24 @@ describe("init", () => {
       process.chdir(currentDir);
 
       try {
-        await init({ projectName: "." });
+        await init({ projectName: ".", logger: testLogger.logger });
 
         // Should display the directory name, not "."
-        const createCall = loggerLogSpy.mock.calls.find(call => 
-          call[0]?.includes('✓ Created project')
-        );
-        expect(createCall).toBeDefined();
-        expect(createCall[0]).toContain('my-project-name');
-        expect(createCall[0]).not.toContain('✓ Created project "."');
+        const createLog = testLogger.logs.find(l => l.includes('✓ Created project'));
+        expect(createLog).toBeDefined();
+        expect(createLog).toContain('my-project-name');
+        expect(createLog).not.toContain('✓ Created project "."');
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should display correct next steps when initializing in current directory", async () => {
     const { dir: TEST_DIR } = getTestResources("init-next-steps-current-dir");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
 
     try {
       const currentDir = join(TEST_DIR, "project");
@@ -949,50 +862,42 @@ describe("init", () => {
       process.chdir(currentDir);
 
       try {
-        await init({ projectName: "." });
+        await init({ projectName: ".", logger: testLogger.logger });
 
         // Should not include "cd projectName" step
-        const calls = loggerLogSpy.mock.calls.map(c => c[0]);
-        expect(calls.some(c => c?.includes("Next steps:"))).toBe(true);
-        expect(calls.some(c => c?.includes("tk dev websrc"))).toBe(true);
-        expect(calls.some(c => c?.includes("cd "))).toBe(false);
+        expect(testLogger.logs.some(l => l.includes("Next steps:"))).toBe(true);
+        expect(testLogger.logs.some(l => l.includes("tk dev websrc"))).toBe(true);
+        expect(testLogger.logs.some(l => l.includes("cd "))).toBe(false);
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should display correct next steps when initializing new directory", async () => {
     const { dir: TEST_DIR } = getTestResources("init-next-steps-new-dir");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
 
     try {
       const projectName = "new-project";
       const projectPath = join(TEST_DIR, projectName);
 
-      await init({ projectName: projectPath });
+      await init({ projectName: projectPath, logger: testLogger.logger });
 
       // Should include "cd projectName" step with the full path
-      const calls = loggerLogSpy.mock.calls.map(c => c[0]);
-      expect(calls.some(c => c?.includes("Next steps:"))).toBe(true);
-      expect(calls.some(c => c?.includes(`cd ${projectPath}`))).toBe(true);
-      expect(calls.some(c => c?.includes("tk dev websrc"))).toBe(true);
+      expect(testLogger.logs.some(l => l.includes("Next steps:"))).toBe(true);
+      expect(testLogger.logs.some(l => l.includes(`cd ${projectPath}`))).toBe(true);
+      expect(testLogger.logs.some(l => l.includes("tk dev websrc"))).toBe(true);
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
 
   it("should display warning message when tkeron files exist without force", async () => {
     const { dir: TEST_DIR } = getTestResources("init-warning-message");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
     const processExitSpy = spyOn(process, "exit").mockImplementation(((code?: number) => {
       throw new Error(`PROCESS_EXIT_${code}`);
     }) as any);
@@ -1009,20 +914,17 @@ describe("init", () => {
         const mockPrompt = async (question: string) => false;
 
         await expect(async () => {
-          await init({ projectName: ".", promptFn: mockPrompt });
+          await init({ projectName: ".", promptFn: mockPrompt, logger: testLogger.logger });
         }).toThrow("PROCESS_EXIT_0");
 
         // Check that warning was displayed
-        const calls = loggerLogSpy.mock.calls.map(c => c[0]);
-        expect(calls.some(c => c?.includes("⚠️"))).toBe(true);
-        expect(calls.some(c => c?.includes("tkeron files already exist"))).toBe(true);
-        expect(calls.some(c => c?.includes("websrc"))).toBe(true);
+        expect(testLogger.logs.some(l => l.includes("⚠️"))).toBe(true);
+        expect(testLogger.logs.some(l => l.includes("tkeron files already exist"))).toBe(true);
+        expect(testLogger.logs.some(l => l.includes("websrc"))).toBe(true);
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       processExitSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -1030,8 +932,7 @@ describe("init", () => {
 
   it("should handle only tkeron.d.ts existing (show in warning)", async () => {
     const { dir: TEST_DIR } = getTestResources("init-only-dts-warning");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
     const processExitSpy = spyOn(process, "exit").mockImplementation(((code?: number) => {
       throw new Error(`PROCESS_EXIT_${code}`);
     }) as any);
@@ -1048,20 +949,17 @@ describe("init", () => {
         const mockPrompt = async (question: string) => false;
 
         await expect(async () => {
-          await init({ projectName: ".", promptFn: mockPrompt });
+          await init({ projectName: ".", promptFn: mockPrompt, logger: testLogger.logger });
         }).toThrow("PROCESS_EXIT_0");
 
         // Check that warning includes tkeron.d.ts
-        const calls = loggerLogSpy.mock.calls.map(c => c[0]);
-        const warningCall = calls.find(c => c?.includes("tkeron files already exist"));
-        expect(warningCall).toBeDefined();
-        expect(warningCall).toContain("tkeron.d.ts");
+        const warningLog = testLogger.logs.find(l => l.includes("tkeron files already exist"));
+        expect(warningLog).toBeDefined();
+        expect(warningLog).toContain("tkeron.d.ts");
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       processExitSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -1069,8 +967,7 @@ describe("init", () => {
 
   it("should handle both src and tkeron.d.ts existing (show in warning)", async () => {
     const { dir: TEST_DIR } = getTestResources("init-both-files-warning");
-    const loggerLogSpy = spyOn(logger, "log").mockImplementation(() => {});
-    const loggerErrorSpy = spyOn(logger, "error").mockImplementation(() => {});
+    const testLogger = createTestLogger();
     const processExitSpy = spyOn(process, "exit").mockImplementation(((code?: number) => {
       throw new Error(`PROCESS_EXIT_${code}`);
     }) as any);
@@ -1088,21 +985,18 @@ describe("init", () => {
         const mockPrompt = async (question: string) => false;
 
         await expect(async () => {
-          await init({ projectName: ".", promptFn: mockPrompt });
+          await init({ projectName: ".", promptFn: mockPrompt, logger: testLogger.logger });
         }).toThrow("PROCESS_EXIT_0");
 
         // Check that warning includes both
-        const calls = loggerLogSpy.mock.calls.map(c => c[0]);
-        const warningCall = calls.find(c => c?.includes("tkeron files already exist"));
-        expect(warningCall).toBeDefined();
-        expect(warningCall).toContain("websrc");
-        expect(warningCall).toContain("tkeron.d.ts");
+        const warningLog = testLogger.logs.find(l => l.includes("tkeron files already exist"));
+        expect(warningLog).toBeDefined();
+        expect(warningLog).toContain("websrc");
+        expect(warningLog).toContain("tkeron.d.ts");
       } finally {
         process.chdir(originalCwd);
       }
     } finally {
-      loggerLogSpy?.mockRestore();
-      loggerErrorSpy?.mockRestore();
       processExitSpy?.mockRestore();
       rmSync(TEST_DIR, { recursive: true, force: true });
     }

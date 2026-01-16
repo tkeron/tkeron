@@ -4,5 +4,5 @@ web
 websrc
 local_test
 **/web/
-.tmp_*
+.tktmp_*
 

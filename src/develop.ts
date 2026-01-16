@@ -1,13 +1,15 @@
 import { resolve, dirname } from "path";
 import { watch } from "fs";
 import { build } from "./build";
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { logger as defaultLogger } from "./logger";
 
 export interface TkeronDevOptions {
   outputDir?: string;
   sourceDir?: string;
   port?: number;
   host?: string;
+  logger?: Logger;
 }
 
 const reloadClients = new Set<ReadableStreamDefaultController>();
@@ -30,6 +32,7 @@ export const develop = async (
     host = "localhost",
     sourceDir,
     outputDir,
+    logger: log = defaultLogger,
   } = options;
 
   const source = await resolve(sourceDir || "websrc");
@@ -37,20 +40,20 @@ export const develop = async (
     ? await resolve(outputDir)
     : await resolve(dirname(source), "web");
 
-  logger.log("🔨 Building project...");
+  log.log("🔨 Building project...");
   try {
-    await build({ sourceDir: source, targetDir: target });
+    await build({ sourceDir: source, targetDir: target, logger: log });
   } catch (error: any) {
     if (error.code === "ENOENT") {
       const actualSourceDir = sourceDir || "websrc";
-      logger.error(`\n❌ Error: Source directory "${actualSourceDir}" does not exist.`);
-      logger.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
-      logger.error(`   Expected: ${source}\n`);
+      log.error(`\n❌ Error: Source directory "${actualSourceDir}" does not exist.`);
+      log.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
+      log.error(`   Expected: ${source}\n`);
       process.exit(1);
     }
     throw error;
   }
-  logger.log("✅ Build complete!");
+  log.log("✅ Build complete!");
 
   const server = Bun.serve({
     development: true,
@@ -120,17 +123,17 @@ export const develop = async (
     },
   });
 
-  logger.log(`🚀 Development server running at http://${host}:${port}`);
+  log.log(`🚀 Development server running at http://${host}:${port}`);
 
   const watcher = watch(
     source,
     { recursive: true },
     async (event, filename) => {
       if (filename) {
-        logger.log(`📝 File changed: ${filename}`);
-        logger.log("🔨 Rebuilding...");
-        await build({ sourceDir: source, targetDir: target });
-        logger.log("✅ Build complete!");
+        log.log(`📝 File changed: ${filename}`);
+        log.log("🔨 Rebuilding...");
+        await build({ sourceDir: source, targetDir: target, logger: log });
+        log.log("✅ Build complete!");
         
         reloadClients.forEach((controller) => {
           try {
@@ -144,7 +147,7 @@ export const develop = async (
   );
 
   const stop = async () => {
-    logger.log("\n👋 Shutting down server...");
+    log.log("\n👋 Shutting down server...");
     watcher.close();
     server.stop();
     // Wait for connections to close

@@ -1,3 +1,30 @@
+# v4.0.0-beta.10
+
+## Improvements
+
+### Temp Directory Robustness
+- **Renamed**: Temp directory prefix changed from `.tmp_tkeron-build-` to `.tktmp_build-` for better identification
+- **New**: Automatic cleanup of orphaned temp directories from previous failed builds
+- **Improved**: Build process now cleans up any leftover `.tktmp_build-*` directories before starting
+- This ensures temp directories are always removed, even after crashes or interrupted builds
+
+### Logger Dependency Injection
+- **Refactored**: Logger is now injectable via options parameter in all main functions
+- All functions (`build`, `develop`, `init`, `processPre`, `processCom`, `processComTs`, `buildDir`, `buildEntrypoints`) now accept an optional `logger` parameter
+- Functions default to `silentLogger` (no-op) when no logger is provided
+- New `Logger` interface with `log`, `error`, `warn`, `info` methods
+- New `createTestLogger()` helper for tests that need to verify log messages
+- This enables parallel test execution without global mock conflicts
+
+### Testing
+- Added comprehensive unit tests for temp directory cleanup
+- Tests cover: successful builds, failed builds, orphaned directories, non-temp directories preservation
+- Tests verify edge cases: empty directories, non-existent directories, files with temp prefix
+- Migrated all test files to use injectable logger pattern instead of `spyOn(logger, ...)`
+- All 183 tests now support parallel execution without interference
+
+---
+
 # v4.0.0-beta.9
 
 ## Features

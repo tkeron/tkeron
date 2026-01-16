@@ -2,8 +2,7 @@ import { describe, it, expect, spyOn } from "bun:test";
 import { processCom } from "./processCom";
 import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
-import { getTestResources } from "./test-helpers";
-import { logger } from "./logger";
+import { getTestResources, createTestLogger, silentLogger } from "./test-helpers";
 
 describe("processCom - Component substitution", () => {
 
@@ -652,7 +651,7 @@ describe("processCom - Component substitution", () => {
   describe("Deep nesting MAX_DEPTH", () => {
     it("should warn when exceeding MAX_DEPTH of 50", async () => {
       const { dir: TEST_DIR } = getTestResources("processCom-max-depth-warning");
-      const consoleWarnSpy = spyOn(console, "warn").mockImplementation(() => {});
+      const testLogger = createTestLogger();
 
       try {
         mkdirSync(TEST_DIR, { recursive: true });
@@ -675,11 +674,11 @@ describe("processCom - Component substitution", () => {
           writeFileSync(join(TEST_DIR, `nest-${i}.com.html`), `<div>${next}</div>`);
         }
 
-        await processCom(TEST_DIR);
+        await processCom(TEST_DIR, { logger: testLogger.logger });
 
-        expect(consoleWarnSpy).toHaveBeenCalled();
+        expect(testLogger.warns.length).toBeGreaterThan(0);
+        expect(testLogger.warns.some(w => w.includes("Maximum component nesting depth"))).toBe(true);
       } finally {
-        consoleWarnSpy?.mockRestore();
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });
@@ -772,6 +771,21 @@ describe("processCom - Component substitution", () => {
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
+    });
+  });
+
+  describe("Input validation", () => {
+    it("should return false and log error when tempDir is invalid", async () => {
+      const { logger, errors } = createTestLogger();
+      
+      // Test with empty string
+      const result1 = await processCom("", { logger });
+      expect(result1).toBe(false);
+      expect(errors.some(e => e.includes("Invalid tempDir"))).toBe(true);
+      
+      // Test with null-ish value
+      const result2 = await processCom(null as any, { logger });
+      expect(result2).toBe(false);
     });
   });
 });

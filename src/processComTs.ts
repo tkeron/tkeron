@@ -2,7 +2,8 @@ import { parseHTML } from "@tkeron/html-parser";
 import { getFilePaths } from "@tkeron/tools";
 import { join, dirname } from "path";
 import { tmpdir } from "os";
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { silentLogger } from "./logger";
 
 const DOCTYPE = "<!doctype html>\n";
 
@@ -12,14 +13,20 @@ function ensureHtmlDocument(html: string): string {
   return `${DOCTYPE}<html><head></head><body>${html}</body></html>`;
 }
 
+export interface ProcessComTsOptions {
+  logger?: Logger;
+}
+
 /**
  * Process .com.ts files and replace custom elements with dynamically generated content
  * @param tempDir - Temporary directory containing the source files
  * @returns true if any components were processed, false otherwise
  */
-export const processComTs = async (tempDir: string): Promise<boolean> => {
+export const processComTs = async (tempDir: string, options: ProcessComTsOptions = {}): Promise<boolean> => {
+  const log = options.logger || silentLogger;
+  
   if (!tempDir || typeof tempDir !== 'string') {
-    logger.error(`\n❌ Error: Invalid tempDir provided for processComTs.`);
+    log.error(`\n❌ Error: Invalid tempDir provided for processComTs.`);
     return false;
   }
 
@@ -38,7 +45,7 @@ export const processComTs = async (tempDir: string): Promise<boolean> => {
     // Process TypeScript components recursively in the entire document (head and body)
     const htmlElement = document.querySelector("html") || document.documentElement;
     if (htmlElement) {
-      const changed = await processComponentsTs(htmlElement, dirname(htmlFile), tempDir, []);
+      const changed = await processComponentsTs(htmlElement, dirname(htmlFile), tempDir, [], 0, log);
       hasChanges = hasChanges || changed;
     }
 
@@ -64,13 +71,14 @@ async function processComponentsTs(
   currentDir: string,
   rootDir: string,
   componentStack: string[],
-  depth: number = 0
+  depth: number = 0,
+  log: Logger = silentLogger
 ): Promise<boolean> {
   let hasChanges = false;
   // Prevent infinite recursion
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
-    logger.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
+    log.warn(`Maximum component nesting depth (${MAX_DEPTH}) reached`);
     return hasChanges;
   }
 
@@ -100,10 +108,10 @@ async function processComponentsTs(
         // Check for circular dependencies
         if (componentStack.includes(tagName)) {
           const chain = [...componentStack, tagName].join(" -> ");
-          logger.error(`\n❌ Error: Circular component dependency detected.`);
-          logger.error(`\n💡 Component chain: ${chain}`);
-          logger.error(`\n   Components cannot include themselves directly or indirectly.`);
-          logger.error(`   Check your .com.ts files for circular references.\n`);
+          log.error(`\n❌ Error: Circular component dependency detected.`);
+          log.error(`\n💡 Component chain: ${chain}`);
+          log.error(`\n   Components cannot include themselves directly or indirectly.`);
+          log.error(`   Check your .com.ts files for circular references.\n`);
           throw new Error(`Circular dependency: ${chain}`);
         }
 
@@ -153,9 +161,9 @@ await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.i
           // Check if execution was successful
           if (proc.exitCode !== 0) {
             const stderr = await new Response(proc.stderr).text();
-            logger.error(`\n❌ Error: Component <${tagName}> failed to execute.`);
-            logger.error(`\n💡 Component file: ${componentPath}`);
-            logger.error(`\nError details:\n${stderr}\n`);
+            log.error(`\n❌ Error: Component <${tagName}> failed to execute.`);
+            log.error(`\n💡 Component file: ${componentPath}`);
+            log.error(`\nError details:\n${stderr}\n`);
             throw new Error(`Component ${tagName} execution failed`);
           }
 
@@ -213,7 +221,7 @@ await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.i
           for (const node of nodesToInsert) {
             if ((node as any).nodeType === 1) {
               // Element node
-              const nestedChanged = await processComponentsTs(node, nextCurrentDir, rootDir, nextStack, depth + 1);
+              const nestedChanged = await processComponentsTs(node, nextCurrentDir, rootDir, nextStack, depth + 1, log);
               hasChanges = hasChanges || nestedChanged;
             }
           }
@@ -231,12 +239,12 @@ await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.i
         }
       } else {
         // Component not found, recurse into children
-        const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1);
+        const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1, log);
         hasChanges = hasChanges || childChanged;
       }
     } else {
       // Not a custom element, recurse into children
-      const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1);
+      const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1, log);
       hasChanges = hasChanges || childChanged;
     }
   }

@@ -1,8 +1,9 @@
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { logger as defaultLogger } from "./logger";
 
-export async function showBanner() {
+export async function showBanner(log: Logger = defaultLogger) {
   const packageJson = await import("../package.json");
-  logger.log(`\x1b[34m
+  log.log(`\x1b[34m
    _______  _  __  _____  ____    ___   _   _
   |__   __|| |/ / |  ___||    \\  /   \\ | \\ | |
      | |   |   /  |  __| |  ^ / |  ^  ||  \\| |

@@ -1,11 +1,18 @@
 import { getPaths } from "@tkeron/tools";
 import { join } from "path";
 import { buildEntrypoints } from "./buildEntrypoints";
-import { logger } from "./logger";
+import type { Logger } from "./logger";
+import { silentLogger } from "./logger";
 
-export const buildDir = async (sourceDir: string, targetDir: string) => {
+export interface BuildDirOptions {
+    logger?: Logger;
+}
+
+export const buildDir = async (sourceDir: string, targetDir: string, options: BuildDirOptions = {}) => {
+    const log = options.logger || silentLogger;
+    
     if (!sourceDir || typeof sourceDir !== 'string' || !targetDir || typeof targetDir !== 'string') {
-        logger.error(`\n❌ Error: Invalid sourceDir or targetDir provided for buildDir.`);
+        log.error(`\n❌ Error: Invalid sourceDir or targetDir provided for buildDir.`);
         return;
     }
 
@@ -13,7 +20,7 @@ export const buildDir = async (sourceDir: string, targetDir: string) => {
         (p) => !p.endsWith(".com.html")
     );
 
-    const files = await buildEntrypoints(htmlFiles, sourceDir);
+    const files = await buildEntrypoints(htmlFiles, sourceDir, { logger: log });
 
     for (const a of files?.artifacts || []) {
         const outPath = join(targetDir, a.pathR);
