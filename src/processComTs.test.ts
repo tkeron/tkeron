@@ -1096,6 +1096,224 @@ com.innerHTML = "";
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });
+
+    it("should handle nested components in <head>", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-nested-components-in-head");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <head-meta></head-meta>
+</head>
+<body>
+  <h1>Body content</h1>
+</body>
+</html>`;
+
+        const headMetaTs = `com.innerHTML = \`<meta name="description" content="Nested test">
+<inner-meta></inner-meta>\`;`;
+
+        const innerMetaTs = `com.innerHTML = \`<meta property="og:title" content="Inner Title">\`;`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "head-meta.com.ts"), headMetaTs);
+        writeFileSync(join(TEST_DIR, "inner-meta.com.ts"), innerMetaTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        expect(result).toContain('<meta name="description" content="Nested test">');
+        expect(result).toContain('<meta property="og:title" content="Inner Title">');
+        expect(result).not.toContain("<head-meta>");
+        expect(result).not.toContain("<inner-meta>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle multiple instances of the same component in <head>", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-multiple-instances-in-head");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <meta-comp></meta-comp>
+  <meta-comp></meta-comp>
+</head>
+<body>
+  <h1>Body content</h1>
+</body>
+</html>`;
+
+        const metaCompTs = `com.innerHTML = \`<meta name="description" content="Instance">\`;`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "meta-comp.com.ts"), metaCompTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        expect(result).toContain('<meta name="description" content="Instance">');
+        expect(result.match(/<meta name="description" content="Instance">/g)).toHaveLength(2);
+        expect(result).not.toContain("<meta-comp>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle components with dynamic props in <head>", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-dynamic-props-in-head");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <dynamic-meta name="keywords" content="test, dynamic"></dynamic-meta>
+</head>
+<body>
+  <h1>Body content</h1>
+</body>
+</html>`;
+
+        const dynamicMetaTs = `const name = com.getAttribute('name');
+const content = com.getAttribute('content');
+com.innerHTML = \`<meta name="\${name}" content="\${content}">\`;`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "dynamic-meta.com.ts"), dynamicMetaTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        expect(result).toContain('<meta name="keywords" content="test, dynamic">');
+        expect(result).not.toContain("<dynamic-meta>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle components returning mixed content in <head>", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-mixed-content-in-head");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <head-assets></head-assets>
+</head>
+<body>
+  <h1>Body content</h1>
+</body>
+</html>`;
+
+        const headAssetsTs = `com.innerHTML = \`<meta name="description" content="Mixed content">
+<link rel="stylesheet" href="style.css">
+<script src="script.js"></script>\`;`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "head-assets.com.ts"), headAssetsTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        expect(result).toContain('<meta name="description" content="Mixed content">');
+        expect(result).toContain('<link rel="stylesheet" href="style.css">');
+        expect(result).toContain('<script src="script.js"></script>');
+        expect(result).not.toContain("<head-assets>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle components returning empty content in <head>", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-empty-content-in-head");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Test</title>
+  <empty-meta></empty-meta>
+</head>
+<body>
+  <h1>Body content</h1>
+</body>
+</html>`;
+
+        const emptyMetaTs = `com.innerHTML = '';`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "empty-meta.com.ts"), emptyMetaTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        expect(result).not.toContain("<empty-meta>");
+        expect(result).toContain("<title>Test</title>"); // Ensure structure is preserved
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle component iteration scenario in <head>", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-iteration-in-head");
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        
+        const indexHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Component Iteration Example</title>
+  <note-box></note-box>
+</head>
+<body>
+  <h1>Content</h1>
+</body>
+</html>`;
+
+        const noteBoxTs = `com.innerHTML = \`<div>📝 Note Container</div>\`;`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "note-box.com.ts"), noteBoxTs);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        
+        expect(result).toContain("📝 Note Container");
+        expect(result).not.toContain("<note-box>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
   });
 
   describe("Input validation", () => {

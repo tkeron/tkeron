@@ -5,7 +5,7 @@ const count = parseInt(com.getAttribute('count') || '5');
 
 // Simulating data processing - real TS logic here
 const users = [
-  { name: 'Alice Johnson', role: 'admin', loginCount: 342, lastLogin: Date.now() - 2 * 60 * 60 * 1000 },
+  { name: 'Alice Johnson', role: 'admin', loginCount: 342, lastLogin: Date.now() - 30 * 60 * 1000 }, // 30min ago - online
   { name: 'Bob Smith', role: 'user', loginCount: 128, lastLogin: Date.now() - 5 * 60 * 60 * 1000 },
   { name: 'Carol White', role: 'moderator', loginCount: 256, lastLogin: Date.now() - 1 * 60 * 60 * 1000 },
   { name: 'David Brown', role: 'user', loginCount: 89, lastLogin: Date.now() - 24 * 60 * 60 * 1000 },

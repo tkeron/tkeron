@@ -1,3 +1,15 @@
+# v4.0.0-beta.11
+
+## Bug Fixes
+
+### HTML Parser Fix
+- **Fixed**: HTML parser now correctly handles HTML entities in all HTML contexts
+- **Issue**: Entities like `&lt;` and `&gt;` were being decoded incorrectly, causing malformed HTML output and confusion between text content and HTML elements
+- **Impact**: This affected component processing in examples and user projects where HTML entities were used
+- **Resolution**: Updated HTML parsing logic to properly handle HTML entities without unintended decoding
+- **Performance**: Test execution time improved from ~5 seconds to ~1.7 seconds due to more efficient HTML processing and optimized component execution using dynamic imports instead of process spawning
+- **Technical Details**: The fix prevents incorrect decoding of HTML entities that could be mistaken for actual HTML elements during component processing, ensuring accurate DOM manipulation
+
 # v4.0.0-beta.10
 
 ## Improvements

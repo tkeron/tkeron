@@ -1,7 +1,6 @@
 import { parseHTML } from "@tkeron/html-parser";
 import { getFilePaths } from "@tkeron/tools";
 import { join, dirname } from "path";
-import { tmpdir } from "os";
 import type { Logger } from "./logger";
 import { silentLogger } from "./logger";
 
@@ -45,7 +44,7 @@ export const processComTs = async (tempDir: string, options: ProcessComTsOptions
     // Process TypeScript components recursively in the entire document (head and body)
     const htmlElement = document.querySelector("html") || document.documentElement;
     if (htmlElement) {
-      const changed = await processComponentsTs(htmlElement, dirname(htmlFile), tempDir, [], 0, log);
+      const changed = await processComponentsTs(htmlElement, dirname(htmlFile), tempDir, [], 0, log, options);
       hasChanges = hasChanges || changed;
     }
 
@@ -72,7 +71,8 @@ async function processComponentsTs(
   rootDir: string,
   componentStack: string[],
   depth: number = 0,
-  log: Logger = silentLogger
+  log: Logger = silentLogger,
+  options: ProcessComTsOptions = {}
 ): Promise<boolean> {
   let hasChanges = false;
   // Prevent infinite recursion
@@ -121,130 +121,123 @@ async function processComponentsTs(
         // Get the original element's HTML
         const elementHTML = (child as any).outerHTML;
 
-        // Create a wrapper code that executes the component with access to `com`
-        // Save the result to a temporary output file to avoid variable name conflicts
-        const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-        const outputPath = componentPath.replace(/\.com\.ts$/, `.com.output.${uniqueSuffix}.json`);
-        const wrapperCode = `
-import { parseHTML } from "@tkeron/html-parser";
+        log.info(`Processing component <${tagName}> from ${componentPath}`);
 
-const __tkeron_element_html = ${JSON.stringify(elementHTML)};
-const __tkeron_temp_doc = parseHTML(\`<html><body>\${__tkeron_element_html}</body></html>\`);
-const com = __tkeron_temp_doc.querySelector("${tagName}");
+        // Create the `com` element using parseHTML in the current process
+        const tempDoc = parseHTML('<html><body>' + elementHTML + '</body></html>');
+        const com = tempDoc.querySelector(tagName);
 
-if (!com) {
-  throw new Error("Failed to create component element for ${tagName}");
-}
+        if (!com) {
+          log.error(`\n❌ Error: Failed to create component element for <${tagName}>`);
+          throw new Error(`Failed to create component element for ${tagName}`);
+        }
 
-// --- Original .com.ts code ---
-${originalComponentCode}
 
-// --- Save the result to a file ---
-await Bun.write(${JSON.stringify(outputPath)}, JSON.stringify({ innerHTML: com.innerHTML }));
-`;
 
-        // Overwrite the .com.ts file temporarily with wrapper code
-        const backupCode = originalComponentCode;
+        // Check if the code has imports (needs special handling)
+        const hasImports = /^\s*import\s+/m.test(originalComponentCode);
         
         try {
-          await Bun.write(componentPath, wrapperCode);
-
-          // Execute the component file using Bun.spawn
-          const proc = Bun.spawn(["bun", "run", componentPath], {
-            cwd: dirname(componentPath),
-            stdout: "pipe",
-            stderr: "pipe",
-          });
-
-          await proc.exited;
-
-          // Check if execution was successful
-          if (proc.exitCode !== 0) {
-            const stderr = await new Response(proc.stderr).text();
-            log.error(`\n❌ Error: Component <${tagName}> failed to execute.`);
-            log.error(`\n💡 Component file: ${componentPath}`);
-            log.error(`\nError details:\n${stderr}\n`);
-            throw new Error(`Component ${tagName} execution failed`);
-          }
-
-          // Read the output
-          const outputData = JSON.parse(await Bun.file(outputPath).text());
-          const newInnerHTML = outputData.innerHTML;
-
-          // Parse the new content
-          const tempDoc = parseHTML(
-            `<html><body><div id="__tkeron_component_root__">${newInnerHTML}</div></body></html>`
-          );
-          const body = tempDoc.querySelector("body");
-          const tempContainer = body?.querySelector("#__tkeron_component_root__") ||
-            body?.firstElementChild;
-
-          if (!tempContainer) {
-            // Empty content, just remove the element
-            const parent = (child as any).parentNode;
-            if (parent) {
-              parent.removeChild(child);
+          if (hasImports) {
+            // For code with imports, write to temp file and use dynamic import
+            const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+            const tempPath = componentPath.replace(/\.com\.ts$/, `.com.${uniqueSuffix}.ts`);
+            
+            // Extract imports and separate them from the rest of the code
+            const importRegex = /^(\s*import\s+.*?(?:;|\n))/gm;
+            const imports: string[] = [];
+            let codeWithoutImports = originalComponentCode.replace(importRegex, (match) => {
+              imports.push(match);
+              return '';
+            });
+            
+            // Wrap the code to export a function that receives `com`
+            const wrappedCode = `${imports.join('\n')}
+export default async function(com: any) {
+${codeWithoutImports}
+}
+`;
+            await Bun.write(tempPath, wrappedCode);
+            
+            try {
+              const module = await import(tempPath);
+              await module.default(com);
+            } finally {
+              // Cleanup temp file
+              try { 
+                const fs = await import("fs/promises");
+                await fs.unlink(tempPath);
+              } catch {}
             }
-            continue;
+          } else {
+            // For simple code without imports, use AsyncFunction (faster)
+            const transpiler = new Bun.Transpiler({ loader: "ts" });
+            const jsCode = transpiler.transformSync(originalComponentCode);
+            const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+            const executeComponent = new AsyncFunction('com', jsCode);
+            await executeComponent(com);
           }
+        } catch (execError: any) {
+          log.error(`\n❌ Error executing component <${tagName}>:`);
+          log.error(`   ${execError.message}`);
+          throw execError;
+        }
 
-          // Get all nodes from the component and clone them
-          const nodesToInsert = Array.from((tempContainer as any).childNodes || []).map(
-            (node: any) => (node?.cloneNode ? node.cloneNode(true) : node)
-          );
+        const newInnerHTML = com.innerHTML;
 
-          // Replace the custom element with component content
+        // Parse the new content
+        const newContentDoc = parseHTML(`<div>${newInnerHTML}</div>`);
+        const div = newContentDoc.querySelector("div");
+
+        if (!div) {
+          // Empty content, just remove the element
           const parent = (child as any).parentNode;
-
           if (parent) {
-            if (nodesToInsert.length === 0) {
-              // Empty component, just remove
-              parent.removeChild(child);
-            } else if (nodesToInsert.length === 1) {
-              // Single node, replace directly
-              parent.replaceChild(nodesToInsert[0], child);
-            } else {
-              // Multiple nodes: replace with first, then insert others after
-              parent.replaceChild(nodesToInsert[0], child);
-              let refNode = nodesToInsert[0];
-              for (let i = 1; i < nodesToInsert.length; i++) {
-                parent.insertBefore(nodesToInsert[i], refNode.nextSibling);
-                refNode = nodesToInsert[i];
-              }
-            }
+            parent.removeChild(child);
           }
+          continue;
+        }
 
-          const nextCurrentDir = dirname(componentPath);
-          const nextStack = [...componentStack, tagName];
+        const nextCurrentDir = dirname(componentPath);
+        const nextStack = [...componentStack, tagName];
 
-          // Process nested components in the newly inserted content
-          for (const node of nodesToInsert) {
-            if ((node as any).nodeType === 1) {
-              // Element node
-              const nestedChanged = await processComponentsTs(node, nextCurrentDir, rootDir, nextStack, depth + 1, log);
-              hasChanges = hasChanges || nestedChanged;
+        // Process nested components in the parsed content BEFORE inserting
+        // The div itself acts as a container, process its children (including custom elements)
+        await processComponentsTs(div, nextCurrentDir, rootDir, nextStack, depth + 1, log, options);
+        
+        // Get all nodes from the processed content
+        const nodesToInsert = Array.from((div as any).childNodes || []).map(
+          (node: any) => (node?.cloneNode ? node.cloneNode(true) : node)
+        );
+
+        // Replace the custom element with processed component content
+        const parent = (child as any).parentNode;
+
+        if (parent) {
+          if (nodesToInsert.length === 0) {
+            // Empty component, just remove
+            parent.removeChild(child);
+          } else if (nodesToInsert.length === 1) {
+            // Single node, replace directly
+            parent.replaceChild(nodesToInsert[0], child);
+          } else {
+            // Multiple nodes: replace with first, then insert others after
+            parent.replaceChild(nodesToInsert[0], child);
+            let refNode = nodesToInsert[0];
+            for (let i = 1; i < nodesToInsert.length; i++) {
+              parent.insertBefore(nodesToInsert[i], refNode.nextSibling);
+              refNode = nodesToInsert[i];
             }
-          }
-        } finally {
-          // Restore original component code
-          await Bun.write(componentPath, backupCode);
-          
-          // Clean up output file
-          try {
-            const fs = await import("fs/promises");
-            await fs.unlink(outputPath);
-          } catch (e) {
-            // Ignore cleanup errors
           }
         }
       } else {
         // Component not found, recurse into children
-        const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1, log);
+        const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1, log, options);
         hasChanges = hasChanges || childChanged;
       }
     } else {
       // Not a custom element, recurse into children
-      const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1, log);
+      const childChanged = await processComponentsTs(child, currentDir, rootDir, componentStack, depth + 1, log, options);
       hasChanges = hasChanges || childChanged;
     }
   }
