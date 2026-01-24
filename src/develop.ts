@@ -84,11 +84,25 @@ export const develop = async (
         });
       }
 
-      const filePath = url.pathname === "/" ? "/index.html" : url.pathname;
-      const file = Bun.file(`${target}${filePath}`);
+      let filePath = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
+      
+      if (filePath.endsWith("/")) {
+        filePath = `${filePath}index.html`;
+      }
+      
+      let file = Bun.file(`${target}${filePath}`);
+      let isHtml = filePath.endsWith(".html");
+
+      if (!(await file.exists()) && !filePath.includes(".")) {
+        const htmlFile = Bun.file(`${target}${filePath}.html`);
+        if (await htmlFile.exists()) {
+          file = htmlFile;
+          isHtml = true;
+        }
+      }
 
       if (await file.exists()) {
-        if (filePath.endsWith(".html")) {
+        if (isHtml) {
           const html = await file.text();
           const injectedHtml = html.replace(
             "</body>",

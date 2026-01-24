@@ -1,3 +1,18 @@
+# v4.0.0-beta.12
+
+## Improvements
+
+### Development Server - Clean URLs
+- **New**: URLs without `.html` extension now serve the corresponding HTML file
+  - `/about` → serves `about.html`
+  - `/docs/api/v1/endpoints` → serves `docs/api/v1/endpoints.html`
+- **New**: Trailing slash in subdirectories serves `index.html` (e.g., `/blog/` → `blog/index.html`)
+- **New**: URL-encoded characters are properly decoded (e.g., `/my%20page` → `my page.html`)
+- **Improved**: Paths with dots (file extensions) are not modified, maintaining expected behavior
+- Query strings work correctly with clean URLs (e.g., `/products?sort=price`)
+
+---
+
 # v4.0.0-beta.11
 
 ## Bug Fixes

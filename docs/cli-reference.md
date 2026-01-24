@@ -162,7 +162,23 @@ tk develop source output 8080 0.0.0.0
 - **Hot Reload:** Page auto-refreshes on file changes
 - **Development Mode:** Serves from output directory
 - **Static File Serving:** Handles all file types
+- **Clean URLs:** Access pages without `.html` extension (e.g., `/about` serves `about.html`)
+- **Directory Index:** Trailing slash serves `index.html` (e.g., `/blog/` serves `blog/index.html`)
 - **Error Handling:** Displays build errors in terminal
+
+**Clean URLs:**
+
+Access HTML pages without the `.html` extension:
+
+| URL | Serves |
+|-----|--------|
+| `/about` | `about.html` |
+| `/services` | `services.html` |
+| `/docs/api/guide` | `docs/api/guide.html` |
+| `/blog/` | `blog/index.html` |
+| `/products?sort=price` | `products.html` (with query string) |
+
+> Note: Paths containing a dot (e.g., `/file.json`) are treated as file requests and won't have `.html` appended.
 
 **Hot Reload Endpoint:**
 

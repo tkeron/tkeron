@@ -511,3 +511,377 @@ it("develop throws error when options is not an object", async () => {
   }
   expect(errorThrown).toBe(true);
 });
+
+it("develop serves html files without extension in URL", async () => {
+  const { port, dir } = getTestResources("develop-serves-html-without-extension");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "services.html"), "<h1>Services</h1>");
+    await writeFile(join(sourceDir, "about.html"), "<h1>About</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const responseServices = await fetch(`http://localhost:${port}/services`);
+    expect(responseServices.status).toBe(200);
+    const textServices = await responseServices.text();
+    expect(textServices).toContain("Services");
+    
+    const responseAbout = await fetch(`http://localhost:${port}/about`);
+    expect(responseAbout.status).toBe(200);
+    const textAbout = await responseAbout.text();
+    expect(textAbout).toContain("About");
+    
+    const responseWithExt = await fetch(`http://localhost:${port}/services.html`);
+    expect(responseWithExt.status).toBe(200);
+    const textWithExt = await responseWithExt.text();
+    expect(textWithExt).toContain("Services");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop returns 404 for non-existent html without extension", async () => {
+  const { port, dir } = getTestResources("develop-404-html-without-extension");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/nonexistent`);
+    expect(response.status).toBe(404);
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop serves html without extension in subdirectories", async () => {
+  const { port, dir } = getTestResources("develop-html-without-ext-subdirs");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(join(sourceDir, "about"), { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "about", "team.html"), "<h1>Team</h1>");
+    await writeFile(join(sourceDir, "about", "contact.html"), "<h1>Contact</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const responseTeam = await fetch(`http://localhost:${port}/about/team`);
+    expect(responseTeam.status).toBe(200);
+    expect(await responseTeam.text()).toContain("Team");
+    
+    const responseContact = await fetch(`http://localhost:${port}/about/contact`);
+    expect(responseContact.status).toBe(200);
+    expect(await responseContact.text()).toContain("Contact");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop injects reload script in html served without extension", async () => {
+  const { port, dir } = getTestResources("develop-reload-script-without-ext");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "services.html"), "<html><body><h1>Services</h1></body></html>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/services`);
+    expect(response.status).toBe(200);
+    const text = await response.text();
+    expect(text).toContain("Services");
+    expect(text).toContain("EventSource");
+    expect(text).toContain("/dev-reload");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop does not add .html to paths with dots", async () => {
+  const { port, dir } = getTestResources("develop-no-html-for-dotted-paths");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/file.unknown`);
+    expect(response.status).toBe(404);
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop serves html without extension with query strings", async () => {
+  const { port, dir } = getTestResources("develop-html-without-ext-query");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "products.html"), "<h1>Products</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/products?category=electronics&sort=price`);
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("Products");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop serves index.html for trailing slash in subdirectory", async () => {
+  const { port, dir } = getTestResources("develop-trailing-slash-subdir");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(join(sourceDir, "blog"), { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "blog", "index.html"), "<h1>Blog Index</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/blog/`);
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("Blog Index");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop falls back to html when path has no extension", async () => {
+  const { port, dir } = getTestResources("develop-html-fallback-priority");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "data.html"), "<h1>Data HTML</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/data`);
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("Data HTML");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop serves static assets from output directory", async () => {
+  const { port, dir } = getTestResources("develop-static-assets-output");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await mkdir(outputDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    await writeFile(join(outputDir, "styles.css"), "body { color: red; }");
+    await writeFile(join(outputDir, "app.js"), "console.log('app');");
+    await writeFile(join(outputDir, "logo.svg"), "<svg></svg>");
+    
+    const responseCss = await fetch(`http://localhost:${port}/styles.css`);
+    expect(responseCss.status).toBe(200);
+    expect(await responseCss.text()).toContain("color: red");
+    
+    const responseJs = await fetch(`http://localhost:${port}/app.js`);
+    expect(responseJs.status).toBe(200);
+    expect(await responseJs.text()).toContain("console.log");
+    
+    const responseSvg = await fetch(`http://localhost:${port}/logo.svg`);
+    expect(responseSvg.status).toBe(200);
+    expect(await responseSvg.text()).toContain("<svg>");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop handles deeply nested paths without extension", async () => {
+  const { port, dir } = getTestResources("develop-deeply-nested-paths");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(join(sourceDir, "docs", "api", "v1"), { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "docs", "api", "v1", "endpoints.html"), "<h1>API Endpoints</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/docs/api/v1/endpoints`);
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("API Endpoints");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop returns 404 for nonexistent subdirectory without extension", async () => {
+  const { port, dir } = getTestResources("develop-404-nonexistent-subdir");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/missing/page`);
+    expect(response.status).toBe(404);
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
+
+it("develop serves html without extension with url encoded characters", async () => {
+  const { port, dir } = getTestResources("develop-url-encoded-chars");
+  const sourceDir = join(dir, "websrc");
+  const outputDir = join(dir, "web");
+  let server: DevelopServer | null = null;
+  try {
+    await mkdir(sourceDir, { recursive: true });
+    await writeFile(join(sourceDir, "index.html"), "<h1>Home</h1>");
+    await writeFile(join(sourceDir, "my page.html"), "<h1>My Page</h1>");
+    await writeFile(join(sourceDir, "index.ts"), "console.log('test');");
+    server = await develop({
+      logger: silentLogger,
+      sourceDir,
+      outputDir,
+      port,
+      host: "localhost",
+    });
+    
+    const response = await fetch(`http://localhost:${port}/my%20page`);
+    expect(response.status).toBe(200);
+    expect(await response.text()).toContain("My Page");
+  } finally {
+    if (server) {
+      await server.stop();
+    }
+    await rm(dir, { recursive: true, force: true }).catch(() => {});
+  }
+}, 10000);
