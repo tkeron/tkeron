@@ -2,16 +2,19 @@ const regionalData = [
   { region: "North", sales: 45000, orders: 123 },
   { region: "South", sales: 38000, orders: 98 },
   { region: "East", sales: 52000, orders: 145 },
-  { region: "West", sales: 41000, orders: 110 }
+  { region: "West", sales: 41000, orders: 110 },
 ];
 
-const rows = regionalData.map(item => 
-  `<tr style="border-bottom: 1px solid #ecf0f1;">
+const rows = regionalData
+  .map(
+    (item) =>
+      `<tr style="border-bottom: 1px solid #ecf0f1;">
     <td style="padding: 0.75rem;">${item.region}</td>
     <td style="padding: 0.75rem;">$${item.sales.toLocaleString()}</td>
     <td style="padding: 0.75rem;">${item.orders}</td>
-  </tr>`
-).join('');
+  </tr>`,
+  )
+  .join("");
 
 com.innerHTML = `
   <div style="border: 3px solid #e74c3c; padding: 1rem; margin: 1rem 0; border-radius: 8px;">

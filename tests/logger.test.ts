@@ -1,5 +1,5 @@
 import { describe, it, expect, spyOn } from "bun:test";
-import { logger, silentLogger, createTestLogger } from "./logger";
+import { logger, silentLogger, createTestLogger } from "../src/logger";
 
 describe("logger", () => {
   describe("default logger", () => {
@@ -47,7 +47,9 @@ describe("logger", () => {
       const consoleSpy = spyOn(console, "log").mockImplementation(() => {});
       try {
         logger.log("message", 123, { key: "value" });
-        expect(consoleSpy).toHaveBeenCalledWith("message", 123, { key: "value" });
+        expect(consoleSpy).toHaveBeenCalledWith("message", 123, {
+          key: "value",
+        });
       } finally {
         consoleSpy.mockRestore();
       }
@@ -106,7 +108,7 @@ describe("logger", () => {
     it("should stringify non-string arguments", () => {
       const { logger, logs } = createTestLogger();
       logger.log("object:", { key: "value" });
-      expect(logs.some(l => l.includes('"key":"value"'))).toBe(true);
+      expect(logs.some((l) => l.includes('"key":"value"'))).toBe(true);
     });
   });
 });

@@ -1,8 +1,19 @@
 import { describe, it, expect, spyOn } from "bun:test";
-import { processPre } from "./processPre";
-import { rmSync, mkdirSync, writeFileSync, existsSync, readFileSync, readdirSync } from "fs";
+import { processPre } from "../src/processPre";
+import {
+  rmSync,
+  mkdirSync,
+  writeFileSync,
+  existsSync,
+  readFileSync,
+  readdirSync,
+} from "fs";
 import { join } from "path";
-import { getTestResources, silentLogger, createTestLogger } from "./test-helpers";
+import {
+  getTestResources,
+  silentLogger,
+  createTestLogger,
+} from "./test-helpers";
 describe("processPre", () => {
   it("should successfully process valid .pre.ts file", async () => {
     const { dir } = getTestResources("processPre-valid-file");
@@ -135,7 +146,10 @@ document.body.appendChild(h1);
     const { dir } = getTestResources("processPre-resolve-imports");
     try {
       mkdirSync(dir, { recursive: true });
-      writeFileSync(join(dir, "my-utils.ts"), `export const greeting = "Hello from local module";`);
+      writeFileSync(
+        join(dir, "my-utils.ts"),
+        `export const greeting = "Hello from local module";`,
+      );
       const preContent = `
 import { greeting } from "./my-utils";
 const h1 = document.createElement("h1");
@@ -154,12 +168,12 @@ document.body.appendChild(h1);
 
   it("should return false and log error when tempDir is invalid", async () => {
     const { logger, errors } = createTestLogger();
-    
+
     // Test with empty string
     const result1 = await processPre("", { logger });
     expect(result1).toBe(false);
-    expect(errors.some(e => e.includes("Invalid tempDir"))).toBe(true);
-    
+    expect(errors.some((e) => e.includes("Invalid tempDir"))).toBe(true);
+
     // Test with null-ish value
     const result2 = await processPre(null as any, { logger });
     expect(result2).toBe(false);

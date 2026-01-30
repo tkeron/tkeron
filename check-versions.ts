@@ -1,7 +1,7 @@
 #!/usr/bin/env bun
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from "fs";
+import { join } from "path";
 
 /**
  * Compares two semver versions including pre-release identifiers
@@ -11,41 +11,44 @@ function compareVersions(v1: string, v2: string): number {
   const parseVersion = (version: string) => {
     const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/);
     if (!match) throw new Error(`Invalid version format: ${version}`);
-    
+
     const [, major, minor, patch, preRelease] = match;
     return {
       major: parseInt(major),
       minor: parseInt(minor),
       patch: parseInt(patch),
-      preRelease: preRelease || null
+      preRelease: preRelease || null,
     };
   };
 
   const v1Parts = parseVersion(v1);
   const v2Parts = parseVersion(v2);
 
-  if (v1Parts.major !== v2Parts.major) return v1Parts.major > v2Parts.major ? 1 : -1;
-  if (v1Parts.minor !== v2Parts.minor) return v1Parts.minor > v2Parts.minor ? 1 : -1;
-  if (v1Parts.patch !== v2Parts.patch) return v1Parts.patch > v2Parts.patch ? 1 : -1;
+  if (v1Parts.major !== v2Parts.major)
+    return v1Parts.major > v2Parts.major ? 1 : -1;
+  if (v1Parts.minor !== v2Parts.minor)
+    return v1Parts.minor > v2Parts.minor ? 1 : -1;
+  if (v1Parts.patch !== v2Parts.patch)
+    return v1Parts.patch > v2Parts.patch ? 1 : -1;
 
   if (!v1Parts.preRelease && !v2Parts.preRelease) return 0;
-  
+
   if (!v1Parts.preRelease) return 1;
   if (!v2Parts.preRelease) return -1;
 
   const preReleasePriority: Record<string, number> = {
-    'alpha': 1,
-    'beta': 2,
-    'rc': 3,
-    'pre': 4
+    alpha: 1,
+    beta: 2,
+    rc: 3,
+    pre: 4,
   };
 
   const parsePreRelease = (pr: string) => {
     const match = pr.match(/^([a-z]+)\.?(\d+)?$/);
     if (!match) return { type: pr, num: 0 };
-    return { 
-      type: match[1], 
-      num: match[2] ? parseInt(match[2]) : 0 
+    return {
+      type: match[1],
+      num: match[2] ? parseInt(match[2]) : 0,
     };
   };
 
@@ -63,73 +66,72 @@ function compareVersions(v1: string, v2: string): number {
 
 async function checkVersions() {
   try {
-    const packageJsonPath = join(process.cwd(), 'package.json');
-    const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
+    const packageJsonPath = join(process.cwd(), "package.json");
+    const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
     const localVersion = packageJson.version;
 
-    console.log('📦 Package: tkeron\n');
-    console.log('🏠 Local version:', localVersion);
+    console.log("📦 Package: tkeron\n");
+    console.log("🏠 Local version:", localVersion);
 
     const getDistTag = (version: string): string => {
-      if (!version.includes('-')) return 'latest';
-      
-      const preRelease = version.split('-')[1];
-      if (preRelease.startsWith('alpha')) return 'alpha';
-      if (preRelease.startsWith('beta')) return 'beta';
-      if (preRelease.startsWith('rc')) return 'rc';
-      if (preRelease.startsWith('pre')) return 'pre';
-      
-      return 'latest';
+      if (!version.includes("-")) return "latest";
+
+      const preRelease = version.split("-")[1];
+      if (preRelease.startsWith("alpha")) return "alpha";
+      if (preRelease.startsWith("beta")) return "beta";
+      if (preRelease.startsWith("rc")) return "rc";
+      if (preRelease.startsWith("pre")) return "pre";
+
+      return "latest";
     };
 
     const distTag = getDistTag(localVersion);
-    console.log('🏷️  Comparing against tag:', distTag);
+    console.log("🏷️  Comparing against tag:", distTag);
 
-    const response = await fetch('https://registry.npmjs.org/tkeron');
-    
+    const response = await fetch("https://registry.npmjs.org/tkeron");
+
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const data = await response.json();
-    const publishedVersion = data['dist-tags'][distTag];
-    
+    const publishedVersion = data["dist-tags"][distTag];
+
     if (!publishedVersion) {
-      console.log(`\n${'='.repeat(50)}`);
+      console.log(`\n${"=".repeat(50)}`);
       console.log(`ℹ️  No published version found for tag '${distTag}'`);
-      console.log('   → This will be the first version with this tag');
-      console.log('='.repeat(50));
+      console.log("   → This will be the first version with this tag");
+      console.log("=".repeat(50));
       process.exit(0);
     }
-    
-    console.log('📡 Published version:', publishedVersion);
+
+    console.log("📡 Published version:", publishedVersion);
 
     const comparison = compareVersions(localVersion, publishedVersion);
-    
-    console.log('\n' + '='.repeat(50));
-    
+
+    console.log("\n" + "=".repeat(50));
+
     if (comparison > 0) {
-      console.log('✅ NEW VERSION DETECTED');
+      console.log("✅ NEW VERSION DETECTED");
       console.log(`   ${localVersion} > ${publishedVersion}`);
-      console.log('   → Should publish to npm');
-      console.log('='.repeat(50));
+      console.log("   → Should publish to npm");
+      console.log("=".repeat(50));
       process.exit(0);
     } else if (comparison === 0) {
-      console.log('ℹ️  SAME VERSION');
+      console.log("ℹ️  SAME VERSION");
       console.log(`   ${localVersion} = ${publishedVersion}`);
-      console.log('   → No need to publish');
-      console.log('='.repeat(50));
+      console.log("   → No need to publish");
+      console.log("=".repeat(50));
       process.exit(1);
     } else {
-      console.log('⚠️  LOCAL VERSION IS OLDER');
+      console.log("⚠️  LOCAL VERSION IS OLDER");
       console.log(`   ${localVersion} < ${publishedVersion}`);
-      console.log('   → Should not publish');
-      console.log('='.repeat(50));
+      console.log("   → Should not publish");
+      console.log("=".repeat(50));
       process.exit(1);
     }
-    
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error("❌ Error:", error.message);
     process.exit(1);
   }
 }

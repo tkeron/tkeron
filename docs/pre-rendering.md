@@ -8,9 +8,9 @@ Create a `.pre.ts` file with the same base name as your `.html` file:
 
 ```typescript
 // index.pre.ts
-const title = document.querySelector('title');
+const title = document.querySelector("title");
 if (title) {
-  title.textContent = 'My Awesome Site';
+  title.textContent = "My Awesome Site";
 }
 ```
 
@@ -20,8 +20,10 @@ The corresponding `index.html` is automatically loaded and modified:
 <!-- index.html - before -->
 <!DOCTYPE html>
 <html>
-<head><title>Document</title></head>
-<body></body>
+  <head>
+    <title>Document</title>
+  </head>
+  <body></body>
 </html>
 ```
 
@@ -31,8 +33,10 @@ After build:
 <!-- index.html - after -->
 <!DOCTYPE html>
 <html>
-<head><title>My Awesome Site</title></head>
-<body></body>
+  <head>
+    <title>My Awesome Site</title>
+  </head>
+  <body></body>
 </html>
 ```
 
@@ -42,10 +46,10 @@ After build:
 
 Pre-rendering files are paired with HTML files:
 
-| Pre-render File | Processes |
-|----------------|-----------|
-| `index.pre.ts` | `index.html` |
-| `about.pre.ts` | `about.html` |
+| Pre-render File    | Processes        |
+| ------------------ | ---------------- |
+| `index.pre.ts`     | `index.html`     |
+| `about.pre.ts`     | `about.html`     |
 | `blog/post.pre.ts` | `blog/post.html` |
 
 ### The `document` Variable
@@ -54,11 +58,11 @@ Every `.pre.ts` file has access to a special `document` variable:
 
 ```typescript
 // Access the full DOM
-document.querySelector('h1')
-document.getElementById('content')
-document.querySelectorAll('.items')
-document.body
-document.documentElement
+document.querySelector("h1");
+document.getElementById("content");
+document.querySelectorAll(".items");
+document.body;
+document.documentElement;
 ```
 
 This is the parsed DOM from the corresponding `.html` file.
@@ -82,13 +86,12 @@ If the `.html` file doesn't exist, Tkeron creates a default one:
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
-<body>
-</body>
+  </head>
+  <body></body>
 </html>
 ```
 
@@ -100,9 +103,9 @@ Then your `.pre.ts` file runs on this template.
 
 ```typescript
 // index.pre.ts
-const title = document.querySelector('title');
+const title = document.querySelector("title");
 if (title) {
-  title.textContent = 'Welcome to My Site';
+  title.textContent = "Welcome to My Site";
 }
 ```
 
@@ -110,12 +113,12 @@ if (title) {
 
 ```typescript
 // index.pre.ts
-const head = document.querySelector('head');
+const head = document.querySelector("head");
 
 if (head) {
-  const meta = document.createElement('meta');
-  meta.setAttribute('name', 'description');
-  meta.setAttribute('content', 'A description of my site');
+  const meta = document.createElement("meta");
+  meta.setAttribute("name", "description");
+  meta.setAttribute("content", "A description of my site");
   head.appendChild(meta);
 }
 ```
@@ -124,11 +127,11 @@ if (head) {
 
 ```typescript
 // index.pre.ts
-const body = document.querySelector('body');
+const body = document.querySelector("body");
 
 if (body) {
-  const header = document.createElement('header');
-  header.innerHTML = '<h1>Welcome!</h1>';
+  const header = document.createElement("header");
+  header.innerHTML = "<h1>Welcome!</h1>";
   body.insertBefore(header, body.firstChild);
 }
 ```
@@ -137,7 +140,7 @@ if (body) {
 
 ```typescript
 // index.pre.ts
-const buildTimeElement = document.getElementById('build-time');
+const buildTimeElement = document.getElementById("build-time");
 
 if (buildTimeElement) {
   const now = new Date();
@@ -172,15 +175,15 @@ interface BlogPost {
 }
 
 const posts: BlogPost[] = [
-  { title: 'First Post', date: '2025-01-01', excerpt: 'This is my first post' },
-  { title: 'Second Post', date: '2025-01-15', excerpt: 'Another great post' },
+  { title: "First Post", date: "2025-01-01", excerpt: "This is my first post" },
+  { title: "Second Post", date: "2025-01-15", excerpt: "Another great post" },
 ];
 
-const container = document.getElementById('blog-posts');
+const container = document.getElementById("blog-posts");
 
 if (container) {
-  posts.forEach(post => {
-    const article = document.createElement('article');
+  posts.forEach((post) => {
+    const article = document.createElement("article");
     article.innerHTML = `
       <h2>${post.title}</h2>
       <time>${post.date}</time>
@@ -195,11 +198,11 @@ if (container) {
 
 ```typescript
 // index.pre.ts
-import { getBuildMetadata } from './build-utils';
+import { getBuildMetadata } from "./build-utils";
 
 const metadata = await getBuildMetadata();
 
-const footer = document.querySelector('footer');
+const footer = document.querySelector("footer");
 if (footer) {
   footer.innerHTML = `
     <p>Built: ${metadata.timestamp}</p>
@@ -213,7 +216,7 @@ if (footer) {
 export async function getBuildMetadata() {
   return {
     timestamp: new Date().toISOString(),
-    version: process.env.TKERON_VERSION || 'unknown',
+    version: process.env.TKERON_VERSION || "unknown",
   };
 }
 ```
@@ -231,17 +234,17 @@ interface Product {
 }
 
 async function getProducts(): Promise<Product[]> {
-  const response = await fetch('https://api.example.com/products');
+  const response = await fetch("https://api.example.com/products");
   return response.json();
 }
 
 const products = await getProducts();
-const container = document.getElementById('products');
+const container = document.getElementById("products");
 
 if (container) {
-  products.forEach(product => {
-    const card = document.createElement('div');
-    card.className = 'product-card';
+  products.forEach((product) => {
+    const card = document.createElement("div");
+    card.className = "product-card";
     card.innerHTML = `
       <h3>${product.name}</h3>
       <p>$${product.price}</p>
@@ -257,15 +260,15 @@ if (container) {
 
 ```typescript
 // blog-post.pre.ts
-import { marked } from 'marked';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { marked } from "marked";
+import { readFileSync } from "fs";
+import { join } from "path";
 
-const markdownPath = join(import.meta.dir, 'post-content.md');
-const markdown = readFileSync(markdownPath, 'utf-8');
+const markdownPath = join(import.meta.dir, "post-content.md");
+const markdown = readFileSync(markdownPath, "utf-8");
 const html = marked(markdown);
 
-const article = document.querySelector('article');
+const article = document.querySelector("article");
 if (article) {
   article.innerHTML = html;
 }
@@ -284,9 +287,9 @@ Access environment variables:
 ```typescript
 // index.pre.ts
 const version = process.env.TKERON_VERSION;
-const nodeEnv = process.env.NODE_ENV || 'development';
+const nodeEnv = process.env.NODE_ENV || "development";
 
-const versionElement = document.getElementById('version');
+const versionElement = document.getElementById("version");
 if (versionElement) {
   versionElement.textContent = `v${version} (${nodeEnv})`;
 }
@@ -296,7 +299,7 @@ if (versionElement) {
 
 ```typescript
 // index.pre.ts
-const buildInfo = document.getElementById('build-info');
+const buildInfo = document.getElementById("build-info");
 
 if (buildInfo) {
   buildInfo.innerHTML = `
@@ -313,11 +316,11 @@ Inject components based on logic:
 
 ```typescript
 // dashboard.pre.ts
-const isDevelopment = process.env.NODE_ENV === 'development';
-const body = document.querySelector('body');
+const isDevelopment = process.env.NODE_ENV === "development";
+const body = document.querySelector("body");
 
 if (body && isDevelopment) {
-  const debugPanel = document.createElement('debug-panel');
+  const debugPanel = document.createElement("debug-panel");
   body.appendChild(debugPanel);
 }
 ```
@@ -340,24 +343,24 @@ interface Post {
 
 async function getPosts(): Promise<Post[]> {
   try {
-    const response = await fetch('https://api.example.com/posts');
+    const response = await fetch("https://api.example.com/posts");
     return response.json();
   } catch (error) {
-    console.warn('Failed to fetch posts, using fallback');
+    console.warn("Failed to fetch posts, using fallback");
     return [];
   }
 }
 
 const posts = await getPosts();
-const blogList = document.getElementById('blog-list');
+const blogList = document.getElementById("blog-list");
 
 if (blogList) {
   if (posts.length === 0) {
-    blogList.innerHTML = '<p>No posts available</p>';
+    blogList.innerHTML = "<p>No posts available</p>";
   } else {
-    posts.forEach(post => {
-      const article = document.createElement('article');
-      article.className = 'blog-preview';
+    posts.forEach((post) => {
+      const article = document.createElement("article");
+      article.className = "blog-preview";
       article.innerHTML = `
         <h2><a href="/blog/${post.slug}">${post.title}</a></h2>
         <time>${new Date(post.date).toLocaleDateString()}</time>
@@ -381,41 +384,41 @@ interface ProductData {
 }
 
 const productData: ProductData = {
-  name: 'Amazing Product',
-  description: 'The best product you can buy',
-  image: 'https://example.com/product.jpg',
+  name: "Amazing Product",
+  description: "The best product you can buy",
+  image: "https://example.com/product.jpg",
   price: 99.99,
 };
 
-const head = document.querySelector('head');
+const head = document.querySelector("head");
 
 if (head) {
   // Title
-  const title = document.querySelector('title');
+  const title = document.querySelector("title");
   if (title) {
     title.textContent = `${productData.name} - My Store`;
   }
 
   // Meta description
-  const metaDesc = document.createElement('meta');
-  metaDesc.setAttribute('name', 'description');
-  metaDesc.setAttribute('content', productData.description);
+  const metaDesc = document.createElement("meta");
+  metaDesc.setAttribute("name", "description");
+  metaDesc.setAttribute("content", productData.description);
   head.appendChild(metaDesc);
 
   // Open Graph
-  const ogTitle = document.createElement('meta');
-  ogTitle.setAttribute('property', 'og:title');
-  ogTitle.setAttribute('content', productData.name);
+  const ogTitle = document.createElement("meta");
+  ogTitle.setAttribute("property", "og:title");
+  ogTitle.setAttribute("content", productData.name);
   head.appendChild(ogTitle);
 
-  const ogImage = document.createElement('meta');
-  ogImage.setAttribute('property', 'og:image');
-  ogImage.setAttribute('content', productData.image);
+  const ogImage = document.createElement("meta");
+  ogImage.setAttribute("property", "og:image");
+  ogImage.setAttribute("content", productData.image);
   head.appendChild(ogImage);
 
-  const ogPrice = document.createElement('meta');
-  ogPrice.setAttribute('property', 'og:price:amount');
-  ogPrice.setAttribute('content', productData.price.toString());
+  const ogPrice = document.createElement("meta");
+  ogPrice.setAttribute("property", "og:price:amount");
+  ogPrice.setAttribute("content", productData.price.toString());
   head.appendChild(ogPrice);
 }
 ```
@@ -425,22 +428,22 @@ if (head) {
 ```typescript
 // sitemap.pre.ts
 const pages = [
-  { url: '/', priority: 1.0 },
-  { url: '/about', priority: 0.8 },
-  { url: '/contact', priority: 0.5 },
+  { url: "/", priority: 1.0 },
+  { url: "/about", priority: 0.8 },
+  { url: "/contact", priority: 0.5 },
 ];
 
-const urlset = document.createElement('urlset');
-urlset.setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
+const urlset = document.createElement("urlset");
+urlset.setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
 
-pages.forEach(page => {
-  const url = document.createElement('url');
-  const loc = document.createElement('loc');
+pages.forEach((page) => {
+  const url = document.createElement("url");
+  const loc = document.createElement("loc");
   loc.textContent = `https://example.com${page.url}`;
-  
-  const priority = document.createElement('priority');
+
+  const priority = document.createElement("priority");
   priority.textContent = page.priority.toString();
-  
+
   url.appendChild(loc);
   url.appendChild(priority);
   urlset.appendChild(url);
@@ -453,13 +456,13 @@ document.documentElement.replaceWith(urlset);
 
 ```typescript
 // documentation.pre.ts
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { readFileSync } from "fs";
+import { join } from "path";
 
-const changelogPath = join(import.meta.dir, '..', 'CHANGELOG.md');
-const changelog = readFileSync(changelogPath, 'utf-8');
+const changelogPath = join(import.meta.dir, "..", "CHANGELOG.md");
+const changelog = readFileSync(changelogPath, "utf-8");
 
-const changelogElement = document.getElementById('changelog');
+const changelogElement = document.getElementById("changelog");
 if (changelogElement) {
   changelogElement.innerHTML = `<pre>${changelog}</pre>`;
 }
@@ -469,20 +472,21 @@ if (changelogElement) {
 
 ```typescript
 // index.pre.ts
-const isProd = process.env.NODE_ENV === 'production';
-const body = document.querySelector('body');
+const isProd = process.env.NODE_ENV === "production";
+const body = document.querySelector("body");
 
 if (body) {
   if (isProd) {
     // Add analytics
-    const script = document.createElement('script');
-    script.src = 'https://analytics.example.com/script.js';
+    const script = document.createElement("script");
+    script.src = "https://analytics.example.com/script.js";
     body.appendChild(script);
   } else {
     // Add development banner
-    const banner = document.createElement('div');
-    banner.style.cssText = 'background: #fef2f2; padding: 1rem; text-align: center;';
-    banner.textContent = '⚠️ Development Mode';
+    const banner = document.createElement("div");
+    banner.style.cssText =
+      "background: #fef2f2; padding: 1rem; text-align: center;";
+    banner.textContent = "⚠️ Development Mode";
     body.insertBefore(banner, body.firstChild);
   }
 }
@@ -493,37 +497,37 @@ if (body) {
 ### Creating Elements
 
 ```typescript
-const div = document.createElement('div');
-div.className = 'container';
-div.id = 'main';
-div.innerHTML = '<p>Content</p>';
+const div = document.createElement("div");
+div.className = "container";
+div.id = "main";
+div.innerHTML = "<p>Content</p>";
 ```
 
 ### Modifying Attributes
 
 ```typescript
-const img = document.querySelector('img');
+const img = document.querySelector("img");
 if (img) {
-  img.setAttribute('loading', 'lazy');
-  img.setAttribute('alt', 'Description');
+  img.setAttribute("loading", "lazy");
+  img.setAttribute("alt", "Description");
 }
 ```
 
 ### Adding Classes
 
 ```typescript
-const element = document.getElementById('content');
+const element = document.getElementById("content");
 if (element) {
-  element.classList.add('active');
-  element.classList.remove('hidden');
+  element.classList.add("active");
+  element.classList.remove("hidden");
 }
 ```
 
 ### Inserting Content
 
 ```typescript
-const parent = document.querySelector('.parent');
-const child = document.createElement('div');
+const parent = document.querySelector(".parent");
+const child = document.createElement("div");
 
 // Append to end
 parent?.appendChild(child);
@@ -532,19 +536,19 @@ parent?.appendChild(child);
 parent?.insertBefore(child, parent.firstChild);
 
 // Insert before specific element
-const ref = document.querySelector('.reference');
+const ref = document.querySelector(".reference");
 parent?.insertBefore(child, ref);
 ```
 
 ### Removing Elements
 
 ```typescript
-const element = document.querySelector('.remove-me');
+const element = document.querySelector(".remove-me");
 element?.remove();
 
 // Or via parent
-const parent = document.querySelector('.parent');
-const child = document.querySelector('.child');
+const parent = document.querySelector(".parent");
+const child = document.querySelector(".child");
 if (parent && child) {
   parent.removeChild(child);
 }
@@ -558,10 +562,10 @@ Pre-rendering runs in Node/Bun, not the browser:
 
 ```typescript
 // ❌ These won't work
-window.location
-localStorage
-sessionStorage
-navigator
+window.location;
+localStorage;
+sessionStorage;
+navigator;
 ```
 
 ### ❌ No User Input
@@ -570,7 +574,7 @@ Can't access runtime user data:
 
 ```typescript
 // ❌ No access to form data or user state
-const username = document.getElementById('username-input')?.value;
+const username = document.getElementById("username-input")?.value;
 ```
 
 ### ❌ No Event Listeners
@@ -579,8 +583,8 @@ Event listeners are not preserved:
 
 ```typescript
 // ❌ This listener won't exist in the browser
-document.querySelector('button')?.addEventListener('click', () => {
-  console.log('clicked');
+document.querySelector("button")?.addEventListener("click", () => {
+  console.log("clicked");
 });
 ```
 
@@ -591,6 +595,7 @@ document.querySelector('button')?.addEventListener('click', () => {
 ### ✅ Use for Build-Time Data
 
 Perfect for:
+
 - Fetching content from CMS/APIs
 - Generating static content
 - Injecting build metadata
@@ -603,13 +608,13 @@ Perfect for:
 // index.pre.ts
 async function fetchData() {
   try {
-    const response = await fetch('https://api.example.com/data');
+    const response = await fetch("https://api.example.com/data");
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
     return response.json();
   } catch (error) {
-    console.error('Failed to fetch data:', error);
+    console.error("Failed to fetch data:", error);
     return null;
   }
 }
@@ -620,9 +625,9 @@ if (data) {
   // Use data
 } else {
   // Show fallback content
-  const main = document.querySelector('main');
+  const main = document.querySelector("main");
   if (main) {
-    main.innerHTML = '<p>Content temporarily unavailable</p>';
+    main.innerHTML = "<p>Content temporarily unavailable</p>";
   }
 }
 ```
@@ -631,10 +636,10 @@ if (data) {
 
 ```typescript
 // index.pre.ts
-import { renderBlogPosts } from './blog-renderer';
+import { renderBlogPosts } from "./blog-renderer";
 
 const posts = await fetchPosts();
-const container = document.getElementById('blog');
+const container = document.getElementById("blog");
 
 if (container) {
   renderBlogPosts(container, posts);
@@ -653,9 +658,9 @@ interface Product {
 
 function isValidProduct(obj: any): obj is Product {
   return (
-    typeof obj.id === 'number' &&
-    typeof obj.name === 'string' &&
-    typeof obj.price === 'number' &&
+    typeof obj.id === "number" &&
+    typeof obj.name === "string" &&
+    typeof obj.price === "number" &&
     obj.price >= 0
   );
 }
@@ -667,6 +672,7 @@ const products = rawData.filter(isValidProduct);
 ### ❌ Don't Overuse
 
 If you just need to modify specific elements, consider:
+
 - [HTML components](./components-html.md) for static reusable markup
 - [TypeScript components](./components-typescript.md) for dynamic elements
 - Regular TypeScript for browser interactivity
@@ -679,13 +685,13 @@ Pre-rendering is for **document-level** transformations.
 
 ```typescript
 // index.pre.ts
-console.log('Pre-rendering index.html');
+console.log("Pre-rendering index.html");
 
-const title = document.querySelector('title');
-console.log('Current title:', title?.textContent);
+const title = document.querySelector("title");
+console.log("Current title:", title?.textContent);
 
-title.textContent = 'New Title';
-console.log('Updated title:', title.textContent);
+title.textContent = "New Title";
+console.log("Updated title:", title.textContent);
 ```
 
 These logs appear in your terminal during build.
@@ -715,7 +721,7 @@ View the final HTML to confirm your transformations worked.
 You have access to the `@tkeron/html-parser` package:
 
 ```typescript
-import { parseHTML } from '@tkeron/html-parser';
+import { parseHTML } from "@tkeron/html-parser";
 
 // This is what Tkeron uses internally
 // You usually don't need it in .pre.ts since 'document' is already parsed
@@ -731,9 +737,9 @@ import { parseHTML } from '@tkeron/html-parser';
 
 ```typescript
 // index.pre.ts
-console.log('Tkeron version:', process.env.TKERON_VERSION);
-console.log('Node env:', process.env.NODE_ENV);
-console.log('Custom var:', process.env.MY_CUSTOM_VAR);
+console.log("Tkeron version:", process.env.TKERON_VERSION);
+console.log("Node env:", process.env.NODE_ENV);
+console.log("Custom var:", process.env.MY_CUSTOM_VAR);
 ```
 
 Run with custom env:
@@ -751,8 +757,8 @@ Generate pages from data:
 ```typescript
 // pages.pre.ts
 const pages = [
-  { slug: 'about', title: 'About Us', content: '...' },
-  { slug: 'contact', title: 'Contact', content: '...' },
+  { slug: "about", title: "About Us", content: "..." },
+  { slug: "contact", title: "Contact", content: "..." },
 ];
 
 // This example shows the concept - in practice, you'd generate
@@ -763,27 +769,27 @@ const pages = [
 
 ```typescript
 // docs.pre.ts
-import { readFileSync, readdirSync } from 'fs';
-import { join } from 'path';
-import { marked } from 'marked';
+import { readFileSync, readdirSync } from "fs";
+import { join } from "path";
+import { marked } from "marked";
 
-const docsDir = join(import.meta.dir, 'docs');
-const files = readdirSync(docsDir).filter(f => f.endsWith('.md'));
+const docsDir = join(import.meta.dir, "docs");
+const files = readdirSync(docsDir).filter((f) => f.endsWith(".md"));
 
-const nav = document.getElementById('doc-nav');
-const content = document.getElementById('doc-content');
+const nav = document.getElementById("doc-nav");
+const content = document.getElementById("doc-content");
 
 if (nav) {
-  files.forEach(file => {
-    const li = document.createElement('li');
-    li.innerHTML = `<a href="#${file}">${file.replace('.md', '')}</a>`;
+  files.forEach((file) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<a href="#${file}">${file.replace(".md", "")}</a>`;
     nav.appendChild(li);
   });
 }
 
 if (content) {
   const firstFile = files[0];
-  const markdown = readFileSync(join(docsDir, firstFile), 'utf-8');
+  const markdown = readFileSync(join(docsDir, firstFile), "utf-8");
   content.innerHTML = marked(markdown);
 }
 ```

@@ -11,20 +11,19 @@ export interface InitWrapperOptions {
 
 export async function initWrapper(options: InitWrapperOptions) {
   const log = options?.logger || defaultLogger;
-  
-  if (!options || typeof options !== 'object') {
+
+  if (!options || typeof options !== "object") {
     log.error("\n❌ Error: Invalid options provided for init.");
     log.error("\n💡 Usage: tk init [project-name]");
     log.error("   Example: tk init my-app\n");
     process.exit(1);
   }
 
-  // If no project name provided, use current directory
   if (!options.projectName) {
     options.projectName = ".";
   }
 
-  if (typeof options.projectName !== 'string') {
+  if (typeof options.projectName !== "string") {
     log.error("\n❌ Error: Project name must be a string.");
     log.error("\n💡 Usage: tk init [project-name]");
     log.error("   Example: tk init my-app\n");
@@ -35,7 +34,7 @@ export async function initWrapper(options: InitWrapperOptions) {
     await init({ ...options, logger: log });
   } catch (error: any) {
     const msg = error.message;
-    
+
     if (msg === "Project name is required") {
       log.error("\n❌ Error: Project name is required.");
       log.error("\n💡 Usage: tk init <project-name>");
@@ -43,7 +42,9 @@ export async function initWrapper(options: InitWrapperOptions) {
     } else if (msg.includes("already exists")) {
       const projectName = msg.split('"')[1];
       log.error(`\n❌ Error: Directory "${projectName}" already exists.`);
-      log.error(`\n💡 Tip: Choose a different name, use '.' for current directory, or use force=true to overwrite.\n`);
+      log.error(
+        `\n💡 Tip: Choose a different name, use '.' for current directory, or use force=true to overwrite.\n`,
+      );
     } else if (msg === "Template directory not found") {
       log.error("\n❌ Error: Template directory not found.");
       log.error("\n💡 This might be a tkeron installation issue.");

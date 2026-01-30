@@ -5,12 +5,13 @@ const dataPoints = [
   { label: "Tue", value: 200 },
   { label: "Wed", value: 150 },
   { label: "Thu", value: 300 },
-  { label: "Fri", value: 250 }
+  { label: "Fri", value: 250 },
 ];
 
-const bars = dataPoints.map(point => {
-  const height = (point.value / 300) * 100;
-  return `
+const bars = dataPoints
+  .map((point) => {
+    const height = (point.value / 300) * 100;
+    return `
     <div style="display: flex; flex-direction: column; align-items: center;">
       <div style="height: 150px; display: flex; align-items: flex-end;">
         <div style="width: 40px; height: ${height}%; background: #667eea;"></div>
@@ -19,7 +20,8 @@ const bars = dataPoints.map(point => {
       <div style="font-size: 0.75rem; color: #666;">${point.value}</div>
     </div>
   `;
-}).join('');
+  })
+  .join("");
 
 com.innerHTML = `
   <div style="border: 3px solid #667eea; padding: 1rem; margin: 1rem 0; border-radius: 8px;">

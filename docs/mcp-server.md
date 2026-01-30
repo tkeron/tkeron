@@ -15,6 +15,7 @@ bun install -g tkeron
 ```
 
 This installs three commands:
+
 - `tk` / `tkeron` - The main CLI tool
 - `tkeron-mcp` - The MCP server
 
@@ -48,7 +49,8 @@ If the global command is not found, use Bun directly:
 ```
 
 **Note:** This is the VS Code format. Other editors (Cursor, Windsurf, etc.) may use different configuration formats.
-```
+
+````
 
 **Find the path:**
 ```bash
@@ -58,7 +60,7 @@ dirname $(which tk)
 
 # The mcp-server.ts is in the same directory
 ls $(dirname $(which tk))/mcp-server.ts
-```
+````
 
 ### Claude Desktop
 
@@ -88,15 +90,15 @@ The server communicates via stdio transport.
 
 The MCP server exposes the following documentation resources:
 
-| URI | Description |
-|-----|-------------|
-| `tkeron://overview` | What Tkeron is, what it does, and what it's not |
-| `tkeron://getting-started` | Installation, first project, and basic workflow |
-| `tkeron://components-html` | Create reusable HTML components with .com.html files |
-| `tkeron://components-typescript` | Build dynamic components with .com.ts files |
-| `tkeron://pre-rendering` | Transform HTML at build time with .pre.ts files |
-| `tkeron://cli-reference` | Complete command-line interface documentation |
-| `tkeron://best-practices` | Patterns, anti-patterns, and limitations |
+| URI                              | Description                                          |
+| -------------------------------- | ---------------------------------------------------- |
+| `tkeron://overview`              | What Tkeron is, what it does, and what it's not      |
+| `tkeron://getting-started`       | Installation, first project, and basic workflow      |
+| `tkeron://components-html`       | Create reusable HTML components with .com.html files |
+| `tkeron://components-typescript` | Build dynamic components with .com.ts files          |
+| `tkeron://pre-rendering`         | Transform HTML at build time with .pre.ts files      |
+| `tkeron://cli-reference`         | Complete command-line interface documentation        |
+| `tkeron://best-practices`        | Patterns, anti-patterns, and limitations             |
 
 ## What AI Agents Can Do
 
@@ -202,6 +204,7 @@ bun install
 ### MCP Client Not Connecting
 
 Check your configuration file syntax:
+
 - Valid JSON
 - Correct command path
 - Proper permissions on the executable

@@ -1,20 +1,20 @@
 // ITERATION 2: This .com.ts reads attributes and creates structure with nested components
 // It passes data to child components that will be processed in iteration 3
 
-const name = com.getAttribute('name') || 'Unknown User';
-const role = com.getAttribute('role') || 'user';
-const engagement = com.getAttribute('engagement') || '0';
-const status = com.getAttribute('status') || 'away';
-const hoursAgo = com.getAttribute('hours-ago') || '0';
+const name = com.getAttribute("name") || "Unknown User";
+const role = com.getAttribute("role") || "user";
+const engagement = com.getAttribute("engagement") || "0";
+const status = com.getAttribute("status") || "away";
+const hoursAgo = com.getAttribute("hours-ago") || "0";
 
 // TypeScript logic: format role display
 const roleLabels = {
-  'admin': '👑 Admin',
-  'moderator': '🛡️ Moderator',
-  'user': '👤 User'
+  admin: "👑 Admin",
+  moderator: "🛡️ Moderator",
+  user: "👤 User",
 };
 
-const roleDisplay = roleLabels[role] || roleLabels['user'];
+const roleDisplay = roleLabels[role] || roleLabels["user"];
 
 com.innerHTML = `
   <div style="border: 2px solid #3498db; border-radius: 8px; padding: 1rem; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">

@@ -25,18 +25,19 @@ Build, and the custom element is replaced with the component's content.
 ### 1. Component Naming
 
 Component filenames must:
+
 - End with `.com.html`
 - Match the custom element name (without `.com.html`)
 - Use lowercase with hyphens
 
 **Examples:**
 
-| Filename | Custom Element | Valid? |
-|----------|---------------|--------|
-| `user-card.com.html` | `<user-card>` | ✅ Yes |
-| `nav-menu.com.html` | `<nav-menu>` | ✅ Yes |
-| `header.com.html` | `<header>` | ❌ No (no hyphen) |
-| `UserCard.com.html` | `<user-card>` | ✅ Yes (case-insensitive) |
+| Filename             | Custom Element | Valid?                    |
+| -------------------- | -------------- | ------------------------- |
+| `user-card.com.html` | `<user-card>`  | ✅ Yes                    |
+| `nav-menu.com.html`  | `<nav-menu>`   | ✅ Yes                    |
+| `header.com.html`    | `<header>`     | ❌ No (no hyphen)         |
+| `UserCard.com.html`  | `<user-card>`  | ✅ Yes (case-insensitive) |
 
 ### 2. Component Resolution
 
@@ -57,6 +58,7 @@ websrc/
 ```
 
 In `blog/post.html`:
+
 - `<comment>` → Finds `blog/comment.com.html` first
 - `<header>` → Falls back to `websrc/header.com.html`
 
@@ -89,8 +91,7 @@ The `.com.html` file is NOT copied to output - only its content is inlined.
 **Usage:**
 
 ```html
-<card></card>
-<card></card>
+<card></card> <card></card>
 ```
 
 **Output:**
@@ -131,12 +132,12 @@ The `.com.html` file is NOT copied to output - only its content is inlined.
 ```html
 <!DOCTYPE html>
 <html>
-<body>
-  <site-header></site-header>
-  <main>
-    <!-- Page content -->
-  </main>
-</body>
+  <body>
+    <site-header></site-header>
+    <main>
+      <!-- Page content -->
+    </main>
+  </body>
 </html>
 ```
 
@@ -160,7 +161,7 @@ Components can use other components:
 ```html
 <!-- user-avatar.com.html -->
 <div class="avatar">
-  <img src="/avatars/default.jpg" alt="User">
+  <img src="/avatars/default.jpg" alt="User" />
 </div>
 ```
 
@@ -185,7 +186,7 @@ Components can use other components:
 ```html
 <div class="user-card">
   <div class="avatar">
-    <img src="/avatars/default.jpg" alt="User">
+    <img src="/avatars/default.jpg" alt="User" />
   </div>
   <div class="user-info">
     <h3>John Doe</h3>
@@ -239,7 +240,9 @@ Components can contain multiple root elements:
 
 ```html
 <!-- alert-box.com.html -->
-<div style="padding: 1rem; background: #fef2f2; border: 1px solid #ef4444; border-radius: 4px;">
+<div
+  style="padding: 1rem; background: #fef2f2; border: 1px solid #ef4444; border-radius: 4px;"
+>
   <strong>Error:</strong> Something went wrong!
 </div>
 ```
@@ -251,7 +254,7 @@ Components work with your existing CSS:
 ```html
 <!-- product-card.com.html -->
 <div class="product-card">
-  <img class="product-image" src="/products/placeholder.jpg" alt="Product">
+  <img class="product-image" src="/products/placeholder.jpg" alt="Product" />
   <h3 class="product-title">Product Name</h3>
   <p class="product-price">$99.99</p>
   <button class="btn btn-primary">Add to Cart</button>
@@ -312,7 +315,8 @@ HTML components don't support:
 ```html
 <!-- wrapper.com.html -->
 <div class="wrapper">
-  <slot></slot> <!-- Not supported -->
+  <slot></slot>
+  <!-- Not supported -->
 </div>
 ```
 
@@ -324,7 +328,8 @@ Components can't include themselves:
 <!-- menu.com.html -->
 <ul>
   <li>Item 1</li>
-  <menu></menu> <!-- ERROR: Circular dependency! -->
+  <menu></menu>
+  <!-- ERROR: Circular dependency! -->
 </ul>
 ```
 
@@ -339,6 +344,7 @@ Components can be nested up to **50 levels** deep. Deeper nesting will be ignore
 ### ✅ Use for Static UI Patterns
 
 Perfect for:
+
 - Headers and footers
 - Navigation menus
 - Card layouts
@@ -352,7 +358,7 @@ Perfect for:
 <!-- Good: Small, focused component -->
 <!-- icon-warning.com.html -->
 <svg width="24" height="24" viewBox="0 0 24 24">
-  <path d="M12 2L1 21h22L12 2z"/>
+  <path d="M12 2L1 21h22L12 2z" />
   <text x="12" y="17" text-anchor="middle">!</text>
 </svg>
 ```
@@ -391,8 +397,8 @@ If your component needs attributes or logic, use [TypeScript Components](./compo
 
 ```typescript
 // user-badge.com.ts
-const name = com.getAttribute('name') || 'Guest';
-const role = com.getAttribute('role') || 'User';
+const name = com.getAttribute("name") || "Guest";
+const role = com.getAttribute("role") || "User";
 com.innerHTML = `<span class="badge">${name} - ${role}</span>`;
 ```
 
@@ -435,7 +441,7 @@ Build and check if "TEST COMPONENT LOADED" appears in output.
 ```html
 <!-- blog-card.com.html -->
 <article class="blog-card">
-  <img src="/blog/placeholder.jpg" alt="Blog post" class="blog-card-image">
+  <img src="/blog/placeholder.jpg" alt="Blog post" class="blog-card-image" />
   <div class="blog-card-content">
     <time class="blog-card-date">2025-01-15</time>
     <h2 class="blog-card-title">Blog Post Title</h2>

@@ -2,7 +2,7 @@ const stats = {
   total: 5000,
   active: 4200,
   premium: 800,
-  growth: "+15%"
+  growth: "+15%",
 };
 
 com.innerHTML = `

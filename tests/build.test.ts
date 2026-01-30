@@ -1,8 +1,23 @@
 import { describe, it, expect, spyOn } from "bun:test";
-import { build, cleanupOrphanedTempDirs, TEMP_DIR_PREFIX } from "./build";
-import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync, readdirSync } from "fs";
+import { build } from "../src/build";
+import {
+  cleanupOrphanedTempDirs,
+  TEMP_DIR_PREFIX,
+} from "../src/cleanupOrphanedTempDirs";
+import {
+  rmSync,
+  existsSync,
+  mkdirSync,
+  writeFileSync,
+  readFileSync,
+  readdirSync,
+} from "fs";
 import { join } from "path";
-import { getTestResources, silentLogger, createTestLogger } from "./test-helpers";
+import {
+  getTestResources,
+  silentLogger,
+  createTestLogger,
+} from "./test-helpers";
 describe("build", () => {
   it("should build HTML with TypeScript and inject bundled script", async () => {
     const { dir } = getTestResources("build-html-with-typescript");
@@ -56,7 +71,10 @@ describe("build", () => {
       writeFileSync(join(TEST_SRC, "index.html"), indexHtml);
       writeFileSync(join(TEST_SRC, "index.ts"), `console.log("main");`);
       writeFileSync(join(TEST_SRC, "section", "index.html"), sectionHtml);
-      writeFileSync(join(TEST_SRC, "section", "index.ts"), `console.log("section");`);
+      writeFileSync(
+        join(TEST_SRC, "section", "index.ts"),
+        `console.log("section");`,
+      );
       await build({
         sourceDir: TEST_SRC,
         targetDir: TEST_OUT,
@@ -225,7 +243,10 @@ document.body.appendChild(h2);
         targetDir: TEST_OUT,
       });
       expect(existsSync(join(TEST_OUT, "nested", "page.html"))).toBe(true);
-      const outputHtml = readFileSync(join(TEST_OUT, "nested", "page.html"), "utf-8");
+      const outputHtml = readFileSync(
+        join(TEST_OUT, "nested", "page.html"),
+        "utf-8",
+      );
       expect(outputHtml).toContain("Nested Pre");
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -275,7 +296,9 @@ describe("temp directory cleanup", () => {
       // Verify no temp directories remain
       const parentDir = dir;
       const entries = readdirSync(parentDir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -293,7 +316,10 @@ describe("temp directory cleanup", () => {
 throw new Error("Intentional test error");
 `;
       writeFileSync(join(TEST_SRC, "error.pre.ts"), invalidPreContent);
-      writeFileSync(join(TEST_SRC, "error.html"), "<!DOCTYPE html><html><body></body></html>");
+      writeFileSync(
+        join(TEST_SRC, "error.html"),
+        "<!DOCTYPE html><html><body></body></html>",
+      );
       // Build should throw but temp should still be cleaned up
       try {
         await build({
@@ -306,7 +332,9 @@ throw new Error("Intentional test error");
       // Verify no temp directories remain
       const parentDir = dir;
       const entries = readdirSync(parentDir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -341,7 +369,9 @@ throw new Error("Intentional test error");
       expect(existsSync(orphan2)).toBe(false);
       // Verify no temp directories remain
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -424,18 +454,26 @@ throw new Error("Intentional test error");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
       // Create a .pre.ts file that throws an error
-      writeFileSync(join(TEST_SRC, "fail.pre.ts"), `throw new Error("processPre catastrophic failure");`);
-      writeFileSync(join(TEST_SRC, "fail.html"), "<!DOCTYPE html><html><body></body></html>");
-      
+      writeFileSync(
+        join(TEST_SRC, "fail.pre.ts"),
+        `throw new Error("processPre catastrophic failure");`,
+      );
+      writeFileSync(
+        join(TEST_SRC, "fail.html"),
+        "<!DOCTYPE html><html><body></body></html>",
+      );
+
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
       } catch (e) {
         // Expected to throw
       }
-      
+
       // Verify no temp directories remain
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -449,19 +487,30 @@ throw new Error("Intentional test error");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
       // Create circular dependency that will cause processCom to throw
-      writeFileSync(join(TEST_SRC, "index.html"), `<!DOCTYPE html><html><body><comp-a></comp-a></body></html>`);
-      writeFileSync(join(TEST_SRC, "comp-a.com.html"), `<div><comp-b></comp-b></div>`);
-      writeFileSync(join(TEST_SRC, "comp-b.com.html"), `<div><comp-a></comp-a></div>`);
-      
+      writeFileSync(
+        join(TEST_SRC, "index.html"),
+        `<!DOCTYPE html><html><body><comp-a></comp-a></body></html>`,
+      );
+      writeFileSync(
+        join(TEST_SRC, "comp-a.com.html"),
+        `<div><comp-b></comp-b></div>`,
+      );
+      writeFileSync(
+        join(TEST_SRC, "comp-b.com.html"),
+        `<div><comp-a></comp-a></div>`,
+      );
+
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
       } catch (e) {
         // Expected to throw due to circular dependency
       }
-      
+
       // Verify no temp directories remain
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -475,18 +524,26 @@ throw new Error("Intentional test error");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
       // Create a .com.ts file that throws
-      writeFileSync(join(TEST_SRC, "index.html"), `<!DOCTYPE html><html><body><bad-comp></bad-comp></body></html>`);
-      writeFileSync(join(TEST_SRC, "bad-comp.com.ts"), `throw new Error("processComTs catastrophic failure");`);
-      
+      writeFileSync(
+        join(TEST_SRC, "index.html"),
+        `<!DOCTYPE html><html><body><bad-comp></bad-comp></body></html>`,
+      );
+      writeFileSync(
+        join(TEST_SRC, "bad-comp.com.ts"),
+        `throw new Error("processComTs catastrophic failure");`,
+      );
+
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
       } catch (e) {
         // Expected to throw
       }
-      
+
       // Verify no temp directories remain
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -500,17 +557,22 @@ throw new Error("Intentional test error");
     const TEST_OUT = "/dev/null/impossible/path";
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      writeFileSync(join(TEST_SRC, "index.html"), `<!DOCTYPE html><html><body><h1>Test</h1></body></html>`);
-      
+      writeFileSync(
+        join(TEST_SRC, "index.html"),
+        `<!DOCTYPE html><html><body><h1>Test</h1></body></html>`,
+      );
+
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
       } catch (e) {
         // Expected to throw
       }
-      
+
       // Verify no temp directories remain in the source parent
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -525,22 +587,27 @@ throw new Error("Intentional test error");
       mkdirSync(TEST_SRC, { recursive: true });
       // Create components that keep inserting new components (up to MAX_DEPTH warning)
       // This tests that even long-running builds cleanup properly
-      writeFileSync(join(TEST_SRC, "index.html"), `<!DOCTYPE html><html><body><level-0></level-0></body></html>`);
-      
+      writeFileSync(
+        join(TEST_SRC, "index.html"),
+        `<!DOCTYPE html><html><body><level-0></level-0></body></html>`,
+      );
+
       // Create many nested components
       for (let i = 0; i < 12; i++) {
         writeFileSync(
           join(TEST_SRC, `level-${i}.com.html`),
-          `<div>Level ${i}<level-${i + 1}></level-${i + 1}></div>`
+          `<div>Level ${i}<level-${i + 1}></level-${i + 1}></div>`,
         );
       }
       writeFileSync(join(TEST_SRC, `level-12.com.html`), `<div>Final</div>`);
-      
+
       await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
-      
+
       // Verify no temp directories remain
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -553,19 +620,27 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      writeFileSync(join(TEST_SRC, "index.html"), `<!DOCTYPE html><html><body><syntax-err></syntax-err></body></html>`);
+      writeFileSync(
+        join(TEST_SRC, "index.html"),
+        `<!DOCTYPE html><html><body><syntax-err></syntax-err></body></html>`,
+      );
       // Invalid TypeScript syntax
-      writeFileSync(join(TEST_SRC, "syntax-err.com.ts"), `com.innerHTML = {{{ invalid syntax`);
-      
+      writeFileSync(
+        join(TEST_SRC, "syntax-err.com.ts"),
+        `com.innerHTML = {{{ invalid syntax`,
+      );
+
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
       } catch (e) {
         // May or may not throw depending on how syntax errors are handled
       }
-      
+
       // Verify no temp directories remain
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -579,18 +654,26 @@ throw new Error("Intentional test error");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
       // Import a module that doesn't exist
-      writeFileSync(join(TEST_SRC, "import-fail.pre.ts"), `import { nonexistent } from "./does-not-exist";`);
-      writeFileSync(join(TEST_SRC, "import-fail.html"), "<!DOCTYPE html><html><body></body></html>");
-      
+      writeFileSync(
+        join(TEST_SRC, "import-fail.pre.ts"),
+        `import { nonexistent } from "./does-not-exist";`,
+      );
+      writeFileSync(
+        join(TEST_SRC, "import-fail.html"),
+        "<!DOCTYPE html><html><body></body></html>",
+      );
+
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
       } catch (e) {
         // Expected to throw
       }
-      
+
       // Verify no temp directories remain
       const entries = readdirSync(dir);
-      const tempDirs = entries.filter((name) => name.startsWith(TEMP_DIR_PREFIX));
+      const tempDirs = entries.filter((name) =>
+        name.startsWith(TEMP_DIR_PREFIX),
+      );
       expect(tempDirs).toHaveLength(0);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -604,10 +687,13 @@ throw new Error("Intentional test error");
     const { logger, warns } = createTestLogger();
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      writeFileSync(join(TEST_SRC, "index.html"), "<!DOCTYPE html><html><body>Test</body></html>");
-      
+      writeFileSync(
+        join(TEST_SRC, "index.html"),
+        "<!DOCTYPE html><html><body>Test</body></html>",
+      );
+
       await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT, logger });
-      
+
       // Build should succeed - warns may or may not contain cleanup warnings
       expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
     } finally {
@@ -622,17 +708,22 @@ throw new Error("Intentional test error");
     const { logger, logs } = createTestLogger();
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      writeFileSync(join(TEST_SRC, "index.html"), "<!DOCTYPE html><html><body>Test</body></html>");
-      
+      writeFileSync(
+        join(TEST_SRC, "index.html"),
+        "<!DOCTYPE html><html><body>Test</body></html>",
+      );
+
       // Create an orphaned temp directory
       const orphanedTempDir = join(dir, `${TEMP_DIR_PREFIX}orphaned-test`);
       mkdirSync(orphanedTempDir, { recursive: true });
-      
+
       await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT, logger });
-      
+
       // Build should succeed and cleanup orphaned dir
       expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
-      expect(logs.some(l => l.includes("Cleaned up orphaned temp directory"))).toBe(true);
+      expect(
+        logs.some((l) => l.includes("Cleaned up orphaned temp directory")),
+      ).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });
     }

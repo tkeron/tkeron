@@ -21,23 +21,26 @@ Powered by [Bun](https://bun.sh).
 ## Key Features
 
 **HTML Components** - Organize markup:
+
 ```html
 <!-- header.com.html -->
 <header><h1>Site Title</h1></header>
 ```
 
 **TypeScript Components** - Dynamic generation:
+
 ```typescript
 // user-badge.com.ts
-const count = com.getAttribute('count') || '3';
+const count = com.getAttribute("count") || "3";
 com.innerHTML = `<ul>${generateItems(count)}</ul>`;
 ```
 
 **Pre-rendering** - DOM manipulation at build time:
+
 ```typescript
 // index.pre.ts
-const data = await fetch('https://api.example.com/data');
-document.getElementById('content').innerHTML = processData(data);
+const data = await fetch("https://api.example.com/data");
+document.getElementById("content").innerHTML = processData(data);
 ```
 
 ## System Requirements
@@ -49,14 +52,17 @@ document.getElementById('content').innerHTML = processData(data);
 ## Documentation Sections
 
 ### Getting Started
+
 - [**Getting Started Guide**](./getting-started.md) - Installation, first project, basic workflow
 
 ### Core Concepts
+
 - [**HTML Components**](./components-html.md) - Create reusable HTML components with `.com.html`
 - [**TypeScript Components**](./components-typescript.md) - Build dynamic components with `.com.ts`
 - [**Pre-rendering**](./pre-rendering.md) - Transform HTML at build time with `.pre.ts`
 
 ### Reference
+
 - [**CLI Reference**](./cli-reference.md) - Complete command-line interface documentation
 - [**Best Practices**](./best-practices.md) - Patterns, anti-patterns, and limitations
 - [**MCP Server**](./mcp-server.md) - AI agent integration via Model Context Protocol
@@ -79,10 +85,10 @@ Use it in your page:
 <!-- index.html -->
 <!DOCTYPE html>
 <html>
-<body>
-  <user-card></user-card>
-  <user-card></user-card>
-</body>
+  <body>
+    <user-card></user-card>
+    <user-card></user-card>
+  </body>
 </html>
 ```
 
@@ -100,9 +106,9 @@ Result: Both `<user-card>` elements are replaced with the component's HTML. No r
 websrc/               Build Steps           web/
 ├── index.html    →  1. .pre.ts        →  ├── index.html
 ├── index.ts         2. .com.ts           ├── index.js
-├── index.pre.ts     3. .com.html         
-├── nav.com.html     4. TypeScript        
-└── card.com.ts      5. Assets            
+├── index.pre.ts     3. .com.html
+├── nav.com.html     4. TypeScript
+└── card.com.ts      5. Assets
 ```
 
 Component files (`.com.html`, `.com.ts`, `.pre.ts`) are not copied to output.

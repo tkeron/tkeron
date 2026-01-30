@@ -8,7 +8,7 @@ Create a `.com.ts` file:
 
 ```typescript
 // greeting.com.ts
-const name = com.getAttribute('name') || 'World';
+const name = com.getAttribute("name") || "World";
 com.innerHTML = `<h1>Hello, ${name}!</h1>`;
 ```
 
@@ -36,9 +36,9 @@ Every `.com.ts` file has access to a special `com` variable:
 
 ```typescript
 // The 'com' variable is the DOM element itself
-com.getAttribute('attr-name')  // Read attributes
-com.innerHTML = '...'           // Set content (this is what's kept)
-com.tagName                     // Get element name
+com.getAttribute("attr-name"); // Read attributes
+com.innerHTML = "..."; // Set content (this is what's kept)
+com.tagName; // Get element name
 ```
 
 **Important:** Only the `innerHTML` you set is included in the final output. Everything else is discarded.
@@ -71,8 +71,8 @@ Same as HTML components:
 
 ```typescript
 // user-badge.com.ts
-const name = com.getAttribute('name') || 'Guest';
-const role = com.getAttribute('role') || 'User';
+const name = com.getAttribute("name") || "Guest";
+const role = com.getAttribute("role") || "User";
 
 com.innerHTML = `
   <div class="badge">
@@ -111,7 +111,7 @@ com.innerHTML = `
 
 ```typescript
 // item-list.com.ts
-const count = parseInt(com.getAttribute('count') || '3');
+const count = parseInt(com.getAttribute("count") || "3");
 const items = [];
 
 for (let i = 1; i <= count; i++) {
@@ -120,7 +120,7 @@ for (let i = 1; i <= count; i++) {
 
 com.innerHTML = `
   <ul class="item-list">
-    ${items.join('')}
+    ${items.join("")}
   </ul>
 `;
 ```
@@ -147,14 +147,14 @@ com.innerHTML = `
 
 ```typescript
 // alert-box.com.ts
-const type = com.getAttribute('type') || 'info';
-const message = com.getAttribute('message') || 'No message provided';
+const type = com.getAttribute("type") || "info";
+const message = com.getAttribute("message") || "No message provided";
 
 const colors = {
-  info: '#3b82f6',
-  success: '#22c55e',
-  warning: '#f59e0b',
-  error: '#ef4444',
+  info: "#3b82f6",
+  success: "#22c55e",
+  warning: "#f59e0b",
+  error: "#ef4444",
 };
 
 const color = colors[type as keyof typeof colors] || colors.info;
@@ -185,23 +185,23 @@ You can use all TypeScript features:
 interface Stats {
   label: string;
   value: number;
-  trend: 'up' | 'down' | 'neutral';
+  trend: "up" | "down" | "neutral";
 }
 
-const label = com.getAttribute('label') || 'Stat';
-const value = parseInt(com.getAttribute('value') || '0');
-const trend = com.getAttribute('trend') as Stats['trend'] || 'neutral';
+const label = com.getAttribute("label") || "Stat";
+const value = parseInt(com.getAttribute("value") || "0");
+const trend = (com.getAttribute("trend") as Stats["trend"]) || "neutral";
 
 const trendIcon = {
-  up: '↑',
-  down: '↓',
-  neutral: '→',
+  up: "↑",
+  down: "↓",
+  neutral: "→",
 };
 
 const trendColor = {
-  up: '#22c55e',
-  down: '#ef4444',
-  neutral: '#6b7280',
+  up: "#22c55e",
+  down: "#ef4444",
+  neutral: "#6b7280",
 };
 
 com.innerHTML = `
@@ -221,10 +221,10 @@ You can import any TypeScript module or npm package:
 
 ```typescript
 // product-card.com.ts
-import { formatPrice } from './utils';
+import { formatPrice } from "./utils";
 
-const name = com.getAttribute('name') || 'Product';
-const price = parseFloat(com.getAttribute('price') || '0');
+const name = com.getAttribute("name") || "Product";
+const price = parseFloat(com.getAttribute("price") || "0");
 
 com.innerHTML = `
   <div class="product-card">
@@ -237,9 +237,9 @@ com.innerHTML = `
 ```typescript
 // utils.ts
 export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
   }).format(price);
 }
 ```
@@ -250,7 +250,7 @@ Fetch data at build time:
 
 ```typescript
 // weather-widget.com.ts
-const city = com.getAttribute('city') || 'London';
+const city = com.getAttribute("city") || "London";
 
 interface WeatherData {
   temperature: number;
@@ -279,9 +279,9 @@ com.innerHTML = `
 
 ```typescript
 // markdown-content.com.ts
-import { marked } from 'marked';
+import { marked } from "marked";
 
-const content = com.getAttribute('content') || '# Hello';
+const content = com.getAttribute("content") || "# Hello";
 const html = marked(content);
 
 com.innerHTML = `
@@ -303,8 +303,8 @@ TypeScript components can use other components:
 
 ```typescript
 // user-profile.com.ts
-const username = com.getAttribute('username') || 'anonymous';
-const bio = com.getAttribute('bio') || 'No bio provided';
+const username = com.getAttribute("username") || "anonymous";
+const bio = com.getAttribute("bio") || "No bio provided";
 
 com.innerHTML = `
   <div class="user-profile">
@@ -327,8 +327,8 @@ Event listeners are lost in the static output:
 
 ```typescript
 // ❌ This won't work
-com.addEventListener('click', () => {
-  console.log('clicked');
+com.addEventListener("click", () => {
+  console.log("clicked");
 });
 ```
 
@@ -336,9 +336,9 @@ com.addEventListener('click', () => {
 
 ```typescript
 // index.ts (runs in browser)
-document.querySelectorAll('.my-button').forEach(button => {
-  button.addEventListener('click', () => {
-    console.log('clicked');
+document.querySelectorAll(".my-button").forEach((button) => {
+  button.addEventListener("click", () => {
+    console.log("clicked");
   });
 });
 ```
@@ -349,8 +349,8 @@ You can't access other parts of the document:
 
 ```typescript
 // ❌ This won't work
-const header = document.querySelector('header');
-com.innerHTML = header?.textContent || '';
+const header = document.querySelector("header");
+com.innerHTML = header?.textContent || "";
 ```
 
 **Solution:** Use [pre-rendering](./pre-rendering.md) for document-wide transformations.
@@ -375,7 +375,7 @@ Build-time components can't access runtime data:
 
 ```typescript
 // ❌ This won't work - no access to current user
-const currentUser = localStorage.getItem('user');
+const currentUser = localStorage.getItem("user");
 com.innerHTML = `<p>Hello, ${currentUser}</p>`;
 ```
 
@@ -386,6 +386,7 @@ com.innerHTML = `<p>Hello, ${currentUser}</p>`;
 ### ✅ Use for Attribute-Driven Components
 
 Perfect for:
+
 - Components that vary based on attributes
 - Generating repetitive HTML
 - Build-time data transformation
@@ -395,11 +396,13 @@ Perfect for:
 
 ```typescript
 // color-badge.com.ts
-const validColors = ['red', 'blue', 'green', 'yellow'];
-const color = com.getAttribute('color') || 'blue';
+const validColors = ["red", "blue", "green", "yellow"];
+const color = com.getAttribute("color") || "blue";
 
 if (!validColors.includes(color)) {
-  throw new Error(`Invalid color: ${color}. Use one of: ${validColors.join(', ')}`);
+  throw new Error(
+    `Invalid color: ${color}. Use one of: ${validColors.join(", ")}`,
+  );
 }
 
 com.innerHTML = `<span class="badge badge-${color}">Badge</span>`;
@@ -415,14 +418,14 @@ Prevent XSS by escaping user-provided content:
 // user-comment.com.ts
 function escapeHtml(text: string): string {
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-const comment = com.getAttribute('comment') || '';
+const comment = com.getAttribute("comment") || "";
 com.innerHTML = `<p>${escapeHtml(comment)}</p>`;
 ```
 
@@ -430,15 +433,15 @@ com.innerHTML = `<p>${escapeHtml(comment)}</p>`;
 
 ```typescript
 // card.com.ts
-type CardVariant = 'default' | 'outlined' | 'elevated';
+type CardVariant = "default" | "outlined" | "elevated";
 
-const variant = com.getAttribute('variant') as CardVariant || 'default';
-const title = com.getAttribute('title') || 'Card';
+const variant = (com.getAttribute("variant") as CardVariant) || "default";
+const title = com.getAttribute("title") || "Card";
 
 const variants = {
-  default: 'border: 1px solid #e5e7eb',
-  outlined: 'border: 2px solid #3b82f6',
-  elevated: 'box-shadow: 0 4px 6px rgba(0,0,0,0.1)',
+  default: "border: 1px solid #e5e7eb",
+  outlined: "border: 2px solid #3b82f6",
+  elevated: "box-shadow: 0 4px 6px rgba(0,0,0,0.1)",
 };
 
 com.innerHTML = `
@@ -452,9 +455,9 @@ com.innerHTML = `
 
 ```typescript
 // data-table.com.ts
-import { generateTableRows } from './table-utils';
+import { generateTableRows } from "./table-utils";
 
-const data = com.getAttribute('data') || '[]';
+const data = com.getAttribute("data") || "[]";
 const rows = generateTableRows(JSON.parse(data));
 
 com.innerHTML = `
@@ -482,8 +485,8 @@ If a component doesn't need attributes or logic, use [HTML components](./compone
 
 ```typescript
 // debug-component.com.ts
-const value = com.getAttribute('value');
-console.log('Building component with value:', value);
+const value = com.getAttribute("value");
+console.log("Building component with value:", value);
 
 com.innerHTML = `<p>${value}</p>`;
 ```
@@ -514,13 +517,17 @@ cat web/index.html | grep "expected-content"
 
 ```typescript
 // image-gallery.com.ts
-const images = com.getAttribute('images')?.split(',') || [];
+const images = com.getAttribute("images")?.split(",") || [];
 
-const imageElements = images.map((img, idx) => `
+const imageElements = images
+  .map(
+    (img, idx) => `
   <div class="gallery-item">
     <img src="${img.trim()}" alt="Image ${idx + 1}" loading="lazy">
   </div>
-`).join('');
+`,
+  )
+  .join("");
 
 com.innerHTML = `
   <div class="image-gallery">
@@ -539,8 +546,11 @@ com.innerHTML = `
 
 ```typescript
 // progress-bar.com.ts
-const progress = Math.min(100, Math.max(0, parseInt(com.getAttribute('progress') || '0')));
-const label = com.getAttribute('label') || `${progress}%`;
+const progress = Math.min(
+  100,
+  Math.max(0, parseInt(com.getAttribute("progress") || "0")),
+);
+const label = com.getAttribute("label") || `${progress}%`;
 
 com.innerHTML = `
   <div class="progress-bar-container">
@@ -554,14 +564,14 @@ com.innerHTML = `
 
 ```typescript
 // code-block.com.ts
-import { codeToHtml } from 'shiki';
+import { codeToHtml } from "shiki";
 
-const code = com.getAttribute('code') || '';
-const lang = com.getAttribute('lang') || 'typescript';
+const code = com.getAttribute("code") || "";
+const lang = com.getAttribute("lang") || "typescript";
 
 const html = await codeToHtml(code, {
   lang,
-  theme: 'github-dark',
+  theme: "github-dark",
 });
 
 com.innerHTML = `
@@ -587,8 +597,8 @@ bun add shiki
 
 ```typescript
 // social-share.com.ts
-const url = com.getAttribute('url') || '';
-const title = com.getAttribute('title') || '';
+const url = com.getAttribute("url") || "";
+const title = com.getAttribute("title") || "";
 
 const encodedUrl = encodeURIComponent(url);
 const encodedTitle = encodeURIComponent(title);
@@ -620,7 +630,7 @@ Add types for better development experience:
 /// <reference path="./tkeron.d.ts" />
 
 // Now 'com' has full type information
-const attr = com.getAttribute('name'); // TypeScript knows about this
+const attr = com.getAttribute("name"); // TypeScript knows about this
 ```
 
 ## Performance Considerations
@@ -631,7 +641,7 @@ Complex components increase build time:
 
 ```typescript
 // ⚠️ Expensive at build time
-const data = await fetch('https://api.example.com/large-dataset');
+const data = await fetch("https://api.example.com/large-dataset");
 ```
 
 For large datasets, consider caching or pre-processing.

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from "bun:test";
-import { build } from "./build";
+import { build } from "../src/build";
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { parseHTML } from "@tkeron/html-parser";
@@ -11,21 +11,21 @@ describe("Examples Build Tests", () => {
   beforeAll(async () => {
     const examples = [
       "basic_build",
-      "with_assets", 
+      "with_assets",
       "with_pre",
       "with_com_html_priority",
       "with_com_ts_priority",
       "with_com_mixed_priority",
-      "with_component_iteration"
+      "with_component_iteration",
     ];
 
     await Promise.all(
-      examples.map(example => 
+      examples.map((example) =>
         build({
           sourceDir: join(EXAMPLES_DIR, example, "src"),
           targetDir: join(EXAMPLES_DIR, example, "web"),
-        })
-      )
+        }),
+      ),
     );
   }, 30000);
 
@@ -41,13 +41,13 @@ describe("Examples Build Tests", () => {
     it("index.html should have valid structure with script injection", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
       const doc = parseHTML(htmlContent);
-      
+
       // Check basic structure
       expect(htmlContent).toContain("<!doctype html>");
       expect(doc.querySelector("html")).toBeTruthy();
       expect(doc.querySelector("head")).toBeTruthy();
       expect(doc.querySelector("body")).toBeTruthy();
-      
+
       // Check script injection
       const script = doc.querySelector('script[type="module"]');
       expect(script).toBeTruthy();
@@ -58,7 +58,7 @@ describe("Examples Build Tests", () => {
 
     it("index.js should contain bundled code", () => {
       const jsContent = readFileSync(join(outDir, "index.js"), "utf-8");
-      
+
       expect(jsContent.length).toBeGreaterThan(0);
       expect(jsContent).toContain("button");
       expect(jsContent).toContain("querySelector");
@@ -83,11 +83,11 @@ describe("Examples Build Tests", () => {
     it("index.html should contain image reference", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
       const doc = parseHTML(htmlContent);
-      
+
       // Check script injection
       const script = doc.querySelector('script[type="module"]');
       expect(script?.getAttribute("src")).toBe("./index.js");
-      
+
       // Check image reference
       const img = doc.querySelector("img");
       expect(img).toBeTruthy();
@@ -96,12 +96,15 @@ describe("Examples Build Tests", () => {
     });
 
     it("nested HTML should have script injection", () => {
-      const nestedHtml = readFileSync(join(outDir, "section/index.html"), "utf-8");
+      const nestedHtml = readFileSync(
+        join(outDir, "section/index.html"),
+        "utf-8",
+      );
       const doc = parseHTML(nestedHtml);
-      
+
       const script = doc.querySelector('script[type="module"]');
       expect(script?.getAttribute("src")).toBe("./index.js");
-      
+
       // Check relative image path
       const img = doc.querySelector("img");
       expect(img?.getAttribute("src")).toBe("../profile.png");
@@ -127,22 +130,25 @@ describe("Examples Build Tests", () => {
     it("pre-generated contact.html should have script with correct path", () => {
       const contactHtml = readFileSync(join(outDir, "contact.html"), "utf-8");
       const doc = parseHTML(contactHtml);
-      
+
       // Verify script injection with correct path
       const script = doc.querySelector('script[type="module"]');
       expect(script).toBeTruthy();
       expect(script?.getAttribute("src")).toBe("./contact.js");
       expect(script?.hasAttribute("crossorigin")).toBe(true);
-      
+
       // Verify content
       const h1 = doc.querySelector("h1");
       expect(h1?.textContent).toBe("Contact Us");
     });
 
     it("pre-generated section/index.html should have script with correct path", () => {
-      const sectionHtml = readFileSync(join(outDir, "section/index.html"), "utf-8");
+      const sectionHtml = readFileSync(
+        join(outDir, "section/index.html"),
+        "utf-8",
+      );
       const doc = parseHTML(sectionHtml);
-      
+
       const script = doc.querySelector('script[type="module"]');
       expect(script?.getAttribute("src")).toBe("./index.js");
     });
@@ -150,7 +156,7 @@ describe("Examples Build Tests", () => {
     it("regular index.html should have script injection", () => {
       const indexHtml = readFileSync(join(outDir, "index.html"), "utf-8");
       const doc = parseHTML(indexHtml);
-      
+
       const script = doc.querySelector('script[type="module"]');
       expect(script?.getAttribute("src")).toBe("./index.js");
     });
@@ -169,39 +175,44 @@ describe("Examples Build Tests", () => {
     it("should not include .com.html files in output", () => {
       expect(existsSync(join(outDir, "site-header.com.html"))).toBe(false);
       expect(existsSync(join(outDir, "info-box.com.html"))).toBe(false);
-      expect(existsSync(join(outDir, "admin/site-header.com.html"))).toBe(false);
+      expect(existsSync(join(outDir, "admin/site-header.com.html"))).toBe(
+        false,
+      );
     });
 
     it("index.html should use root components", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
       const doc = parseHTML(htmlContent);
-      
+
       // Should have root header
       expect(htmlContent).toContain("Root Header Component");
       expect(htmlContent).toContain("This header is from the root directory");
-      
+
       // Should have root info box
       expect(htmlContent).toContain("Root Info Box");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<site-header>");
       expect(htmlContent).not.toContain("<info-box>");
     });
 
     it("admin/dashboard.html should use local overrides", () => {
-      const htmlContent = readFileSync(join(outDir, "admin/dashboard.html"), "utf-8");
-      
+      const htmlContent = readFileSync(
+        join(outDir, "admin/dashboard.html"),
+        "utf-8",
+      );
+
       // Should have local admin header (not root)
       expect(htmlContent).toContain("Admin Header (Local Override)");
       expect(htmlContent).toContain("This header is from the admin directory");
       expect(htmlContent).not.toContain("Root Header Component");
-      
+
       // Should have admin panel (local component)
       expect(htmlContent).toContain("Admin Panel");
-      
+
       // Should have nested component
       expect(htmlContent).toContain("Nested Stat Component");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<site-header>");
       expect(htmlContent).not.toContain("<admin-panel>");
@@ -210,15 +221,15 @@ describe("Examples Build Tests", () => {
 
     it("blog/post.html should use root components and local blog components", () => {
       const htmlContent = readFileSync(join(outDir, "blog/post.html"), "utf-8");
-      
+
       // Should use root header (no local override)
       expect(htmlContent).toContain("Root Header Component");
-      
+
       // Should have blog-specific components
       expect(htmlContent).toContain("Comments");
       expect(htmlContent).toContain("User123:");
       expect(htmlContent).toContain("Great article!");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<comment-section>");
       expect(htmlContent).not.toContain("<comment-item>");
@@ -232,66 +243,78 @@ describe("Examples Build Tests", () => {
     it("should generate all HTML files", () => {
       expect(existsSync(join(outDir, "index.html"))).toBe(true);
       expect(existsSync(join(outDir, "analytics/report.html"))).toBe(true);
-      expect(existsSync(join(outDir, "sales/regional/overview.html"))).toBe(true);
+      expect(existsSync(join(outDir, "sales/regional/overview.html"))).toBe(
+        true,
+      );
     });
 
     it("should not include .com.ts files in output", () => {
       expect(existsSync(join(outDir, "user-stats.com.ts"))).toBe(false);
       expect(existsSync(join(outDir, "data-table.com.ts"))).toBe(false);
-      expect(existsSync(join(outDir, "analytics/user-stats.com.ts"))).toBe(false);
+      expect(existsSync(join(outDir, "analytics/user-stats.com.ts"))).toBe(
+        false,
+      );
     });
 
     it("index.html should use root TypeScript components", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
-      
+
       // Should have root user stats
       expect(htmlContent).toContain("User Statistics (Root)");
       expect(htmlContent).toContain("Total: 1000");
       expect(htmlContent).toContain("Active: 750");
-      
+
       // Should have root data table
       expect(htmlContent).toContain("Data Table (Root)");
       expect(htmlContent).toContain("Item A");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<user-stats>");
       expect(htmlContent).not.toContain("<data-table>");
     });
 
     it("analytics/report.html should use local overrides", () => {
-      const htmlContent = readFileSync(join(outDir, "analytics/report.html"), "utf-8");
-      
+      const htmlContent = readFileSync(
+        join(outDir, "analytics/report.html"),
+        "utf-8",
+      );
+
       // Should have local analytics stats (not root)
       expect(htmlContent).toContain("Analytics User Stats (Local Override)");
       expect(htmlContent).toContain("Total Users:</strong> 5000");
       expect(htmlContent).toContain("Premium:</strong> 800");
       expect(htmlContent).not.toContain("User Statistics (Root)");
-      
+
       // Should have chart widget (local component)
       expect(htmlContent).toContain("Chart Widget");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<user-stats>");
       expect(htmlContent).not.toContain("<chart-widget>");
     });
 
     it("sales/regional/overview.html should use deep local overrides", () => {
-      const htmlContent = readFileSync(join(outDir, "sales/regional/overview.html"), "utf-8");
-      
+      const htmlContent = readFileSync(
+        join(outDir, "sales/regional/overview.html"),
+        "utf-8",
+      );
+
       // Should use root user-stats (no local override)
       expect(htmlContent).toContain("User Statistics (Root)");
-      
+
       // Should have deep local data-table
-      expect(htmlContent).toContain("Regional Data Table (Deep Local Override)");
+      expect(htmlContent).toContain(
+        "Regional Data Table (Deep Local Override)",
+      );
       expect(htmlContent).toContain("sales/regional/ directory");
       expect(htmlContent).toContain("North");
       expect(htmlContent).toContain("$45,000");
       expect(htmlContent).not.toContain("Data Table (Root)");
-      
+
       // Should have sales summary (local component)
       expect(htmlContent).toContain("Sales Summary");
       expect(htmlContent).toContain("$176,000");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<data-table>");
       expect(htmlContent).not.toContain("<sales-summary>");
@@ -312,23 +335,25 @@ describe("Examples Build Tests", () => {
     it("should not include component files in output", () => {
       expect(existsSync(join(outDir, "page-header.com.html"))).toBe(false);
       expect(existsSync(join(outDir, "feature-card.com.ts"))).toBe(false);
-      expect(existsSync(join(outDir, "dashboard/page-header.com.ts"))).toBe(false);
+      expect(existsSync(join(outDir, "dashboard/page-header.com.ts"))).toBe(
+        false,
+      );
     });
 
     it("index.html should use root components (both .html and .ts)", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
-      
+
       // Should have root HTML header
       expect(htmlContent).toContain("Root Header (HTML Component)");
       expect(htmlContent).toContain("static HTML component from root");
-      
+
       // Should have root TS feature card
       expect(htmlContent).toContain("Feature 1 (Root TS Component)");
       expect(htmlContent).toContain("dynamic TypeScript component");
-      
+
       // Should have root HTML footer
       expect(htmlContent).toContain("Root Footer (HTML Component)");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<page-header>");
       expect(htmlContent).not.toContain("<feature-card");
@@ -336,20 +361,25 @@ describe("Examples Build Tests", () => {
     });
 
     it("dashboard/main.html should use root .com.html since it processes first", () => {
-      const htmlContent = readFileSync(join(outDir, "dashboard/main.html"), "utf-8");
-      
+      const htmlContent = readFileSync(
+        join(outDir, "dashboard/main.html"),
+        "utf-8",
+      );
+
       // Should have root HTML header (processed first, so local .com.ts doesn't find the component)
       expect(htmlContent).toContain("Root Header (HTML Component)");
-      expect(htmlContent).toContain("This is a static HTML component from root");
+      expect(htmlContent).toContain(
+        "This is a static HTML component from root",
+      );
       expect(htmlContent).not.toContain("Dashboard Header (Local TS Override)");
-      
+
       // Should have dashboard stats widget (local .com.ts, no .com.html conflict)
       expect(htmlContent).toContain("Dashboard Stats");
       expect(htmlContent).toContain("1523");
-      
+
       // Should have feature-card (root .com.ts, no .com.html exists)
       expect(htmlContent).toContain("Dashboard Feature");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<page-header>");
       expect(htmlContent).not.toContain("<stats-widget>");
@@ -357,41 +387,51 @@ describe("Examples Build Tests", () => {
     });
 
     it("users/profiles/view.html should demonstrate deep nesting with mixed types", () => {
-      const htmlContent = readFileSync(join(outDir, "users/profiles/view.html"), "utf-8");
-      
+      const htmlContent = readFileSync(
+        join(outDir, "users/profiles/view.html"),
+        "utf-8",
+      );
+
       // Should have deep local HTML header (local .com.html)
-      expect(htmlContent).toContain("Profile Header (Deep Local HTML Override)");
+      expect(htmlContent).toContain(
+        "Profile Header (Deep Local HTML Override)",
+      );
       expect(htmlContent).toContain("users/profiles/ directory");
-      
+
       // Should have user profile content from local .com.ts
       expect(htmlContent).toContain("Jane Doe");
       expect(htmlContent).toContain("jane@example.com");
-      
+
       // Should have nested profile-actions from local .com.html (inside user-profile)
       expect(htmlContent).toContain("Edit Profile");
       expect(htmlContent).toContain("View Activity");
-      
+
       // Should have activity feed (local .com.ts, no .com.html conflict)
       expect(htmlContent).toContain("Recent Activity (Local TS Component)");
       expect(htmlContent).toContain("Updated profile");
-      
+
       // Should not have custom elements at top level
       expect(htmlContent).not.toContain("<user-profile>");
       expect(htmlContent).not.toContain("<activity-feed>");
     });
 
     it("settings/config.html should show .com.html processes first", () => {
-      const htmlContent = readFileSync(join(outDir, "settings/config.html"), "utf-8");
-      
+      const htmlContent = readFileSync(
+        join(outDir, "settings/config.html"),
+        "utf-8",
+      );
+
       // Should use HTML component (processed first, so .com.ts doesn't find the component)
       expect(htmlContent).toContain("This is the HTML component");
-      expect(htmlContent).toContain("If you see this, the .com.ts version was NOT used");
+      expect(htmlContent).toContain(
+        "If you see this, the .com.ts version was NOT used",
+      );
       expect(htmlContent).not.toContain("TypeScript Component Wins!");
       expect(htmlContent).not.toContain(".com.ts has priority over .com.html");
-      
+
       // Should have feature-card from root .com.ts (no .com.html conflict)
       expect(htmlContent).toContain("Settings Feature");
-      
+
       // Should not have custom elements
       expect(htmlContent).not.toContain("<priority-test>");
       expect(htmlContent).not.toContain("<feature-card>");
@@ -417,28 +457,28 @@ describe("Examples Build Tests", () => {
 
     it("index.html should demonstrate component iteration", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
-      
+
       // Should have processed status badges with emojis (iteration 3)
       expect(htmlContent).toContain("🟢"); // online status
       expect(htmlContent).toContain("🟡"); // recent status
-      
+
       // Should have engagement labels from .com.ts logic (iteration 3)
       expect(htmlContent).toContain("🔥 Active");
       expect(htmlContent).toContain("📊 Moderate");
-      
+
       // Should have processed note-box from .com.html (iteration 3)
       expect(htmlContent).toContain("📝 Note Container");
-      
+
       // Should have user names from card-list.com.ts data (iteration 1)
       expect(htmlContent).toContain("Alice Johnson");
       expect(htmlContent).toContain("Bob Smith");
       expect(htmlContent).toContain("Carol White");
-      
+
       // Should have role labels formatted by user-card.com.ts (iteration 2)
       expect(htmlContent).toContain("👑 Admin");
       expect(htmlContent).toContain("🛡️ Moderator");
       expect(htmlContent).toContain("👤 User");
-      
+
       // Should not have unprocessed custom elements
       expect(htmlContent).not.toContain("<card-list>");
       expect(htmlContent).not.toContain("<user-card>");
@@ -449,10 +489,11 @@ describe("Examples Build Tests", () => {
 
     it("should show iteration markers from components", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
-      
+
       // Iteration 2 marker from user-card.com.ts
-      expect(htmlContent).toContain("Iteration 2: user-card.com.ts passes data to nested components");
+      expect(htmlContent).toContain(
+        "Iteration 2: user-card.com.ts passes data to nested components",
+      );
     });
   });
-
 });

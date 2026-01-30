@@ -34,6 +34,7 @@ tk build           # Build to web/
 ## Examples
 
 **HTML Component:**
+
 ```html
 <!-- counter-card.com.html -->
 <section>
@@ -44,22 +45,24 @@ tk build           # Build to web/
 ```
 
 **TypeScript Component:**
+
 ```typescript
 // user-badge.com.ts
-const count = com.getAttribute('count') || '3';
+const count = com.getAttribute("count") || "3";
 const items = [];
 for (let i = 1; i <= parseInt(count); i++) {
   items.push(`<li>Item ${i}</li>`);
 }
-com.innerHTML = `<ul>${items.join('')}</ul>`;
+com.innerHTML = `<ul>${items.join("")}</ul>`;
 ```
 
 **Pre-rendering:**
+
 ```typescript
 // index.pre.ts
-const response = await fetch('https://api.quotable.io/random');
+const response = await fetch("https://api.quotable.io/random");
 const data = await response.json();
-document.getElementById('quote').textContent = data.content;
+document.getElementById("quote").textContent = data.content;
 ```
 
 ## Documentation
@@ -90,11 +93,13 @@ See [CLI Reference](./docs/cli-reference.md) for all options.
 Tkeron includes a Model Context Protocol server for AI agents.
 
 **Setup:**
+
 ```bash
 bun install -g tkeron
 ```
 
 **Configure in VS Code** (`~/.config/Code/User/mcp.json`):
+
 ```json
 {
   "servers": {
@@ -117,6 +122,7 @@ See [MCP Documentation](./docs/mcp-server.md) for details.
 ## Examples
 
 Check the [`examples/`](./examples/) directory for working projects:
+
 - `init_sample/` - Template with all features
 - `with_pre/` - Pre-rendering examples
 - `with_com_html_priority/` - Component resolution

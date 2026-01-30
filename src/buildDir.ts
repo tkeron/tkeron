@@ -5,31 +5,42 @@ import type { Logger } from "./logger";
 import { silentLogger } from "./logger";
 
 export interface BuildDirOptions {
-    logger?: Logger;
+  logger?: Logger;
 }
 
-export const buildDir = async (sourceDir: string, targetDir: string, options: BuildDirOptions = {}) => {
-    const log = options.logger || silentLogger;
-    
-    if (!sourceDir || typeof sourceDir !== 'string' || !targetDir || typeof targetDir !== 'string') {
-        log.error(`\n❌ Error: Invalid sourceDir or targetDir provided for buildDir.`);
-        return;
-    }
+export const buildDir = async (
+  sourceDir: string,
+  targetDir: string,
+  options: BuildDirOptions = {},
+) => {
+  const log = options.logger || silentLogger;
 
-    const htmlFiles = (await getPaths(sourceDir, "**/*.html", "no", true)).filter(
-        (p) => !p.endsWith(".com.html")
+  if (
+    !sourceDir ||
+    typeof sourceDir !== "string" ||
+    !targetDir ||
+    typeof targetDir !== "string"
+  ) {
+    log.error(
+      `\n❌ Error: Invalid sourceDir or targetDir provided for buildDir.`,
     );
+    return;
+  }
 
-    const files = await buildEntrypoints(htmlFiles, sourceDir, { logger: log });
+  const htmlFiles = (await getPaths(sourceDir, "**/*.html", "no", true)).filter(
+    (p) => !p.endsWith(".com.html"),
+  );
 
-    for (const a of files?.artifacts || []) {
-        const outPath = join(targetDir, a.pathR);
-        if (a.pathR.toLowerCase().endsWith(".html")) {
-            const html = await a.artifact.text();
-            const normalized = html.replace(/<!doctype html>/i, "<!doctype html>");
-            await Bun.write(outPath, normalized, { createPath: true });
-        } else {
-            await Bun.write(outPath, a.artifact, { createPath: true });
-        }
+  const files = await buildEntrypoints(htmlFiles, sourceDir, { logger: log });
+
+  for (const a of files?.artifacts || []) {
+    const outPath = join(targetDir, a.pathR);
+    if (a.pathR.toLowerCase().endsWith(".html")) {
+      const html = await a.artifact.text();
+      const normalized = html.replace(/<!doctype html>/i, "<!doctype html>");
+      await Bun.write(outPath, normalized, { createPath: true });
+    } else {
+      await Bun.write(outPath, a.artifact, { createPath: true });
     }
+  }
 };

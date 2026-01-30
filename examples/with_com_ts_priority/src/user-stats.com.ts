@@ -1,7 +1,7 @@
 const stats = {
   total: 1000,
   active: 750,
-  pending: 250
+  pending: 250,
 };
 
 com.innerHTML = `

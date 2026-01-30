@@ -23,9 +23,11 @@ const getDocsDir = () => {
       return docsPath;
     }
   }
-  
+
   // Fallback: resolve from the actual file location
-  const currentFile = import.meta.url ? fileURLToPath(import.meta.url) : __filename;
+  const currentFile = import.meta.url
+    ? fileURLToPath(import.meta.url)
+    : __filename;
   const currentDir = dirname(currentFile);
   return join(currentDir, "docs");
 };
@@ -40,8 +42,10 @@ const getExamplesDir = () => {
       return examplesPath;
     }
   }
-  
-  const currentFile = import.meta.url ? fileURLToPath(import.meta.url) : __filename;
+
+  const currentFile = import.meta.url
+    ? fileURLToPath(import.meta.url)
+    : __filename;
   const currentDir = dirname(currentFile);
   return join(currentDir, "examples");
 };
@@ -103,7 +107,7 @@ const server = new Server(
       resources: {},
       tools: {},
     },
-  }
+  },
 );
 
 server.setRequestHandler(ListResourcesRequestSchema, async () => {
@@ -126,12 +130,12 @@ server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
     }
 
     const filePath = join(DOCS_DIR, doc.file);
-    
+
     // Check if file exists before reading
     if (!existsSync(filePath)) {
       throw new Error(`Documentation file not found: ${doc.file}`);
     }
-    
+
     const content = readFileSync(filePath, "utf-8");
 
     return {
@@ -154,7 +158,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
     tools: [
       {
         name: "get_tkeron_docs",
-        description: "Get Tkeron documentation. Available topics: overview, getting-started, components-html, components-typescript, pre-rendering, cli-reference, best-practices",
+        description:
+          "Get Tkeron documentation. Available topics: overview, getting-started, components-html, components-typescript, pre-rendering, cli-reference, best-practices",
         inputSchema: {
           type: "object",
           properties: {
@@ -168,72 +173,78 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
                 "components-typescript",
                 "pre-rendering",
                 "cli-reference",
-                "best-practices"
-              ]
-            }
+                "best-practices",
+              ],
+            },
           },
-          required: ["topic"]
-        }
+          required: ["topic"],
+        },
       },
       {
         name: "list_examples",
-        description: "List all available Tkeron example projects with their descriptions",
+        description:
+          "List all available Tkeron example projects with their descriptions",
         inputSchema: {
           type: "object",
           properties: {},
-          required: []
-        }
+          required: [],
+        },
       },
       {
         name: "get_example",
-        description: "Get the source code and structure of a specific Tkeron example project",
+        description:
+          "Get the source code and structure of a specific Tkeron example project",
         inputSchema: {
           type: "object",
           properties: {
             example: {
               type: "string",
-              description: "Example name (e.g., 'basic_build', 'with_component_iteration')"
-            }
+              description:
+                "Example name (e.g., 'basic_build', 'with_component_iteration')",
+            },
           },
-          required: ["example"]
-        }
+          required: ["example"],
+        },
       },
       {
         name: "tkeron_init",
-        description: "Initialize a new Tkeron project with the standard structure (websrc/ directory with sample files)",
+        description:
+          "Initialize a new Tkeron project with the standard structure (websrc/ directory with sample files)",
         inputSchema: {
           type: "object",
           properties: {
             projectPath: {
               type: "string",
-              description: "Absolute path where the project will be created"
+              description: "Absolute path where the project will be created",
             },
             force: {
               type: "boolean",
               description: "Overwrite existing files if they exist",
-              default: false
-            }
+              default: false,
+            },
           },
-          required: ["projectPath"]
-        }
+          required: ["projectPath"],
+        },
       },
       {
         name: "tkeron_build",
-        description: "Build a Tkeron project (processes .pre.ts, .com.html, and .com.ts files)",
+        description:
+          "Build a Tkeron project (processes .pre.ts, .com.html, and .com.ts files)",
         inputSchema: {
           type: "object",
           properties: {
             sourceDir: {
               type: "string",
-              description: "Absolute path to source directory (default: websrc/)"
+              description:
+                "Absolute path to source directory (default: websrc/)",
             },
             targetDir: {
               type: "string",
-              description: "Absolute path to output directory (default: web/)"
-            }
+              description: "Absolute path to output directory (default: web/)",
+            },
           },
-          required: []
-        }
+          required: [],
+        },
       },
       {
         name: "tkeron_develop",
@@ -243,275 +254,286 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           properties: {
             sourceDir: {
               type: "string",
-              description: "Absolute path to source directory (default: websrc/)"
+              description:
+                "Absolute path to source directory (default: websrc/)",
             },
             outputDir: {
               type: "string",
-              description: "Absolute path to output directory (default: web/)"
+              description: "Absolute path to output directory (default: web/)",
             },
             port: {
               type: "number",
               description: "Port number for dev server (default: 3000)",
-              default: 3000
+              default: 3000,
             },
             host: {
               type: "string",
               description: "Host for dev server (default: localhost)",
-              default: "localhost"
-            }
+              default: "localhost",
+            },
           },
-          required: []
-        }
-      }
-    ]
+          required: [],
+        },
+      },
+    ],
   };
 });
 
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
-  
+
   if (name === "get_tkeron_docs") {
     const topic = (args as any).topic;
-    const doc = DOCS.find(d => d.uri === `tkeron://${topic}`);
-    
+    const doc = DOCS.find((d) => d.uri === `tkeron://${topic}`);
+
     if (!doc) {
       return {
         content: [
           {
             type: "text",
-            text: `Unknown topic: ${topic}`
-          }
-        ]
+            text: `Unknown topic: ${topic}`,
+          },
+        ],
       };
     }
-    
+
     const filePath = join(DOCS_DIR, doc.file);
     const content = readFileSync(filePath, "utf-8");
-    
+
     return {
       content: [
         {
           type: "text",
-          text: content
-        }
-      ]
+          text: content,
+        },
+      ],
     };
   }
-  
+
   if (name === "list_examples") {
     try {
-      const examples = readdirSync(EXAMPLES_DIR)
-        .filter(name => {
-          const examplePath = join(EXAMPLES_DIR, name);
-          // Accept both src/ and websrc/ directories (init_sample uses websrc/)
-          return statSync(examplePath).isDirectory() && 
-                 (existsSync(join(examplePath, "src")) || existsSync(join(examplePath, "websrc")));
-        });
-      
+      const examples = readdirSync(EXAMPLES_DIR).filter((name) => {
+        const examplePath = join(EXAMPLES_DIR, name);
+        // Accept both src/ and websrc/ directories (init_sample uses websrc/)
+        return (
+          statSync(examplePath).isDirectory() &&
+          (existsSync(join(examplePath, "src")) ||
+            existsSync(join(examplePath, "websrc")))
+        );
+      });
+
       const exampleDescriptions: { [key: string]: string } = {
-        "init_sample": "Complete starter template with all features (used by 'tk init')",
-        "basic_build": "Simple HTML + TypeScript bundling",
-        "with_assets": "HTML in multiple directories with asset references",
-        "with_pre": "Pre-rendering HTML at build time with .pre.ts files",
-        "with_com_html_priority": "Static HTML components (.com.html) with local override priority",
-        "with_com_ts_priority": "TypeScript components (.com.ts) with local override priority",
-        "with_com_mixed_priority": "Mixed .com.html and .com.ts showing processing order",
-        "with_component_iteration": "Component iteration: .com.ts with logic, .com.html for templates"
+        init_sample:
+          "Complete starter template with all features (used by 'tk init')",
+        basic_build: "Simple HTML + TypeScript bundling",
+        with_assets: "HTML in multiple directories with asset references",
+        with_pre: "Pre-rendering HTML at build time with .pre.ts files",
+        with_com_html_priority:
+          "Static HTML components (.com.html) with local override priority",
+        with_com_ts_priority:
+          "TypeScript components (.com.ts) with local override priority",
+        with_com_mixed_priority:
+          "Mixed .com.html and .com.ts showing processing order",
+        with_component_iteration:
+          "Component iteration: .com.ts with logic, .com.html for templates",
       };
-      
-      const exampleList = examples.map(name => ({
+
+      const exampleList = examples.map((name) => ({
         name,
         description: exampleDescriptions[name] || "No description available",
-        path: `examples/${name}`
+        path: `examples/${name}`,
       }));
-      
+
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(exampleList, null, 2)
-          }
-        ]
+            text: JSON.stringify(exampleList, null, 2),
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error listing examples: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error listing examples: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
-  
+
   if (name === "get_example") {
     const exampleName = (args as any).example;
     const examplePath = join(EXAMPLES_DIR, exampleName);
-    
+
     if (!existsSync(examplePath)) {
       return {
         content: [
           {
             type: "text",
-            text: `Example not found: ${exampleName}`
-          }
-        ]
+            text: `Example not found: ${exampleName}`,
+          },
+        ],
       };
     }
-    
+
     try {
       // init_sample uses websrc/, others use src/
       let srcPath = join(examplePath, "src");
       if (!existsSync(srcPath)) {
         srcPath = join(examplePath, "websrc");
       }
-      
+
       if (!existsSync(srcPath)) {
         return {
           content: [
             {
               type: "text",
-              text: `Example ${exampleName} does not have a src or websrc directory`
-            }
-          ]
+              text: `Example ${exampleName} does not have a src or websrc directory`,
+            },
+          ],
         };
       }
-      
+
       // Read all files in src directory recursively
-      const readDirRecursive = (dir: string, baseDir: string = dir): { [key: string]: string } => {
+      const readDirRecursive = (
+        dir: string,
+        baseDir: string = dir,
+      ): { [key: string]: string } => {
         const files: { [key: string]: string } = {};
         const items = readdirSync(dir);
-        
+
         for (const item of items) {
           const fullPath = join(dir, item);
           const relativePath = fullPath.substring(baseDir.length + 1);
-          
+
           if (statSync(fullPath).isDirectory()) {
             Object.assign(files, readDirRecursive(fullPath, baseDir));
           } else {
             files[relativePath] = readFileSync(fullPath, "utf-8");
           }
         }
-        
+
         return files;
       };
-      
+
       const sourceFiles = readDirRecursive(srcPath);
-      
+
       const result = {
         example: exampleName,
         path: `examples/${exampleName}`,
-        files: sourceFiles
+        files: sourceFiles,
       };
-      
+
       return {
         content: [
           {
             type: "text",
-            text: JSON.stringify(result, null, 2)
-          }
-        ]
+            text: JSON.stringify(result, null, 2),
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error reading example: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error reading example: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
-  
+
   if (name === "tkeron_init") {
     const projectPath = (args as any).projectPath;
     const force = (args as any).force || false;
-    
+
     try {
       await init({
         projectName: projectPath,
         force,
-        promptFn: async () => force // Auto-confirm if force is true
+        promptFn: async () => force, // Auto-confirm if force is true
       });
-      
+
       return {
         content: [
           {
             type: "text",
-            text: `✅ Tkeron project initialized at ${projectPath}`
-          }
-        ]
+            text: `✅ Tkeron project initialized at ${projectPath}`,
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error initializing project: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error initializing project: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
-  
+
   if (name === "tkeron_build") {
     const sourceDir = (args as any).sourceDir;
     const targetDir = (args as any).targetDir;
-    
+
     try {
       await build({ sourceDir, targetDir });
-      
+
       return {
         content: [
           {
             type: "text",
-            text: `✅ Build complete! Output: ${targetDir || 'web/'}`
-          }
-        ]
+            text: `✅ Build complete! Output: ${targetDir || "web/"}`,
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error building project: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error building project: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
-  
+
   if (name === "tkeron_develop") {
     const sourceDir = (args as any).sourceDir;
     const outputDir = (args as any).outputDir;
     const port = (args as any).port || 3000;
     const host = (args as any).host || "localhost";
-    
+
     try {
       const server = await develop({ sourceDir, outputDir, port, host });
-      
+
       return {
         content: [
           {
             type: "text",
-            text: `✅ Development server started at http://${server.host}:${server.port}\n\n⚠️ Note: Server is running in the background. Use the returned server object to stop it later.`
-          }
-        ]
+            text: `✅ Development server started at http://${server.host}:${server.port}\n\n⚠️ Note: Server is running in the background. Use the returned server object to stop it later.`,
+          },
+        ],
       };
     } catch (error) {
       return {
         content: [
           {
             type: "text",
-            text: `Error starting development server: ${error instanceof Error ? error.message : String(error)}`
-          }
-        ]
+            text: `Error starting development server: ${error instanceof Error ? error.message : String(error)}`,
+          },
+        ],
       };
     }
   }
-  
+
   throw new Error(`Unknown tool: ${name}`);
 });
 
@@ -520,10 +542,10 @@ async function main() {
     console.error(`[tkeron-mcp] Starting server...`);
     console.error(`[tkeron-mcp] Docs directory: ${DOCS_DIR}`);
     console.error(`[tkeron-mcp] Available resources: ${DOCS.length}`);
-    
+
     const transport = new StdioServerTransport();
     await server.connect(transport);
-    
+
     console.error(`[tkeron-mcp] Server started successfully`);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

@@ -1,5 +1,3 @@
+const noLinked = <HTMLImageElement>document.querySelector(".no-linked");
 
-
-const noLinked = <HTMLImageElement>document.querySelector('.no-linked');
-
-noLinked.setAttribute("src","./no-linked-profile.png");
+noLinked.setAttribute("src", "./no-linked-profile.png");

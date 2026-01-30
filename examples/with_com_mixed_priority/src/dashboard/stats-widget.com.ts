@@ -1,7 +1,7 @@
 const stats = {
   users: 1523,
   revenue: 45230,
-  growth: 23.5
+  growth: 23.5,
 };
 
 com.innerHTML = `

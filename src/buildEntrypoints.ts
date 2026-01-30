@@ -6,15 +6,19 @@ export interface BuildEntrypointsOptions {
   logger?: Logger;
 }
 
-export const buildEntrypoints = async (filePaths: string[], root: string, options: BuildEntrypointsOptions = {}) => {
+export const buildEntrypoints = async (
+  filePaths: string[],
+  root: string,
+  options: BuildEntrypointsOptions = {},
+) => {
   const log = options.logger || silentLogger;
-  
+
   if (!filePaths || !Array.isArray(filePaths) || filePaths.length === 0) {
     log.error(`\n❌ Error: No entrypoints provided for buildEntrypoints.`);
     return;
   }
 
-  if (!root || typeof root !== 'string') {
+  if (!root || typeof root !== "string") {
     log.error(`\n❌ Error: Invalid root provided for buildEntrypoints.`);
     return;
   }
@@ -55,7 +59,7 @@ export const buildEntrypoints = async (filePaths: string[], root: string, option
         sourcemap,
         artifact,
       };
-    })
+    }),
   );
 
   return { artifacts };

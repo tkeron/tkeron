@@ -3,6 +3,7 @@ import { watch } from "fs";
 import { build } from "./build";
 import type { Logger } from "./logger";
 import { logger as defaultLogger } from "./logger";
+import { setupSigintHandler } from "./setupSigintHandler";
 
 export interface TkeronDevOptions {
   outputDir?: string;
@@ -21,10 +22,10 @@ export interface DevelopServer {
 }
 
 export const develop = async (
-  options: TkeronDevOptions
+  options: TkeronDevOptions,
 ): Promise<DevelopServer> => {
-  if (!options || typeof options !== 'object') {
-    throw new Error('Invalid options provided for develop');
+  if (!options || typeof options !== "object") {
+    throw new Error("Invalid options provided for develop");
   }
 
   const {
@@ -46,8 +47,12 @@ export const develop = async (
   } catch (error: any) {
     if (error.code === "ENOENT") {
       const actualSourceDir = sourceDir || "websrc";
-      log.error(`\n❌ Error: Source directory "${actualSourceDir}" does not exist.`);
-      log.error(`\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`);
+      log.error(
+        `\n❌ Error: Source directory "${actualSourceDir}" does not exist.`,
+      );
+      log.error(
+        `\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`,
+      );
       log.error(`   Expected: ${source}\n`);
       process.exit(1);
     }
@@ -79,17 +84,18 @@ export const develop = async (
           headers: {
             "Content-Type": "text/event-stream",
             "Cache-Control": "no-cache",
-            "Connection": "keep-alive",
+            Connection: "keep-alive",
           },
         });
       }
 
-      let filePath = url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
-      
+      let filePath =
+        url.pathname === "/" ? "/index.html" : decodeURIComponent(url.pathname);
+
       if (filePath.endsWith("/")) {
         filePath = `${filePath}index.html`;
       }
-      
+
       let file = Bun.file(`${target}${filePath}`);
       let isHtml = filePath.endsWith(".html");
 
@@ -124,7 +130,7 @@ export const develop = async (
   }
   connect();
 })();
-</script></body>`
+</script></body>`,
           );
           return new Response(injectedHtml, {
             headers: { "Content-Type": "text/html" },
@@ -148,7 +154,7 @@ export const develop = async (
         log.log("🔨 Rebuilding...");
         await build({ sourceDir: source, targetDir: target, logger: log });
         log.log("✅ Build complete!");
-        
+
         reloadClients.forEach((controller) => {
           try {
             controller.enqueue("data: reload\n\n");
@@ -157,15 +163,15 @@ export const develop = async (
           }
         });
       }
-    }
+    },
   );
 
   const stop = async () => {
     log.log("\n👋 Shutting down server...");
     watcher.close();
     server.stop();
-    // Wait for connections to close
-    await new Promise(resolve => setTimeout(resolve, 100));
+
+    await new Promise((resolve) => setTimeout(resolve, 100));
   };
 
   setupSigintHandler(stop);
@@ -177,9 +183,4 @@ export const develop = async (
   };
 };
 
-export function setupSigintHandler(stopCallback: () => Promise<void>) {
-  process.on("SIGINT", async () => {
-    await stopCallback();
-    process.exit(0);
-  });
-}
+export { setupSigintHandler } from "./setupSigintHandler";

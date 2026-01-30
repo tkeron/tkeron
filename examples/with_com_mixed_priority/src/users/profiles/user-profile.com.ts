@@ -3,7 +3,7 @@ const user = {
   email: "jane@example.com",
   role: "Administrator",
   joined: "January 2024",
-  avatar: "👩‍💼"
+  avatar: "👩‍💼",
 };
 
 com.innerHTML = `

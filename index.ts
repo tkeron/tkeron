@@ -12,41 +12,33 @@ if (process.argv.length === 2) {
 }
 
 getCommands()
+  .addCommand("build")
+  .addAlias("b")
+  .addDescription("Build the project")
+  .addPositionedArgument("sourceDir")
+  .addPositionedArgument("targetDir")
+  .setCallback(build)
 
+  .commands()
 
-    .addCommand("build")
-    .addAlias("b")
-    .addDescription("Build the project")
-    .addPositionedArgument("sourceDir")
-    .addPositionedArgument("targetDir")
-    .setCallback(build)
+  .addCommand("develop")
+  .addAlias("dev")
+  .addAlias("d")
+  .addDescription("Start development server")
+  .addPositionedArgument("sourceDir")
+  .addPositionedArgument("targetDir")
+  .addPositionedArgument("port")
+  .addPositionedArgument("host")
+  .setCallback(develop)
 
+  .commands()
 
-    .commands()
+  .addCommand("init")
+  .addAlias("i")
+  .addDescription("Initialize a new tkeron project")
+  .addPositionedArgument("projectName")
+  .addOption("force")
+  .setCallback(initWrapper)
 
-
-    .addCommand("develop")
-    .addAlias("dev")
-    .addAlias("d")
-    .addDescription("Start development server")
-    .addPositionedArgument("sourceDir")
-    .addPositionedArgument("targetDir")
-    .addPositionedArgument("port")
-    .addPositionedArgument("host")
-    .setCallback(develop)
-
-
-    .commands()
-
-
-    .addCommand("init")
-    .addAlias("i")
-    .addDescription("Initialize a new tkeron project")
-    .addPositionedArgument("projectName")
-    .addOption("force")
-    .setCallback(initWrapper)
-
-
-    .commands().start();
-
-
+  .commands()
+  .start();

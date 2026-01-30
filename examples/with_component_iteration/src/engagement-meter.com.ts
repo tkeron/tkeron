@@ -1,23 +1,28 @@
 // ITERATION 3: This .com.ts processes <engagement-meter> and performs CALCULATIONS
 // Real TypeScript processing: percentage calculations, conditional rendering
 
-const engagement = parseInt(com.getAttribute('engagement') || '0');
+const engagement = parseInt(com.getAttribute("engagement") || "0");
 
 // TypeScript calculations and logic
 const percentage = Math.min(100, Math.max(0, engagement));
-const level = percentage >= 75 ? 'high' : percentage >= 40 ? 'medium' : 'low';
+const level = percentage >= 75 ? "high" : percentage >= 40 ? "medium" : "low";
 
 // Conditional color based on calculated level
 const colors = {
-  high: { bar: '#27ae60', bg: '#d5f4e6', text: '#27ae60' },
-  medium: { bar: '#f39c12', bg: '#fef5e7', text: '#f39c12' },
-  low: { bar: '#e74c3c', bg: '#fadbd8', text: '#e74c3c' }
+  high: { bar: "#27ae60", bg: "#d5f4e6", text: "#27ae60" },
+  medium: { bar: "#f39c12", bg: "#fef5e7", text: "#f39c12" },
+  low: { bar: "#e74c3c", bg: "#fadbd8", text: "#e74c3c" },
 };
 
 const color = colors[level];
 
 // TypeScript string manipulation and template generation
-const label = level === 'high' ? '🔥 Active' : level === 'medium' ? '📊 Moderate' : '💤 Low';
+const label =
+  level === "high"
+    ? "🔥 Active"
+    : level === "medium"
+      ? "📊 Moderate"
+      : "💤 Low";
 
 com.innerHTML = `
   <div style="margin: 0.5rem 0;">

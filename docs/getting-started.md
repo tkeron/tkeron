@@ -3,16 +3,19 @@
 ## Installation
 
 **Requires [Bun](https://bun.sh) runtime:**
+
 ```bash
 curl -fsSL https://bun.sh/install | bash
 ```
 
 **Install Tkeron:**
+
 ```bash
 bun install -g tkeron
 ```
 
 **Verify:**
+
 ```bash
 tk
 ```
@@ -65,6 +68,7 @@ tk build websrc web
 ```
 
 **Parameters:**
+
 - First argument: source directory (default: `websrc`)
 - Second argument: output directory (default: `web`)
 
@@ -96,6 +100,7 @@ tk dev
 ```
 
 This will:
+
 1. Build your project
 2. Start a server at `http://localhost:3000`
 3. Watch for file changes
@@ -108,6 +113,7 @@ tk dev websrc web 8080 0.0.0.0
 ```
 
 **Parameters:**
+
 - Source directory (default: `websrc`)
 - Output directory (default: `web`)
 - Port (default: `3000`)
@@ -143,15 +149,15 @@ Edit `websrc/index.html`:
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>My First Tkeron Site</title>
-</head>
-<body>
-  <h1>My Website</h1>
-  <greeting></greeting>
-  <greeting></greeting>
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>My First Tkeron Site</title>
+  </head>
+  <body>
+    <h1>My Website</h1>
+    <greeting></greeting>
+    <greeting></greeting>
+  </body>
 </html>
 ```
 
@@ -189,15 +195,15 @@ Open `web/index.html` in your browser. You'll see the greeting component inlined
 
 ### What Gets Processed?
 
-| File Type | Purpose | In Output? |
-|-----------|---------|------------|
-| `.html` | Regular HTML pages | ✅ Yes |
-| `.ts` / `.js` | Scripts for pages | ✅ Yes (compiled) |
-| `.com.html` | HTML components | ❌ No (inlined) |
-| `.com.ts` | TypeScript components | ❌ No (inlined) |
-| `.pre.ts` | Pre-rendering scripts | ❌ No (executed) |
-| `.css` | Stylesheets | ✅ Yes |
-| Images, fonts, etc. | Static assets | ✅ Yes |
+| File Type           | Purpose               | In Output?        |
+| ------------------- | --------------------- | ----------------- |
+| `.html`             | Regular HTML pages    | ✅ Yes            |
+| `.ts` / `.js`       | Scripts for pages     | ✅ Yes (compiled) |
+| `.com.html`         | HTML components       | ❌ No (inlined)   |
+| `.com.ts`           | TypeScript components | ❌ No (inlined)   |
+| `.pre.ts`           | Pre-rendering scripts | ❌ No (executed)  |
+| `.css`              | Stylesheets           | ✅ Yes            |
+| Images, fonts, etc. | Static assets         | ✅ Yes            |
 
 ## Common Commands
 

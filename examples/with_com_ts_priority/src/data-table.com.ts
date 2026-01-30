@@ -1,12 +1,15 @@
 const data = [
   { id: 1, name: "Item A", value: 100 },
   { id: 2, name: "Item B", value: 200 },
-  { id: 3, name: "Item C", value: 300 }
+  { id: 3, name: "Item C", value: 300 },
 ];
 
-const rows = data.map(item => 
-  `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.value}</td></tr>`
-).join('');
+const rows = data
+  .map(
+    (item) =>
+      `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.value}</td></tr>`,
+  )
+  .join("");
 
 com.innerHTML = `
   <div style="border: 2px solid #3498db; padding: 1rem; margin: 1rem 0;">

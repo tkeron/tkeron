@@ -1,1 +1,1 @@
-console.log('Component iteration example loaded!');
+console.log("Component iteration example loaded!");

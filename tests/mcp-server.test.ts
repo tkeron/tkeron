@@ -72,11 +72,11 @@ function readResource(uri: string) {
   }
 
   const filePath = join(docsDir, doc.file);
-  
+
   if (!existsSync(filePath)) {
     throw new Error(`Documentation file not found: ${doc.file}`);
   }
-  
+
   const content = readFileSync(filePath, "utf-8");
 
   return {
@@ -96,7 +96,8 @@ function listTools() {
     tools: [
       {
         name: "get_tkeron_docs",
-        description: "Get Tkeron documentation. Available topics: overview, getting-started, components-html, components-typescript, pre-rendering, cli-reference, best-practices",
+        description:
+          "Get Tkeron documentation. Available topics: overview, getting-started, components-html, components-typescript, pre-rendering, cli-reference, best-practices",
         inputSchema: {
           type: "object",
           properties: {
@@ -110,14 +111,14 @@ function listTools() {
                 "components-typescript",
                 "pre-rendering",
                 "cli-reference",
-                "best-practices"
-              ]
-            }
+                "best-practices",
+              ],
+            },
           },
-          required: ["topic"]
-        }
-      }
-    ]
+          required: ["topic"],
+        },
+      },
+    ],
   };
 }
 
@@ -127,29 +128,29 @@ function callTool(name: string, topic: string) {
     throw new Error(`Unknown tool: ${name}`);
   }
 
-  const doc = DOCS.find(d => d.uri === `tkeron://${topic}`);
-  
+  const doc = DOCS.find((d) => d.uri === `tkeron://${topic}`);
+
   if (!doc) {
     return {
       content: [
         {
           type: "text",
-          text: `Unknown topic: ${topic}`
-        }
-      ]
+          text: `Unknown topic: ${topic}`,
+        },
+      ],
     };
   }
-  
+
   const filePath = join(docsDir, doc.file);
   const content = readFileSync(filePath, "utf-8");
-  
+
   return {
     content: [
       {
         type: "text",
-        text: content
-      }
-    ]
+        text: content,
+      },
+    ],
   };
 }
 
@@ -175,15 +176,15 @@ describe("MCP Server - Resource Listing", () => {
 
   it("should have unique URIs", () => {
     const result = listResources();
-    const uris = result.resources.map(r => r.uri);
+    const uris = result.resources.map((r) => r.uri);
     const uniqueUris = new Set(uris);
     expect(uniqueUris.size).toBe(result.resources.length);
   });
 
   it("should match expected resource names", () => {
     const result = listResources();
-    const names = result.resources.map(r => r.name);
-    
+    const names = result.resources.map((r) => r.name);
+
     expect(names).toContain("Tkeron Overview");
     expect(names).toContain("Getting Started");
     expect(names).toContain("HTML Components");
@@ -207,7 +208,7 @@ describe("MCP Server - Resource Reading", () => {
   it("should read all documented resources successfully", () => {
     for (const doc of DOCS) {
       const result = readResource(doc.uri);
-      
+
       expect(result.contents[0]!.uri).toBe(doc.uri);
       expect(result.contents[0]!.text.length).toBeGreaterThan(100);
     }
@@ -222,14 +223,14 @@ describe("MCP Server - Resource Reading", () => {
   it("should return valid markdown content", () => {
     const result = readResource("tkeron://overview");
     const content = result.contents[0]!.text;
-    
+
     expect(content).toContain("#");
   });
 
   it("should read actual file content from disk", () => {
     const result = readResource("tkeron://getting-started");
     const content = result.contents[0]!.text;
-    
+
     // Verify it contains expected sections
     expect(content).toContain("Installation");
     expect(content).toContain("tk");
@@ -239,7 +240,7 @@ describe("MCP Server - Resource Reading", () => {
 describe("MCP Server - Tool Listing", () => {
   it("should return get_tkeron_docs tool", () => {
     const result = listTools();
-    
+
     expect(result.tools.length).toBe(1);
     expect(result.tools[0]!.name).toBe("get_tkeron_docs");
   });
@@ -247,7 +248,7 @@ describe("MCP Server - Tool Listing", () => {
   it("should have valid tool schema", () => {
     const result = listTools();
     const tool = result.tools[0]!;
-    
+
     expect(tool.description).toBeDefined();
     expect(tool.description.length).toBeGreaterThan(0);
     expect(tool.inputSchema).toBeDefined();
@@ -260,7 +261,7 @@ describe("MCP Server - Tool Listing", () => {
     const result = listTools();
     const tool = result.tools[0]!;
     const enumValues = tool.inputSchema.properties.topic.enum;
-    
+
     expect(enumValues).toContain("overview");
     expect(enumValues).toContain("getting-started");
     expect(enumValues).toContain("components-html");
@@ -275,7 +276,7 @@ describe("MCP Server - Tool Listing", () => {
 describe("MCP Server - Tool Execution", () => {
   it("should execute get_tkeron_docs tool successfully", () => {
     const result = callTool("get_tkeron_docs", "overview");
-    
+
     expect(result.content.length).toBe(1);
     expect(result.content[0]!.type).toBe("text");
     expect(result.content[0]!.text.length).toBeGreaterThan(100);
@@ -289,7 +290,7 @@ describe("MCP Server - Tool Execution", () => {
       "components-typescript",
       "pre-rendering",
       "cli-reference",
-      "best-practices"
+      "best-practices",
     ];
 
     for (const topic of topics) {
@@ -312,7 +313,7 @@ describe("MCP Server - Tool Execution", () => {
   it("should return actual file content via tool", () => {
     const result = callTool("get_tkeron_docs", "cli-reference");
     const content = result.content[0]!.text;
-    
+
     expect(content).toContain("tk build");
     expect(content).toContain("tk dev");
     expect(content).toContain("tk init");

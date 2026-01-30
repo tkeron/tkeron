@@ -1,55 +1,112 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Component Iteration Example</title>
-  <style>
-    body { font-family: system-ui; max-width: 800px; margin: 2rem auto; padding: 0 1rem; }
-    .example { border: 2px solid #ddd; padding: 1rem; margin: 1rem 0; border-radius: 8px; }
-    h1 { color: #333; }
-    code { background: #f5f5f5; padding: 0.2rem 0.4rem; border-radius: 4px; }
-  </style>
-</head>
-<body>
-  <h1>🔄 Component Iteration Example</h1>
-  
-  <p>This example demonstrates how Tkeron's build process iterates through components:</p>
-  
-  <div class="example">
-    <h2>Step 1: Dynamic Data Processing</h2>
-    <p>The <code>&lt;card-list&gt;</code> component is a <strong>.com.ts</strong> that:</p>
-    <ul>
-      <li>Processes user data with TypeScript logic</li>
-      <li>Calculates engagement scores and status</li>
-      <li>Generates <code>&lt;user-card&gt;</code> components with computed attributes</li>
-    </ul>
-    <card-list count="3"></card-list>
-    <note-box></note-box>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Component Iteration Example</title>
+    <style>
+      body {
+        font-family: system-ui;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      .example {
+        border: 2px solid #ddd;
+        padding: 1rem;
+        margin: 1rem 0;
+        border-radius: 8px;
+      }
+      h1 {
+        color: #333;
+      }
+      code {
+        background: #f5f5f5;
+        padding: 0.2rem 0.4rem;
+        border-radius: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔄 Component Iteration Example</h1>
 
-  <div class="example">
-    <h2>How It Works - Mixed .com.ts and .com.html</h2>
-    <ol>
-      <li><strong>Iteration 1 (.com.ts):</strong> <code>card-list.com.ts</code> performs calculations (engagement scores, time deltas) and generates <code>&lt;user-card&gt;</code> elements with data</li>
-      <li><strong>Iteration 2 (.com.ts):</strong> <code>user-card.com.ts</code> reads attributes, formats role labels, and inserts <code>&lt;status-badge&gt;</code> and <code>&lt;engagement-meter&gt;</code> with specific data</li>
-      <li><strong>Iteration 3 (.com.ts + .com.html):</strong> 
-        <ul>
-          <li><code>status-badge.com.ts</code> applies conditional logic for colors/icons based on status</li>
-          <li><code>engagement-meter.com.ts</code> calculates percentages and levels with TS logic</li>
-          <li><code>note-box.com.html</code> provides static HTML wrapper (no logic needed)</li>
-        </ul>
-      </li>
-      <li><strong>Iteration 4:</strong> No more components found, build completes!</li>
-    </ol>
-    <p><strong>Key differences:</strong></p>
-    <ul>
-      <li><strong>.com.ts</strong> = Dynamic processing, calculations, conditional logic, data transformation</li>
-      <li><strong>.com.html</strong> = Static templates when no logic is needed, just consistent markup</li>
-    </ul>
-    <p><strong>Note:</strong> Custom elements must have a hyphen (like <code>&lt;my-component&gt;</code>).</p>
-  </div>
+    <p>
+      This example demonstrates how Tkeron's build process iterates through
+      components:
+    </p>
 
-  <script type="module" src="./index.ts"></script>
-</body>
+    <div class="example">
+      <h2>Step 1: Dynamic Data Processing</h2>
+      <p>
+        The <code>&lt;card-list&gt;</code> component is a
+        <strong>.com.ts</strong> that:
+      </p>
+      <ul>
+        <li>Processes user data with TypeScript logic</li>
+        <li>Calculates engagement scores and status</li>
+        <li>
+          Generates <code>&lt;user-card&gt;</code> components with computed
+          attributes
+        </li>
+      </ul>
+      <card-list count="3"></card-list>
+      <note-box></note-box>
+    </div>
+
+    <div class="example">
+      <h2>How It Works - Mixed .com.ts and .com.html</h2>
+      <ol>
+        <li>
+          <strong>Iteration 1 (.com.ts):</strong>
+          <code>card-list.com.ts</code> performs calculations (engagement
+          scores, time deltas) and generates
+          <code>&lt;user-card&gt;</code> elements with data
+        </li>
+        <li>
+          <strong>Iteration 2 (.com.ts):</strong>
+          <code>user-card.com.ts</code> reads attributes, formats role labels,
+          and inserts <code>&lt;status-badge&gt;</code> and
+          <code>&lt;engagement-meter&gt;</code> with specific data
+        </li>
+        <li>
+          <strong>Iteration 3 (.com.ts + .com.html):</strong>
+          <ul>
+            <li>
+              <code>status-badge.com.ts</code> applies conditional logic for
+              colors/icons based on status
+            </li>
+            <li>
+              <code>engagement-meter.com.ts</code> calculates percentages and
+              levels with TS logic
+            </li>
+            <li>
+              <code>note-box.com.html</code> provides static HTML wrapper (no
+              logic needed)
+            </li>
+          </ul>
+        </li>
+        <li>
+          <strong>Iteration 4:</strong> No more components found, build
+          completes!
+        </li>
+      </ol>
+      <p><strong>Key differences:</strong></p>
+      <ul>
+        <li>
+          <strong>.com.ts</strong> = Dynamic processing, calculations,
+          conditional logic, data transformation
+        </li>
+        <li>
+          <strong>.com.html</strong> = Static templates when no logic is needed,
+          just consistent markup
+        </li>
+      </ul>
+      <p>
+        <strong>Note:</strong> Custom elements must have a hyphen (like
+        <code>&lt;my-component&gt;</code>).
+      </p>
+    </div>
+
+    <script type="module" src="./index.ts"></script>
+  </body>
 </html>

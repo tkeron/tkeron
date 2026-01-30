@@ -3,6 +3,7 @@
 ## What Tkeron Does
 
 **Build time:**
+
 - Runs `.pre.ts` - full DOM access, TypeScript, Bun APIs
 - Executes `.com.ts` - reads attributes, generates HTML
 - Inlines `.com.html` - static replacement
@@ -10,6 +11,7 @@
 - Copies assets
 
 **Runtime (browser):**
+
 - Your compiled JavaScript runs
 - Zero framework overhead
 - Use any browser APIs
@@ -36,27 +38,28 @@ Dynamic generation with attributes:
 
 ```typescript
 // user-badge.com.ts
-const count = com.getAttribute('count') || '3';
+const count = com.getAttribute("count") || "3";
 const items = [];
 for (let i = 1; i <= parseInt(count); i++) {
   items.push(`<li>Item ${i}</li>`);
 }
-com.innerHTML = `<ul>${items.join('')}</ul>`;
+com.innerHTML = `<ul>${items.join("")}</ul>`;
 ```
 
 Use for: Dynamic lists, conditional rendering, computed HTML.
 
 **Always validate and escape:**
+
 ```typescript
 function escapeHtml(str: string): string {
   return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
 
-const text = com.getAttribute('text') || '';
+const text = com.getAttribute("text") || "";
 com.innerHTML = `<p>${escapeHtml(text)}</p>`;
 ```
 
@@ -66,14 +69,15 @@ Build-time DOM manipulation:
 
 ```typescript
 // index.pre.ts
-const res = await fetch('https://api.quotable.io/random');
+const res = await fetch("https://api.quotable.io/random");
 const data = await res.json();
-document.getElementById('quote').textContent = data.content;
+document.getElementById("quote").textContent = data.content;
 ```
 
 Use for: API data fetching, SEO meta tags, build metadata.
 
 **Handle errors:**
+
 ```typescript
 const controller = new AbortController();
 setTimeout(() => controller.abort(), 5000);
@@ -114,20 +118,22 @@ Components run at build time. For runtime interactivity, use your `.ts` files:
 
 ```typescript
 // index.ts - runs in browser
-document.getElementById('btn').addEventListener('click', () => {
-  console.log('clicked');
+document.getElementById("btn").addEventListener("click", () => {
+  console.log("clicked");
 });
 ```
 
 ## Build vs Runtime
 
 **Build time (.pre.ts, .com.ts):**
+
 - Runs in Bun
 - Has `fetch()`, `Bun.file()`, Node APIs
 - Can import npm packages
 - No `window`, `localStorage`, etc.
 
 **Runtime (browser):**
+
 - Your compiled `.js` files
 - Standard browser environment
 - All browser APIs available
@@ -137,18 +143,21 @@ document.getElementById('btn').addEventListener('click', () => {
 Tkeron does NOT bundle npm packages for browser.
 
 **Build time:**
+
 ```typescript
 // .pre.ts - works
-import _ from 'lodash';
+import _ from "lodash";
 ```
 
 **Browser:**
+
 ```typescript
 // index.ts - won't work without bundler
-import _ from 'lodash';
+import _ from "lodash";
 ```
 
 **Solutions:**
+
 - Use CDN: `<script src="https://cdn.jsdelivr.net/npm/lodash"></script>`
 - Use a bundler alongside (Vite, esbuild)
 - Write vanilla JavaScript
@@ -164,11 +173,13 @@ tsc --noEmit && tk build
 ## Performance
 
 **Build time:**
+
 - Cache external data when possible
 - Use timeouts for API calls
 - Parallel requests with `Promise.all()`
 
 **Output size:**
+
 - Keep components lean
 - Use CSS classes, not inline styles
 - Share styles via external CSS files
@@ -184,6 +195,7 @@ tk build            # Build for production
 ## Common Patterns
 
 **Client-side counter:**
+
 ```html
 <!-- counter.com.html -->
 <button id="btn">Count: <span id="count">0</span></button>
@@ -192,25 +204,27 @@ tk build            # Build for production
 ```typescript
 // index.ts
 let count = 0;
-document.getElementById('btn').addEventListener('click', () => {
+document.getElementById("btn").addEventListener("click", () => {
   count++;
-  document.getElementById('count').textContent = count.toString();
+  document.getElementById("count").textContent = count.toString();
 });
 ```
 
 **Dynamic list component:**
+
 ```typescript
 // list.com.ts
-const items = com.getAttribute('items')?.split(',') || [];
-com.innerHTML = `<ul>${items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+const items = com.getAttribute("items")?.split(",") || [];
+com.innerHTML = `<ul>${items.map((i) => `<li>${i}</li>`).join("")}</ul>`;
 ```
 
 **Pre-render API data:**
+
 ```typescript
 // index.pre.ts
-const res = await fetch('https://api.github.com/users/tkeron');
+const res = await fetch("https://api.github.com/users/tkeron");
 const data = await res.json();
-document.getElementById('stars').textContent = data.public_repos;
+document.getElementById("stars").textContent = data.public_repos;
 ```
 
 ## Summary
@@ -223,30 +237,31 @@ document.getElementById('stars').textContent = data.public_repos;
 - No type checking (use `tsc --noEmit`)
 - Powered by Bun
   document.querySelectorAll('.my-button').forEach(btn => {
-    btn.addEventListener('click', handleClick);
+  btn.addEventListener('click', handleClick);
   });
-});
-```
+  });
+
+````
 
 ```typescript
 // ❌ Don't try to maintain state
 let count = 0; // This is meaningless
 com.innerHTML = `<button>Count: ${count}</button>`;
-```
+````
 
 **Solution:** Use client-side JavaScript for stateful UI.
 
 ```typescript
 // ❌ Don't access DOM outside 'com'
-const header = document.querySelector('header');
-com.innerHTML = header?.innerHTML || ''; // Won't work
+const header = document.querySelector("header");
+com.innerHTML = header?.innerHTML || ""; // Won't work
 ```
 
 **Solution:** Use pre-rendering for document-wide access.
 
 ```typescript
 // ❌ Don't use relative imports that won't resolve
-import { helper } from '../../../utils'; // May break
+import { helper } from "../../../utils"; // May break
 ```
 
 **Solution:** Use absolute paths or ensure the temp build directory preserves import paths.
@@ -261,10 +276,10 @@ import { helper } from '../../../utils'; // May break
 // ✅ Fetch data at build time
 async function fetchPosts() {
   try {
-    const res = await fetch('https://api.example.com/posts');
+    const res = await fetch("https://api.example.com/posts");
     return await res.json();
   } catch (error) {
-    console.error('Failed to fetch:', error);
+    console.error("Failed to fetch:", error);
     return [];
   }
 }
@@ -274,7 +289,7 @@ const posts = await fetchPosts();
 
 ```typescript
 // ✅ Inject build metadata
-const buildTime = document.getElementById('build-time');
+const buildTime = document.getElementById("build-time");
 if (buildTime) {
   buildTime.textContent = new Date().toISOString();
 }
@@ -282,23 +297,23 @@ if (buildTime) {
 
 ```typescript
 // ✅ Conditional content based on environment
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === "production";
 
 if (isProd) {
   // Add analytics
-  const script = document.createElement('script');
-  script.src = 'https://analytics.example.com/script.js';
+  const script = document.createElement("script");
+  script.src = "https://analytics.example.com/script.js";
   document.body?.appendChild(script);
 }
 ```
 
 ```typescript
 // ✅ Generate SEO meta tags
-const head = document.querySelector('head');
+const head = document.querySelector("head");
 if (head) {
-  const meta = document.createElement('meta');
-  meta.setAttribute('property', 'og:title');
-  meta.setAttribute('content', 'My Page Title');
+  const meta = document.createElement("meta");
+  meta.setAttribute("property", "og:title");
+  meta.setAttribute("content", "My Page Title");
   head.appendChild(meta);
 }
 ```
@@ -307,8 +322,8 @@ if (head) {
 
 ```typescript
 // ❌ Don't use browser APIs
-window.location.href = '/redirect'; // No 'window'
-localStorage.setItem('key', 'value'); // No localStorage
+window.location.href = "/redirect"; // No 'window'
+localStorage.setItem("key", "value"); // No localStorage
 navigator.userAgent; // No navigator
 ```
 
@@ -316,7 +331,7 @@ navigator.userAgent; // No navigator
 
 ```typescript
 // ❌ Don't try to read runtime user data
-const username = document.querySelector('#username-input')?.value;
+const username = document.querySelector("#username-input")?.value;
 // This is build-time, no user input exists yet
 ```
 
@@ -324,7 +339,7 @@ const username = document.querySelector('#username-input')?.value;
 
 ```typescript
 // ❌ Don't make blocking requests without timeout
-const data = await fetch('https://slow-api.com/data');
+const data = await fetch("https://slow-api.com/data");
 // If API is down, build hangs forever
 ```
 
@@ -335,8 +350,8 @@ const controller = new AbortController();
 const timeout = setTimeout(() => controller.abort(), 5000);
 
 try {
-  const data = await fetch('https://api.com/data', { 
-    signal: controller.signal 
+  const data = await fetch("https://api.com/data", {
+    signal: controller.signal,
   });
   return await data.json();
 } catch (error) {
@@ -390,6 +405,7 @@ websrc/
 ```
 
 **Benefits:**
+
 - Components are organized by purpose
 - Related files are grouped together
 - Easy to find and maintain
@@ -408,6 +424,7 @@ websrc/
 ```
 
 **Problems:**
+
 - No organization
 - Unclear purpose
 - Hard to maintain
@@ -429,6 +446,7 @@ social-share-button.com.ts → <social-share-button>
 ```
 
 **Rules:**
+
 - Lowercase with hyphens (kebab-case)
 - Descriptive and specific
 - Follows custom element naming (must have hyphen)
@@ -475,43 +493,46 @@ test123.html       → Meaningless
 
 ```typescript
 // ✅ Cache external data
-import { readFileSync, writeFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from "fs";
 
-const cacheFile = '/tmp/api-cache.json';
+const cacheFile = "/tmp/api-cache.json";
 const cacheMaxAge = 3600000; // 1 hour
 
 async function getCachedData() {
   if (existsSync(cacheFile)) {
-    const cache = JSON.parse(readFileSync(cacheFile, 'utf-8'));
+    const cache = JSON.parse(readFileSync(cacheFile, "utf-8"));
     if (Date.now() - cache.timestamp < cacheMaxAge) {
       return cache.data;
     }
   }
-  
-  const data = await fetch('https://api.example.com/data');
+
+  const data = await fetch("https://api.example.com/data");
   const json = await data.json();
-  
-  writeFileSync(cacheFile, JSON.stringify({
-    timestamp: Date.now(),
-    data: json
-  }));
-  
+
+  writeFileSync(
+    cacheFile,
+    JSON.stringify({
+      timestamp: Date.now(),
+      data: json,
+    }),
+  );
+
   return json;
 }
 ```
 
 ```typescript
 // ✅ Limit API calls
-const posts = await fetch('https://api.example.com/posts?limit=10');
+const posts = await fetch("https://api.example.com/posts?limit=10");
 // Don't fetch all 10,000 posts at build time
 ```
 
 ```typescript
 // ✅ Parallel processing when possible
 const [posts, authors, tags] = await Promise.all([
-  fetch('https://api.example.com/posts').then(r => r.json()),
-  fetch('https://api.example.com/authors').then(r => r.json()),
-  fetch('https://api.example.com/tags').then(r => r.json()),
+  fetch("https://api.example.com/posts").then((r) => r.json()),
+  fetch("https://api.example.com/authors").then((r) => r.json()),
+  fetch("https://api.example.com/tags").then((r) => r.json()),
 ]);
 ```
 
@@ -519,15 +540,15 @@ const [posts, authors, tags] = await Promise.all([
 
 ```typescript
 // ❌ Sequential API calls
-const posts = await fetch('/api/posts').then(r => r.json());
-const authors = await fetch('/api/authors').then(r => r.json());
-const tags = await fetch('/api/tags').then(r => r.json());
+const posts = await fetch("/api/posts").then((r) => r.json());
+const authors = await fetch("/api/authors").then((r) => r.json());
+const tags = await fetch("/api/tags").then((r) => r.json());
 // Use Promise.all instead
 ```
 
 ```typescript
 // ❌ Large data fetching
-const allUsers = await fetch('/api/users?limit=100000');
+const allUsers = await fetch("/api/users?limit=100000");
 // This makes builds slow and outputs huge HTML
 ```
 
@@ -547,7 +568,7 @@ com.innerHTML = `
 ```html
 <!-- ✅ Share styles via CSS -->
 <!-- Don't inline repeated styles in every component -->
-<link rel="stylesheet" href="/styles/components.css">
+<link rel="stylesheet" href="/styles/components.css" />
 ```
 
 **❌ DON'T:**
@@ -591,14 +612,14 @@ com.innerHTML = `<div class="card">${content}</div>`;
 // ✅ Escape HTML in user content
 function escapeHtml(unsafe: string): string {
   return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-const userComment = com.getAttribute('comment') || '';
+const userComment = com.getAttribute("comment") || "";
 com.innerHTML = `<p>${escapeHtml(userComment)}</p>`;
 ```
 
@@ -607,14 +628,14 @@ com.innerHTML = `<p>${escapeHtml(userComment)}</p>`;
 function isSafeUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    return ['http:', 'https:'].includes(parsed.protocol);
+    return ["http:", "https:"].includes(parsed.protocol);
   } catch {
     return false;
   }
 }
 
-const url = com.getAttribute('href') || '#';
-const safeUrl = isSafeUrl(url) ? url : '#';
+const url = com.getAttribute("href") || "#";
+const safeUrl = isSafeUrl(url) ? url : "#";
 com.innerHTML = `<a href="${safeUrl}">Link</a>`;
 ```
 
@@ -622,13 +643,13 @@ com.innerHTML = `<a href="${safeUrl}">Link</a>`;
 
 ```typescript
 // ❌ Raw user input
-const userInput = com.getAttribute('text') || '';
+const userInput = com.getAttribute("text") || "";
 com.innerHTML = userInput; // XSS vulnerability!
 ```
 
 ```typescript
 // ❌ Unvalidated URLs
-const url = com.getAttribute('href') || '';
+const url = com.getAttribute("href") || "";
 com.innerHTML = `<a href="${url}">Link</a>`;
 // Can be exploited: <my-link href="javascript:alert('xss')">
 ```
@@ -639,19 +660,19 @@ com.innerHTML = `<a href="${url}">Link</a>`;
 
 ```typescript
 // ✅ Validate and sanitize
-const count = parseInt(com.getAttribute('count') || '5');
+const count = parseInt(com.getAttribute("count") || "5");
 if (isNaN(count) || count < 0 || count > 100) {
-  throw new Error('Invalid count: must be 0-100');
+  throw new Error("Invalid count: must be 0-100");
 }
 ```
 
 ```typescript
 // ✅ Whitelist allowed values
-const validTypes = ['info', 'warning', 'error', 'success'];
-const type = com.getAttribute('type') || 'info';
+const validTypes = ["info", "warning", "error", "success"];
+const type = com.getAttribute("type") || "info";
 
 if (!validTypes.includes(type)) {
-  throw new Error(`Invalid type. Allowed: ${validTypes.join(', ')}`);
+  throw new Error(`Invalid type. Allowed: ${validTypes.join(", ")}`);
 }
 ```
 
@@ -665,7 +686,7 @@ if (!validTypes.includes(type)) {
 
 ```typescript
 // ✅ Fail fast with clear messages
-const required = com.getAttribute('data');
+const required = com.getAttribute("data");
 if (!required) {
   throw new Error('Attribute "data" is required for data-table component');
 }
@@ -674,11 +695,11 @@ if (!required) {
 ```typescript
 // ✅ Provide context
 try {
-  const data = JSON.parse(com.getAttribute('json') || '{}');
+  const data = JSON.parse(com.getAttribute("json") || "{}");
 } catch (error) {
   throw new Error(
     `Failed to parse JSON in component. ` +
-    `Attribute value: ${com.getAttribute('json')}`
+      `Attribute value: ${com.getAttribute("json")}`,
   );
 }
 ```
@@ -687,16 +708,16 @@ try {
 
 ```typescript
 // ❌ Silent failures
-const data = com.getAttribute('data');
+const data = com.getAttribute("data");
 if (!data) {
-  com.innerHTML = ''; // Component just disappears, unclear why
+  com.innerHTML = ""; // Component just disappears, unclear why
   return;
 }
 ```
 
 ```typescript
 // ❌ Generic errors
-throw new Error('Something went wrong'); // Not helpful
+throw new Error("Something went wrong"); // Not helpful
 ```
 
 ### Pre-rendering Errors
@@ -707,11 +728,11 @@ throw new Error('Something went wrong'); // Not helpful
 // ✅ Graceful degradation
 async function fetchData() {
   try {
-    const response = await fetch('https://api.example.com/data');
+    const response = await fetch("https://api.example.com/data");
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.warn('API fetch failed, using fallback:', error);
+    console.warn("API fetch failed, using fallback:", error);
     return { items: [] }; // Fallback data
   }
 }
@@ -726,7 +747,7 @@ try {
   const response = await fetch(url, { signal: controller.signal });
   return await response.json();
 } catch (error) {
-  console.error('Request timeout or failed');
+  console.error("Request timeout or failed");
   return fallbackData;
 }
 ```
@@ -782,6 +803,7 @@ test -f web/index.js || exit 1
 Components generate HTML at build time. For runtime interactivity, use your regular `.ts` files:
 
 **Static button component:**
+
 ```html
 <!-- button-counter.com.html -->
 <button class="counter-button" data-count="0">
@@ -790,13 +812,14 @@ Components generate HTML at build time. For runtime interactivity, use your regu
 ```
 
 **Add interactivity in browser:**
+
 ```typescript
 // index.ts - runs in browser
-document.querySelectorAll('.counter-button').forEach(btn => {
+document.querySelectorAll(".counter-button").forEach((btn) => {
   let count = 0;
-  btn.addEventListener('click', () => {
+  btn.addEventListener("click", () => {
     count++;
-    const span = btn.querySelector('.count');
+    const span = btn.querySelector(".count");
     if (span) span.textContent = count.toString();
   });
 });
@@ -820,7 +843,7 @@ page → layout → section → card → header → icon → svg (7 levels!)
 
 ```typescript
 // user-badge.com.ts
-const value = com.getAttribute('value') || '0';
+const value = com.getAttribute("value") || "0";
 const num = parseInt(value, 10);
 
 if (isNaN(num)) {
@@ -837,14 +860,14 @@ Always escape dynamic content to prevent XSS:
 ```typescript
 function escapeHtml(unsafe: string): string {
   return unsafe
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
-const text = com.getAttribute('text') || '';
+const text = com.getAttribute("text") || "";
 com.innerHTML = `<p>${escapeHtml(text)}</p>`;
 ```
 
@@ -890,6 +913,7 @@ rsync -avz web/ server:/var/www/html/
 ### Build-Time vs Runtime
 
 **Build time (.pre.ts, .com.ts):**
+
 - Runs in Bun runtime (not browser)
 - Full TypeScript support
 - Can use `fetch()`, `Bun.file()`, Node APIs
@@ -897,6 +921,7 @@ rsync -avz web/ server:/var/www/html/
 - Manipulate DOM with full access to `document`
 
 **Runtime (browser):**
+
 - Your compiled `.js` files run
 - Standard browser environment
 - Use any browser APIs, libraries, patterns
@@ -908,16 +933,17 @@ Tkeron **does NOT bundle** npm packages into browser code.
 
 ```typescript
 // .pre.ts or .com.ts - Build time
-import _ from 'lodash'; // ✅ Works - runs in Bun during build
+import _ from "lodash"; // ✅ Works - runs in Bun during build
 const result = _.chunk([1, 2, 3], 2);
 ```
 
 ```typescript
-// index.ts - Browser runtime  
-import _ from 'lodash'; // ❌ Won't work - not bundled
+// index.ts - Browser runtime
+import _ from "lodash"; // ❌ Won't work - not bundled
 ```
 
 **Solutions:**
+
 - Use CDN: `<script src="https://cdn.jsdelivr.net/npm/lodash"></script>`
 - Use a bundler alongside Tkeron (Vite, esbuild, etc.)
 - Write vanilla JavaScript (often simpler than you think)
@@ -998,7 +1024,7 @@ websrc/features/
 
 ```typescript
 // index.pre.ts
-const isProd = process.env.NODE_ENV === 'production';
+const isProd = process.env.NODE_ENV === "production";
 
 if (!isProd) {
   // Development-only code

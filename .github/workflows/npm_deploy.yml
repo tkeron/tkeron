@@ -1,7 +1,7 @@
 name: cli package
 on:
   push:
-    branches: 
+    branches:
       - master
 
 jobs:
@@ -32,4 +32,3 @@ jobs:
         run: npm publish --access public --tag beta
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-

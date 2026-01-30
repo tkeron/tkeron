@@ -33,6 +33,7 @@ tk
 ```
 
 **Output:**
+
 ```
 ╔════════════════════════╗
 ║       TKERON           ║
@@ -56,10 +57,10 @@ tk build [sourceDir] [targetDir]
 
 **Arguments:**
 
-| Argument | Type | Default | Description |
-|----------|------|---------|-------------|
+| Argument    | Type   | Default  | Description                                    |
+| ----------- | ------ | -------- | ---------------------------------------------- |
 | `sourceDir` | string | `websrc` | Source directory containing your project files |
-| `targetDir` | string | `web` | Output directory for built files |
+| `targetDir` | string | `web`    | Output directory for built files               |
 
 **Examples:**
 
@@ -89,11 +90,13 @@ tk build source output
 8. Cleans up temporary directory
 
 **Files Excluded from Output:**
+
 - `*.com.html` - HTML components (inlined)
 - `*.com.ts` - TypeScript components (inlined)
 - `*.pre.ts` - Pre-rendering scripts (executed)
 
 **Exit Codes:**
+
 - `0` - Success
 - `1` - Error (missing source directory, build failure, etc.)
 
@@ -122,12 +125,12 @@ tk develop [sourceDir] [outputDir] [port] [host]
 
 **Arguments:**
 
-| Argument | Type | Default | Description |
-|----------|------|---------|-------------|
-| `sourceDir` | string | `websrc` | Source directory to watch |
-| `outputDir` | string | `web` | Output directory for builds |
-| `port` | number | `3000` | Port for development server |
-| `host` | string | `localhost` | Host to bind server to |
+| Argument    | Type   | Default     | Description                 |
+| ----------- | ------ | ----------- | --------------------------- |
+| `sourceDir` | string | `websrc`    | Source directory to watch   |
+| `outputDir` | string | `web`       | Output directory for builds |
+| `port`      | number | `3000`      | Port for development server |
+| `host`      | string | `localhost` | Host to bind server to      |
 
 **Examples:**
 
@@ -170,12 +173,12 @@ tk develop source output 8080 0.0.0.0
 
 Access HTML pages without the `.html` extension:
 
-| URL | Serves |
-|-----|--------|
-| `/about` | `about.html` |
-| `/services` | `services.html` |
-| `/docs/api/guide` | `docs/api/guide.html` |
-| `/blog/` | `blog/index.html` |
+| URL                    | Serves                              |
+| ---------------------- | ----------------------------------- |
+| `/about`               | `about.html`                        |
+| `/services`            | `services.html`                     |
+| `/docs/api/guide`      | `docs/api/guide.html`               |
+| `/blog/`               | `blog/index.html`                   |
 | `/products?sort=price` | `products.html` (with query string) |
 
 > Note: Paths containing a dot (e.g., `/file.json`) are treated as file requests and won't have `.html` appended.
@@ -189,17 +192,17 @@ The server adds a `/dev-reload` endpoint that uses Server-Sent Events (SSE) to p
 All HTML files automatically get this script before `</body>`:
 
 ```javascript
-(function() {
+(function () {
   let es;
   function connect() {
-    es = new EventSource('/dev-reload');
-    es.onmessage = function(e) {
-      if (e.data === 'reload') {
-        console.log('🔄 Reloading page...');
+    es = new EventSource("/dev-reload");
+    es.onmessage = function (e) {
+      if (e.data === "reload") {
+        console.log("🔄 Reloading page...");
         location.reload();
       }
     };
-    es.onerror = function() {
+    es.onerror = function () {
       es.close();
       setTimeout(connect, 1000);
     };
@@ -243,14 +246,14 @@ tk init <projectName> [--force]
 
 **Arguments:**
 
-| Argument | Type | Required | Description |
-|----------|------|----------|-------------|
-| `projectName` | string | Yes | Name of project directory, or `.` for current directory |
+| Argument      | Type   | Required | Description                                             |
+| ------------- | ------ | -------- | ------------------------------------------------------- |
+| `projectName` | string | Yes      | Name of project directory, or `.` for current directory |
 
 **Options:**
 
-| Option | Description |
-|--------|-------------|
+| Option    | Description                                |
+| --------- | ------------------------------------------ |
 | `--force` | Overwrite existing files without prompting |
 
 **Examples:**
@@ -342,11 +345,11 @@ Error: Template directory not found
 
 Quick reference for command shortcuts:
 
-| Full Command | Aliases | Description |
-|--------------|---------|-------------|
-| `tk build` | `tk b` | Build project |
-| `tk develop` | `tk dev`, `tk d` | Start dev server |
-| `tk init` | `tk i` | Initialize project |
+| Full Command | Aliases          | Description        |
+| ------------ | ---------------- | ------------------ |
+| `tk build`   | `tk b`           | Build project      |
+| `tk develop` | `tk dev`, `tk d` | Start dev server   |
+| `tk init`    | `tk i`           | Initialize project |
 
 **Examples:**
 
@@ -363,17 +366,17 @@ tk i my-site            # Same as: tk init my-site
 
 ### Built-in Variables
 
-| Variable | Description | Set By |
-|----------|-------------|--------|
+| Variable         | Description            | Set By |
+| ---------------- | ---------------------- | ------ |
 | `TKERON_VERSION` | Current Tkeron version | Tkeron |
-| `NODE_ENV` | Environment mode | User |
+| `NODE_ENV`       | Environment mode       | User   |
 
 **Usage in Pre-rendering:**
 
 ```typescript
 // index.pre.ts
-console.log('Tkeron:', process.env.TKERON_VERSION);
-console.log('Environment:', process.env.NODE_ENV);
+console.log("Tkeron:", process.env.TKERON_VERSION);
+console.log("Environment:", process.env.NODE_ENV);
 ```
 
 **Setting Custom Variables:**
@@ -399,10 +402,10 @@ NODE_ENV=production API_URL=https://api.prod.com tk build
 
 ## Exit Codes
 
-| Code | Meaning |
-|------|---------|
-| `0` | Success |
-| `1` | Error (missing directory, build failure, invalid arguments, etc.) |
+| Code | Meaning                                                           |
+| ---- | ----------------------------------------------------------------- |
+| `0`  | Success                                                           |
+| `1`  | Error (missing directory, build failure, invalid arguments, etc.) |
 
 **Usage in Scripts:**
 
@@ -526,19 +529,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-      
+
       - name: Install Tkeron
         run: bun install -g tkeron
-      
+
       - name: Build
         run: tk build
         env:
           NODE_ENV: production
-      
+
       - name: Deploy
         run: |
           # Your deployment commands
@@ -641,6 +644,7 @@ tk
 ### Command Documentation
 
 This document! Also available at:
+
 - [GitHub Repository](https://github.com/tkeron/tkeron)
 - [Documentation Site](https://tkeron.dev/docs)
 
