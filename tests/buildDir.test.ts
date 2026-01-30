@@ -13,7 +13,6 @@ describe("buildDir", () => {
   it("should return early and log error when sourceDir is invalid", async () => {
     const { logger, errors } = createTestLogger();
 
-    // Test with empty string sourceDir
     await buildDir("", "/tmp/out", { logger });
     expect(
       errors.some((e) => e.includes("Invalid sourceDir or targetDir")),
@@ -23,7 +22,6 @@ describe("buildDir", () => {
   it("should return early and log error when targetDir is invalid", async () => {
     const { logger, errors } = createTestLogger();
 
-    // Test with empty string targetDir
     await buildDir("/tmp/src", "", { logger });
     expect(
       errors.some((e) => e.includes("Invalid sourceDir or targetDir")),

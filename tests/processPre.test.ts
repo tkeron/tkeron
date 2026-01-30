@@ -158,12 +158,10 @@ document.body.appendChild(h1);
   it("should return false and log error when tempDir is invalid", async () => {
     const { logger, errors } = createTestLogger();
 
-    // Test with empty string
     const result1 = await processPre("", { logger });
     expect(result1).toBe(false);
     expect(errors.some((e) => e.includes("Invalid tempDir"))).toBe(true);
 
-    // Test with null-ish value
     const result2 = await processPre(null as any, { logger });
     expect(result2).toBe(false);
   });

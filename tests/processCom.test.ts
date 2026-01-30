@@ -110,7 +110,6 @@ describe("processCom - Component substitution", () => {
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Should have 2 instances of the component content
         const matches = result.match(/<div class="comp">Content<\/div>/g);
         expect(matches).toBeTruthy();
         expect(matches?.length).toBe(2);
@@ -215,7 +214,6 @@ describe("processCom - Component substitution", () => {
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Component's own classes should be there, not the original element's
         expect(result).toContain('<div class="comp-class">Component</div>');
         expect(result).not.toContain("custom-class");
         expect(result).not.toContain("my-id");
@@ -286,7 +284,6 @@ describe("processCom - Component substitution", () => {
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Should remain unchanged
         expect(result).toContain("<unknown-component></unknown-component>");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
@@ -453,7 +450,6 @@ describe("processCom - Component substitution", () => {
           "utf-8",
         );
 
-        // Should use local component, not root
         expect(result).toContain("<div>Local component</div>");
         expect(result).not.toContain("<div>Root component</div>");
       } finally {
@@ -484,7 +480,6 @@ describe("processCom - Component substitution", () => {
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Should replace with empty content
         expect(result).not.toContain("<my-comp>");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
@@ -627,7 +622,6 @@ describe("processCom - Component substitution", () => {
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Verify all components were replaced
         for (const comp of components) {
           expect(result).toContain(
             `<div class="${comp}">Content ${comp}</div>`,
@@ -635,7 +629,6 @@ describe("processCom - Component substitution", () => {
           expect(result).not.toContain(`<${comp}>`);
         }
 
-        // Should complete in reasonable time (< 1 second for 50 components)
         expect(duration).toBeLessThan(1000);
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
@@ -761,7 +754,6 @@ describe("processCom - Component substitution", () => {
       try {
         mkdirSync(TEST_DIR, { recursive: true });
 
-        // Create deeply nested HTML
         let html = `<!DOCTYPE html><html><body>`;
         for (let i = 0; i < 52; i++) {
           html += `<nest-${i}>`;
@@ -773,7 +765,6 @@ describe("processCom - Component substitution", () => {
 
         writeFileSync(join(TEST_DIR, "index.html"), html);
 
-        // Create components that nest into each other
         for (let i = 0; i < 52; i++) {
           const next = i < 51 ? `<nest-${i + 1}></nest-${i + 1}>` : "End";
           writeFileSync(
@@ -880,7 +871,6 @@ describe("processCom - Component substitution", () => {
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Check head components
         expect(result).toContain(
           '<meta property="og:title" content="Page Title">',
         );
@@ -889,7 +879,6 @@ describe("processCom - Component substitution", () => {
         );
         expect(result).not.toContain("<social-meta>");
 
-        // Check body components
         expect(result).toContain("<header>");
         expect(result).toContain("<h1>Welcome</h1>");
         expect(result).toContain("<nav>Navigation</nav>");
@@ -904,12 +893,10 @@ describe("processCom - Component substitution", () => {
     it("should return false and log error when tempDir is invalid", async () => {
       const { logger, errors } = createTestLogger();
 
-      // Test with empty string
       const result1 = await processCom("", { logger });
       expect(result1).toBe(false);
       expect(errors.some((e) => e.includes("Invalid tempDir"))).toBe(true);
 
-      // Test with null-ish value
       const result2 = await processCom(null as any, { logger });
       expect(result2).toBe(false);
     });
