@@ -1,12 +1,8 @@
-import { describe, it, expect, spyOn } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { processCom } from "../src/processCom";
-import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
+import { rmSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
-import {
-  getTestResources,
-  createTestLogger,
-  silentLogger,
-} from "./test-helpers";
+import { getTestResources, createTestLogger } from "./test-helpers";
 
 describe("processCom - Component substitution", () => {
   describe("Basic .com.html substitution", () => {

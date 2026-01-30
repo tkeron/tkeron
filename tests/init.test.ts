@@ -825,8 +825,7 @@ describe("init", () => {
 
     try {
       // Mock import.meta.dir to point to a non-existent location
-      const originalInit = await import("../src/init");
-      const initModule = { ...originalInit };
+      await import("../src/init");
 
       // This test is tricky because import.meta.dir is read-only
       // The template directory check is an edge case (corrupted installation)

@@ -30,7 +30,6 @@ describe("Examples Build Tests", () => {
   }, 30000);
 
   describe("basic_build", () => {
-    const srcDir = join(EXAMPLES_DIR, "basic_build/src");
     const outDir = join(EXAMPLES_DIR, "basic_build/web");
 
     it("should generate index.html and index.js", () => {
@@ -66,7 +65,6 @@ describe("Examples Build Tests", () => {
   });
 
   describe("with_assets", () => {
-    const srcDir = join(EXAMPLES_DIR, "with_assets/src");
     const outDir = join(EXAMPLES_DIR, "with_assets/web");
 
     it("should generate main files", () => {
@@ -112,7 +110,6 @@ describe("Examples Build Tests", () => {
   });
 
   describe("with_pre", () => {
-    const srcDir = join(EXAMPLES_DIR, "with_pre/src");
     const outDir = join(EXAMPLES_DIR, "with_pre/web");
 
     it("should generate files from .pre.ts files", () => {
@@ -163,7 +160,6 @@ describe("Examples Build Tests", () => {
   });
 
   describe("with_com_html_priority", () => {
-    const srcDir = join(EXAMPLES_DIR, "with_com_html_priority/src");
     const outDir = join(EXAMPLES_DIR, "with_com_html_priority/web");
 
     it("should generate all HTML files", () => {
@@ -182,7 +178,6 @@ describe("Examples Build Tests", () => {
 
     it("index.html should use root components", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
-      const doc = parseHTML(htmlContent);
 
       // Should have root header
       expect(htmlContent).toContain("Root Header Component");
@@ -237,7 +232,6 @@ describe("Examples Build Tests", () => {
   });
 
   describe("with_com_ts_priority", () => {
-    const srcDir = join(EXAMPLES_DIR, "with_com_ts_priority/src");
     const outDir = join(EXAMPLES_DIR, "with_com_ts_priority/web");
 
     it("should generate all HTML files", () => {
@@ -322,7 +316,6 @@ describe("Examples Build Tests", () => {
   });
 
   describe("with_com_mixed_priority", () => {
-    const srcDir = join(EXAMPLES_DIR, "with_com_mixed_priority/src");
     const outDir = join(EXAMPLES_DIR, "with_com_mixed_priority/web");
 
     it("should generate all HTML files", () => {
@@ -439,7 +432,6 @@ describe("Examples Build Tests", () => {
   });
 
   describe("with_component_iteration", () => {
-    const srcDir = join(EXAMPLES_DIR, "with_component_iteration/src");
     const outDir = join(EXAMPLES_DIR, "with_component_iteration/web");
 
     it("should generate index.html and index.js", () => {

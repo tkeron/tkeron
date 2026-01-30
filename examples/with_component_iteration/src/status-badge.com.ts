@@ -16,7 +16,8 @@ const statusConfig = {
   away: { color: "#95a5a6", bg: "#ecf0f1", icon: "⚪", text: "Away" },
 };
 
-const config = statusConfig[status] || statusConfig.away;
+const config =
+  statusConfig[status as keyof typeof statusConfig] || statusConfig.away;
 
 // Calculate urgency level (this is TypeScript processing)
 const urgencyLevel =

@@ -1,7 +1,8 @@
 import { it, expect, spyOn } from "bun:test";
 import { mkdir, writeFile, rm } from "fs/promises";
 import { join } from "path";
-import { develop, DevelopServer } from "../src/develop";
+import { develop } from "../src/develop";
+import type { DevelopServer } from "../src/develop";
 import { getTestResources, silentLogger } from "./test-helpers";
 it("develop starts server and serves files", async () => {
   const { port, dir } = getTestResources(

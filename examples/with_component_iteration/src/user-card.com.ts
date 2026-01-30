@@ -14,7 +14,8 @@ const roleLabels = {
   user: "👤 User",
 };
 
-const roleDisplay = roleLabels[role] || roleLabels["user"];
+const roleDisplay =
+  roleLabels[role as keyof typeof roleLabels] || roleLabels["user"];
 
 com.innerHTML = `
   <div style="border: 2px solid #3498db; border-radius: 8px; padding: 1rem; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">

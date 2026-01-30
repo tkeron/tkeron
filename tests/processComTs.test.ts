@@ -1,12 +1,8 @@
 import { describe, it, expect } from "bun:test";
 import { processComTs } from "../src/processComTs";
-import { rmSync, existsSync, mkdirSync, writeFileSync, readFileSync } from "fs";
+import { rmSync, mkdirSync, writeFileSync, readFileSync } from "fs";
 import { join } from "path";
-import {
-  getTestResources,
-  silentLogger,
-  createTestLogger,
-} from "./test-helpers";
+import { getTestResources, createTestLogger } from "./test-helpers";
 
 describe("processComTs - TypeScript component substitution", () => {
   describe("Basic .com.ts substitution", () => {

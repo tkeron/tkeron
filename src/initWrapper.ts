@@ -30,8 +30,10 @@ export async function initWrapper(options: InitWrapperOptions) {
     process.exit(1);
   }
 
+  const projectName: string = options.projectName;
+
   try {
-    await init({ ...options, logger: log });
+    await init({ ...options, projectName, logger: log });
   } catch (error: any) {
     const msg = error.message;
 

@@ -13,6 +13,8 @@ function compareVersions(v1: string, v2: string): number {
     if (!match) throw new Error(`Invalid version format: ${version}`);
 
     const [, major, minor, patch, preRelease] = match;
+    if (!major || !minor || !patch)
+      throw new Error(`Invalid version format: ${version}`);
     return {
       major: parseInt(major),
       minor: parseInt(minor),
@@ -46,8 +48,10 @@ function compareVersions(v1: string, v2: string): number {
   const parsePreRelease = (pr: string) => {
     const match = pr.match(/^([a-z]+)\.?(\d+)?$/);
     if (!match) return { type: pr, num: 0 };
+    const type = match[1];
+    if (!type) return { type: pr, num: 0 };
     return {
-      type: match[1],
+      type,
       num: match[2] ? parseInt(match[2]) : 0,
     };
   };
@@ -77,6 +81,7 @@ async function checkVersions() {
       if (!version.includes("-")) return "latest";
 
       const preRelease = version.split("-")[1];
+      if (!preRelease) return "latest";
       if (preRelease.startsWith("alpha")) return "alpha";
       if (preRelease.startsWith("beta")) return "beta";
       if (preRelease.startsWith("rc")) return "rc";
@@ -130,8 +135,9 @@ async function checkVersions() {
       console.log("=".repeat(50));
       process.exit(1);
     }
-  } catch (error) {
-    console.error("❌ Error:", error.message);
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("❌ Error:", message);
     process.exit(1);
   }
 }

@@ -13,11 +13,7 @@ import {
   readdirSync,
 } from "fs";
 import { join } from "path";
-import {
-  getTestResources,
-  silentLogger,
-  createTestLogger,
-} from "./test-helpers";
+import { getTestResources, createTestLogger } from "./test-helpers";
 describe("build", () => {
   it("should build HTML with TypeScript and inject bundled script", async () => {
     const { dir } = getTestResources("build-html-with-typescript");
@@ -412,7 +408,8 @@ throw new Error("Intentional test error");
     try {
       mkdirSync(dir, { recursive: true });
       // Should not throw on empty directory
-      await cleanupOrphanedTempDirs(dir);
+      const { logger } = createTestLogger();
+      await cleanupOrphanedTempDirs(dir, logger);
       expect(existsSync(dir)).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -422,7 +419,8 @@ throw new Error("Intentional test error");
     const { dir } = getTestResources("cleanup-nonexistent-dir");
     const nonExistentDir = join(dir, "does-not-exist");
     // Should not throw on non-existent directory
-    await cleanupOrphanedTempDirs(nonExistentDir);
+    const { logger } = createTestLogger();
+    await cleanupOrphanedTempDirs(nonExistentDir, logger);
   });
   it("cleanupOrphanedTempDirs should only remove directories, not files", async () => {
     const { dir } = getTestResources("cleanup-only-dirs");
@@ -434,7 +432,8 @@ throw new Error("Intentional test error");
       // Create a directory with the temp prefix (should be deleted)
       const tempDir = join(dir, `${TEMP_DIR_PREFIX}some-dir`);
       mkdirSync(tempDir, { recursive: true });
-      await cleanupOrphanedTempDirs(dir);
+      const { logger } = createTestLogger();
+      await cleanupOrphanedTempDirs(dir, logger);
       // File should remain
       expect(existsSync(tempFile)).toBe(true);
       // Directory should be removed
@@ -684,7 +683,7 @@ throw new Error("Intentional test error");
     const { dir } = getTestResources("cleanup-warning-on-failure");
     const TEST_SRC = join(dir, "src");
     const TEST_OUT = join(dir, "web");
-    const { logger, warns } = createTestLogger();
+    const { logger } = createTestLogger();
     try {
       mkdirSync(TEST_SRC, { recursive: true });
       writeFileSync(

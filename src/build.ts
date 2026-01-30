@@ -1,9 +1,9 @@
-import { resolve, dirname, join, relative } from "path";
+import { resolve, dirname, join } from "path";
 import { buildDir } from "./buildDir";
 import { processPre } from "./processPre";
 import { processCom } from "./processCom";
 import { processComTs } from "./processComTs";
-import { rm, exists, mkdir, cp, readdir } from "fs/promises";
+import { rm, exists, mkdir, cp } from "fs/promises";
 import type { Logger } from "./logger";
 import { silentLogger } from "./logger";
 import {
