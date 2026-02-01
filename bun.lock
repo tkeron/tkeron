@@ -24,7 +24,7 @@
 
     "@tkeron/commands": ["@tkeron/commands@0.3.1", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-b7YpdpwVrq8dwnvztpFYCNhjYjiQhX5xix1XXL1Dvt2oHcWiZ3RnG/6yzH0woL3Vbc7shpRNfIexlxmtEkhnIQ=="],
 
-    "@tkeron/html-parser": ["@tkeron/html-parser@1.5.2", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-gfsuviqygRugYl3okOEq1JRPWgGGskxoQ3jNouy9n4EK79krJ/4NCQG04Q74ZqNYohioNqQt2rwNc7uSQjIKCg=="],
+    "@tkeron/html-parser": ["@tkeron/html-parser@1.5.3", "", { "peerDependencies": { "typescript": "^5.9.3" } }, "sha512-/JZBUB+Qv6WAETJgw9GqhZStIhDhYVAweqA57hxowENfSvJTE52OC9CCUmcusF6fMis5OxljjU0196VhtKnlug=="],
 
     "@tkeron/tools": ["@tkeron/tools@0.2.2", "", { "peerDependencies": { "typescript": "^5.7.3" } }, "sha512-DaS1bMiJnmrTJ1QBeYvI0CMDADPHArRj+bwI5FDp3ohgWrnXwK22vbDfqf4dyhqBUSGjdx5N7t/L2UZ8XLc1hg=="],
 
