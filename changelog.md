@@ -1,3 +1,36 @@
+# v4.0.0-beta.13
+
+## New Features
+
+### Testing API - getBuildResult()
+
+- **New**: `getBuildResult(sourcePath, options?)` function for testing tkeron projects programmatically
+- **Export**: Tkeron now exports a public API from `import { getBuildResult } from "tkeron"`
+- **Returns**: `Record<string, FileInfo>` with metadata for each output file:
+  - `dom` - Parsed DOM object (HTML files only) with full querySelector/getElementById support
+  - `getContentAsString()` - Lazy content getter (text files only)
+  - `fileName`, `filePath`, `path` - File path information
+  - `type` - MIME type (text/html, text/css, image/png, etc.)
+  - `size` - File size in bytes
+  - `fileHash` - SHA-256 hash of file content
+- **Usage**: Enables easy testing of tkeron projects:
+  ```typescript
+  import { getBuildResult } from "tkeron";
+  const result = await getBuildResult("./websrc");
+  const dom = result["index.html"].dom;
+  expect(dom.getElementById("my_component")).toBeDefined();
+  ```
+- **Cleanup**: Automatic temp directory cleanup (creates `.tktmp_buildresult-{uuid}` and removes after)
+- **Logger**: Optional `{ logger: Logger }` option for debugging build process
+
+### Package Exports
+
+- **New**: Added `main` and `exports` fields to package.json for programmatic usage
+- **New**: Created `src/index.ts` with public API exports
+- **Exported types**: `GetBuildResultOptions`, `FileInfo`, `BuildResult`, `Logger`
+
+---
+
 # v4.0.0-beta.12
 
 ## Improvements

@@ -3,6 +3,13 @@
   "version": "4.0.0-beta.12",
   "description": "CLI tool for backend-driven frontend development with TypeScript.",
   "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
   "bin": {
     "tkeron": "./index.ts",
     "tk": "./index.ts",

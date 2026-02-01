@@ -114,6 +114,32 @@ bun install -g tkeron
 
 See [MCP Documentation](./docs/mcp-server.md) for details.
 
+## Testing API
+
+Tkeron exports a testing helper to validate your built projects:
+
+```typescript
+import { getBuildResult } from "tkeron";
+import { expect, it } from "bun:test";
+
+it("should render my component", async () => {
+  const result = await getBuildResult("./websrc");
+  const dom = result["index.html"].dom;
+
+  const myComponent = dom.getElementById("my_component");
+  expect(myComponent.innerHTML).toBe("expected content");
+});
+```
+
+**Returns:** `Record<string, FileInfo>` with:
+
+- `dom` - Parsed DOM (HTML files only)
+- `getContentAsString()` - File content (text files only)
+- `fileName`, `filePath`, `path` - Path info
+- `type` - MIME type
+- `size` - File size in bytes
+- `fileHash` - SHA-256 hash
+
 ## Requirements
 
 - **[Bun](https://bun.sh)** runtime (Node.js not supported)
