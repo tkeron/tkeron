@@ -42,7 +42,7 @@ export const build = async (options: BuildOptions) => {
 
     await cp(source, tempDir, { recursive: true });
 
-    await processPre(tempDir, { logger: log });
+    await processPre(tempDir, { logger: log, projectRoot: sourceParent });
 
     const MAX_ITERATIONS = 10;
     for (let i = 0; i < MAX_ITERATIONS; i++) {

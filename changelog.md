@@ -1,3 +1,14 @@
+# v4.0.0-beta.14
+
+## Bug Fixes
+
+### Pre-rendering Module Resolution
+
+- **Fixed**: Module resolution in `.pre.ts` files now correctly resolves from project `node_modules` instead of temporary build directory
+- **Impact**: `.pre.ts` files can now properly import `@tkeron/html-parser` and other dependencies when using tkeron installed as a package
+- **Technical**: `processPre()` now receives `projectRoot` parameter and uses it as `cwd` when executing pre-render scripts
+- **Backward compatible**: Falls back to temp directory if `projectRoot` is not provided
+
 # v4.0.0-beta.13
 
 ## New Features

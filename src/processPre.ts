@@ -28,6 +28,7 @@ const DEFAULT_HTML = `<!DOCTYPE html>
 
 export interface ProcessPreOptions {
   logger?: Logger;
+  projectRoot?: string;
 }
 
 export const processPre = async (
@@ -72,7 +73,7 @@ export const processPre = async (
     await Bun.write(preFile, modifiedCode);
 
     const proc = Bun.spawn(["bun", "run", preFile], {
-      cwd: dirname(preFile),
+      cwd: options.projectRoot || dirname(preFile),
       stdout: "pipe",
       stderr: "pipe",
       env: {
