@@ -7,14 +7,6 @@ const packageJsonPath = join(import.meta.dir, "..", "package.json");
 const packageJson = await Bun.file(packageJsonPath).json();
 const TKERON_VERSION = packageJson.version;
 
-const HTML_PARSER_PATH = join(
-  import.meta.dir,
-  "..",
-  "node_modules",
-  "@tkeron",
-  "html-parser",
-);
-
 const DEFAULT_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -56,7 +48,7 @@ export const processPre = async (
       : DEFAULT_HTML;
 
     const modifiedCode = `
-        import { parseHTML } from "${HTML_PARSER_PATH}";
+        import { parseHTML } from "@tkeron/html-parser";
 
         const htmlPath = ${JSON.stringify(htmlFile)};
         const htmlContent = ${JSON.stringify(htmlContent)};

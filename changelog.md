@@ -1,3 +1,14 @@
+# v4.0.0-beta.15
+
+## Bug Fixes
+
+### Pre-rendering Module Resolution (Complete Fix)
+
+- **Fixed**: Changed `@tkeron/html-parser` import from absolute path to package import in `.pre.ts` files
+- **Root cause**: Previous version used `HTML_PARSER_PATH` pointing to `node_modules` inside tkeron installation, causing resolution failures
+- **Solution**: Use direct package import `@tkeron/html-parser` which resolves correctly with `projectRoot` as cwd
+- **Impact**: `.pre.ts` files now work correctly when tkeron is installed as a package from npm
+
 # v4.0.0-beta.14
 
 ## Bug Fixes
