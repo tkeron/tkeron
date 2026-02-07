@@ -901,4 +901,34 @@ describe("processCom - Component substitution", () => {
       expect(result2).toBe(false);
     });
   });
+
+  describe("Component naming validation", () => {
+    it("should error on .com.html component without hyphen in name", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-should-error-on-com-html-without-hyphen",
+      );
+      const { logger } = createTestLogger();
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <greeting></greeting>
+</body>
+</html>`;
+
+        const componentHtml = `<div>Hello</div>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "greeting.com.html"), componentHtml);
+
+        await expect(processCom(TEST_DIR, { logger })).rejects.toThrow(
+          "Component name 'greeting' must contain at least one hyphen",
+        );
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
 });

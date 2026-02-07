@@ -25,7 +25,7 @@ describe("processPre - Module Resolution", () => {
       await Bun.write(join(tempDir, "test.pre.ts"), preFileContent);
       await Bun.write(join(tempDir, "test.html"), "<html></html>");
 
-      const logger = createTestLogger();
+      const { logger, logs } = createTestLogger();
 
       const result = await processPre(tempDir, {
         logger,
@@ -34,7 +34,7 @@ describe("processPre - Module Resolution", () => {
 
       expect(result).toBe(true);
       expect(
-        logger.logs.some((log) => log.includes("Pre-rendering failed")),
+        logs.some((log) => log.includes("Pre-rendering failed")),
       ).toBe(false);
     } finally {
       await rm(testRoot, { recursive: true, force: true });
@@ -60,13 +60,13 @@ describe("processPre - Module Resolution", () => {
       await Bun.write(join(tempDir, "test.pre.ts"), preFileContent);
       await Bun.write(join(tempDir, "test.html"), "<html></html>");
 
-      const logger = createTestLogger();
+      const { logger, logs } = createTestLogger();
 
       const result = await processPre(tempDir, { logger });
 
       expect(result).toBe(true);
       expect(
-        logger.logs.some((log) => log.includes("Pre-rendering failed")),
+        logs.some((log) => log.includes("Pre-rendering failed")),
       ).toBe(false);
     } finally {
       await rm(testRoot, { recursive: true, force: true });

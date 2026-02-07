@@ -69,6 +69,14 @@ export const build = async (options: BuildOptions) => {
       log.error(`   Expected: ${source}\n`);
       process.exit(1);
     }
+
+    if (
+      error.message &&
+      error.message.includes("must contain at least one hyphen")
+    ) {
+      process.exit(1);
+    }
+
     throw error;
   } finally {
     try {

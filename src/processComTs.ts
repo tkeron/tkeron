@@ -82,171 +82,186 @@ async function processComponentsTs(
   for (const child of children) {
     const tagName = (child as any).tagName?.toLowerCase();
 
-    if (tagName && tagName.includes("-")) {
-      const localPath = join(currentDir, `${tagName}.com.ts`);
-      const rootPath = join(rootDir, `${tagName}.com.ts`);
-
-      let componentPath: string | null = null;
-
-      if (await Bun.file(localPath).exists()) {
-        componentPath = localPath;
-      } else if (await Bun.file(rootPath).exists()) {
-        componentPath = rootPath;
-      }
-
-      if (componentPath) {
-        hasChanges = true;
-
-        if (componentStack.includes(tagName)) {
-          const chain = [...componentStack, tagName].join(" -> ");
-          log.error(`\n❌ Error: Circular component dependency detected.`);
-          log.error(`\n💡 Component chain: ${chain}`);
+    if (tagName) {
+      if (!tagName.includes("-")) {
+        const localPath = join(currentDir, `${tagName}.com.ts`);
+        const rootPath = join(rootDir, `${tagName}.com.ts`);
+        if (
+          (await Bun.file(localPath).exists()) ||
+          (await Bun.file(rootPath).exists())
+        ) {
           log.error(
-            `\n   Components cannot include themselves directly or indirectly.`,
+            `\n❌ Error: Component name '${tagName}' must contain at least one hyphen.`,
           );
-          log.error(`   Check your .com.ts files for circular references.\n`);
-          throw new Error(`Circular dependency: ${chain}`);
+          log.error(`\n💡 Custom elements require hyphens to be valid HTML.`);
+          log.error(
+            `   Rename '${tagName}.com.ts' to 'tk-${tagName}.com.ts' or similar.`,
+          );
+          log.error(
+            `   File: ${(await Bun.file(localPath).exists()) ? localPath : rootPath}\n`,
+          );
+          throw new Error(
+            `Component name '${tagName}' must contain at least one hyphen`,
+          );
+        }
+      } else {
+        const localPath = join(currentDir, `${tagName}.com.ts`);
+        const rootPath = join(rootDir, `${tagName}.com.ts`);
+
+        let componentPath: string | null = null;
+
+        if (await Bun.file(localPath).exists()) {
+          componentPath = localPath;
+        } else if (await Bun.file(rootPath).exists()) {
+          componentPath = rootPath;
         }
 
-        const originalComponentCode = await Bun.file(componentPath).text();
+        if (componentPath) {
+          hasChanges = true;
 
-        const elementHTML = (child as any).outerHTML;
+          if (componentStack.includes(tagName)) {
+            const chain = [...componentStack, tagName].join(" -> ");
+            log.error(`\n❌ Error: Circular component dependency detected.`);
+            log.error(`\n💡 Component chain: ${chain}`);
+            log.error(
+              `\n   Components cannot include themselves directly or indirectly.`,
+            );
+            log.error(`   Check your .com.ts files for circular references.\n`);
+            throw new Error(`Circular dependency: ${chain}`);
+          }
 
-        log.info(`Processing component <${tagName}> from ${componentPath}`);
+          const originalComponentCode = await Bun.file(componentPath).text();
 
-        const tempDoc = parseHTML(
-          "<html><body>" + elementHTML + "</body></html>",
-        );
-        const com = tempDoc.querySelector(tagName);
+          const elementHTML = (child as any).outerHTML;
 
-        if (!com) {
-          log.error(
-            `\n❌ Error: Failed to create component element for <${tagName}>`,
+          log.info(`Processing component <${tagName}> from ${componentPath}`);
+
+          const tempDoc = parseHTML(
+            "<html><body>" + elementHTML + "</body></html>",
           );
-          throw new Error(`Failed to create component element for ${tagName}`);
-        }
+          const com = tempDoc.querySelector(tagName);
 
-        const hasImports = /^\s*import\s+/m.test(originalComponentCode);
-
-        try {
-          if (hasImports) {
-            const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-            const tempPath = componentPath.replace(
-              /\.com\.ts$/,
-              `.com.${uniqueSuffix}.ts`,
+          if (!com) {
+            log.error(
+              `\n❌ Error: Failed to create component element for <${tagName}>`,
             );
-
-            const importRegex = /^(\s*import\s+.*?(?:;|\n))/gm;
-            const imports: string[] = [];
-            let codeWithoutImports = originalComponentCode.replace(
-              importRegex,
-              (match) => {
-                imports.push(match);
-                return "";
-              },
+            throw new Error(
+              `Failed to create component element for ${tagName}`,
             );
+          }
 
-            const wrappedCode = `${imports.join("\n")}
+          const hasImports = /^\s*import\s+/m.test(originalComponentCode);
+
+          try {
+            if (hasImports) {
+              const uniqueSuffix = `${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+              const tempPath = componentPath.replace(
+                /\.com\.ts$/,
+                `.com.${uniqueSuffix}.ts`,
+              );
+
+              const importRegex = /^(\s*import\s+.*?(?:;|\n))/gm;
+              const imports: string[] = [];
+              let codeWithoutImports = originalComponentCode.replace(
+                importRegex,
+                (match) => {
+                  imports.push(match);
+                  return "";
+                },
+              );
+
+              const wrappedCode = `${imports.join("\n")}
 export const component = async function(com: any) {
 ${codeWithoutImports}
 }
 `;
-            await Bun.write(tempPath, wrappedCode);
+              await Bun.write(tempPath, wrappedCode);
 
-            try {
-              const module = await import(tempPath);
-              await module.component(com);
-            } finally {
               try {
-                const fs = await import("fs/promises");
-                await fs.unlink(tempPath);
-              } catch {}
+                const module = await import(tempPath);
+                await module.component(com);
+              } finally {
+                try {
+                  const fs = await import("fs/promises");
+                  await fs.unlink(tempPath);
+                } catch {}
+              }
+            } else {
+              const transpiler = new Bun.Transpiler({ loader: "ts" });
+              const jsCode = transpiler.transformSync(originalComponentCode);
+              const AsyncFunction = Object.getPrototypeOf(
+                async function () {},
+              ).constructor;
+              const executeComponent = new AsyncFunction("com", jsCode);
+              await executeComponent(com);
             }
-          } else {
-            const transpiler = new Bun.Transpiler({ loader: "ts" });
-            const jsCode = transpiler.transformSync(originalComponentCode);
-            const AsyncFunction = Object.getPrototypeOf(
-              async function () {},
-            ).constructor;
-            const executeComponent = new AsyncFunction("com", jsCode);
-            await executeComponent(com);
+          } catch (execError: any) {
+            log.error(`\n❌ Error executing component <${tagName}>:`);
+            log.error(`   ${execError.message}`);
+            throw execError;
           }
-        } catch (execError: any) {
-          log.error(`\n❌ Error executing component <${tagName}>:`);
-          log.error(`   ${execError.message}`);
-          throw execError;
-        }
 
-        const newInnerHTML = com.innerHTML;
+          const newInnerHTML = com.innerHTML;
 
-        const newContentDoc = parseHTML(`<div>${newInnerHTML}</div>`);
-        const div = newContentDoc.querySelector("div");
+          const newContentDoc = parseHTML(`<div>${newInnerHTML}</div>`);
+          const div = newContentDoc.querySelector("div");
 
-        if (!div) {
+          if (!div) {
+            const parent = (child as any).parentNode;
+            if (parent) {
+              parent.removeChild(child);
+            }
+            continue;
+          }
+
+          const nextCurrentDir = dirname(componentPath);
+          const nextStack = [...componentStack, tagName];
+
+          await processComponentsTs(
+            div,
+            nextCurrentDir,
+            rootDir,
+            nextStack,
+            depth + 1,
+            log,
+            options,
+          );
+
+          const nodesToInsert = Array.from((div as any).childNodes || []).map(
+            (node: any) => (node?.cloneNode ? node.cloneNode(true) : node),
+          );
+
           const parent = (child as any).parentNode;
+
           if (parent) {
-            parent.removeChild(child);
-          }
-          continue;
-        }
-
-        const nextCurrentDir = dirname(componentPath);
-        const nextStack = [...componentStack, tagName];
-
-        await processComponentsTs(
-          div,
-          nextCurrentDir,
-          rootDir,
-          nextStack,
-          depth + 1,
-          log,
-          options,
-        );
-
-        const nodesToInsert = Array.from((div as any).childNodes || []).map(
-          (node: any) => (node?.cloneNode ? node.cloneNode(true) : node),
-        );
-
-        const parent = (child as any).parentNode;
-
-        if (parent) {
-          if (nodesToInsert.length === 0) {
-            parent.removeChild(child);
-          } else if (nodesToInsert.length === 1) {
-            parent.replaceChild(nodesToInsert[0], child);
-          } else {
-            parent.replaceChild(nodesToInsert[0], child);
-            let refNode = nodesToInsert[0];
-            for (let i = 1; i < nodesToInsert.length; i++) {
-              parent.insertBefore(nodesToInsert[i], refNode.nextSibling);
-              refNode = nodesToInsert[i];
+            if (nodesToInsert.length === 0) {
+              parent.removeChild(child);
+            } else if (nodesToInsert.length === 1) {
+              parent.replaceChild(nodesToInsert[0], child);
+            } else {
+              parent.replaceChild(nodesToInsert[0], child);
+              let refNode = nodesToInsert[0];
+              for (let i = 1; i < nodesToInsert.length; i++) {
+                parent.insertBefore(nodesToInsert[i], refNode.nextSibling);
+                refNode = nodesToInsert[i];
+              }
             }
           }
         }
-      } else {
-        const childChanged = await processComponentsTs(
-          child,
-          currentDir,
-          rootDir,
-          componentStack,
-          depth + 1,
-          log,
-          options,
-        );
-        hasChanges = hasChanges || childChanged;
       }
-    } else {
-      const childChanged = await processComponentsTs(
-        child,
-        currentDir,
-        rootDir,
-        componentStack,
-        depth + 1,
-        log,
-        options,
-      );
-      hasChanges = hasChanges || childChanged;
     }
+
+    // Recursively process child elements
+    const childChanged = await processComponentsTs(
+      child,
+      currentDir,
+      rootDir,
+      componentStack,
+      depth,
+      log,
+      options,
+    );
+    hasChanges = hasChanges || childChanged;
   }
 
   return hasChanges;

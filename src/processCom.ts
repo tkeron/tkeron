@@ -80,103 +80,119 @@ async function processComponents(
   for (const child of children) {
     const tagName = (child as any).tagName?.toLowerCase();
 
-    if (tagName && tagName.includes("-")) {
-      const localPath = join(currentDir, `${tagName}.com.html`);
-      const rootPath = join(rootDir, `${tagName}.com.html`);
-
-      let componentPath: string | null = null;
-
-      if (await Bun.file(localPath).exists()) {
-        componentPath = localPath;
-      } else if (await Bun.file(rootPath).exists()) {
-        componentPath = rootPath;
-      }
-
-      if (componentPath) {
-        hasChanges = true;
-
-        if (componentStack.includes(tagName)) {
-          const chain = [...componentStack, tagName].join(" -> ");
-          log.error(`\n❌ Error: Circular component dependency detected.`);
-          log.error(`\n💡 Component chain: ${chain}`);
+    if (tagName) {
+      if (!tagName.includes("-")) {
+        const localPath = join(currentDir, `${tagName}.com.html`);
+        const rootPath = join(rootDir, `${tagName}.com.html`);
+        if (
+          (await Bun.file(localPath).exists()) ||
+          (await Bun.file(rootPath).exists())
+        ) {
           log.error(
-            `\n   Components cannot include themselves directly or indirectly.`,
+            `\n❌ Error: Component name '${tagName}' must contain at least one hyphen.`,
           );
-          log.error(`   Check your .com.html files for circular references.\n`);
-          throw new Error(`Circular dependency: ${chain}`);
+          log.error(`\n💡 Custom elements require hyphens to be valid HTML.`);
+          log.error(
+            `   Rename '${tagName}.com.html' to 'tk-${tagName}.com.html' or similar.`,
+          );
+          log.error(
+            `   File: ${(await Bun.file(localPath).exists()) ? localPath : rootPath}\n`,
+          );
+          throw new Error(
+            `Component name '${tagName}' must contain at least one hyphen`,
+          );
+        }
+      } else {
+        const localPath = join(currentDir, `${tagName}.com.html`);
+        const rootPath = join(rootDir, `${tagName}.com.html`);
+
+        let componentPath: string | null = null;
+
+        if (await Bun.file(localPath).exists()) {
+          componentPath = localPath;
+        } else if (await Bun.file(rootPath).exists()) {
+          componentPath = rootPath;
         }
 
-        const componentHtml = await Bun.file(componentPath).text();
+        if (componentPath) {
+          hasChanges = true;
 
-        const tempDoc = parseHTML(
-          `<html><body><div id="__tkeron_component_root__">${componentHtml}</div></body></html>`,
-        );
-        const body = tempDoc.querySelector("body");
-        const tempContainer =
-          body?.querySelector("#__tkeron_component_root__") ||
-          body?.firstElementChild;
+          if (componentStack.includes(tagName)) {
+            const chain = [...componentStack, tagName].join(" -> ");
+            log.error(`\n❌ Error: Circular component dependency detected.`);
+            log.error(`\n💡 Component chain: ${chain}`);
+            log.error(
+              `\n   Components cannot include themselves directly or indirectly.`,
+            );
+            log.error(
+              `   Check your .com.html files for circular references.\n`,
+            );
+            throw new Error(`Circular dependency: ${chain}`);
+          }
 
-        if (!tempContainer) continue;
+          const componentHtml = await Bun.file(componentPath).text();
 
-        const nodesToInsert = Array.from(
-          (tempContainer as any).childNodes || [],
-        ).map((node: any) => (node?.cloneNode ? node.cloneNode(true) : node));
+          const tempDoc = parseHTML(
+            `<html><body><div id="__tkeron_component_root__">${componentHtml}</div></body></html>`,
+          );
+          const body = tempDoc.querySelector("body");
+          const tempContainer =
+            body?.querySelector("#__tkeron_component_root__") ||
+            body?.firstElementChild;
 
-        const parent = (child as any).parentNode;
+          if (!tempContainer) continue;
 
-        if (parent) {
-          if (nodesToInsert.length === 0) {
-            parent.removeChild(child);
-          } else if (nodesToInsert.length === 1) {
-            parent.replaceChild(nodesToInsert[0], child);
-          } else {
-            parent.replaceChild(nodesToInsert[0], child);
-            let refNode = nodesToInsert[0];
-            for (let i = 1; i < nodesToInsert.length; i++) {
-              parent.insertBefore(nodesToInsert[i], refNode.nextSibling);
-              refNode = nodesToInsert[i];
+          const nodesToInsert = Array.from(
+            (tempContainer as any).childNodes || [],
+          ).map((node: any) => (node?.cloneNode ? node.cloneNode(true) : node));
+
+          const parent = (child as any).parentNode;
+
+          if (parent) {
+            if (nodesToInsert.length === 0) {
+              parent.removeChild(child);
+            } else if (nodesToInsert.length === 1) {
+              parent.replaceChild(nodesToInsert[0], child);
+            } else {
+              parent.replaceChild(nodesToInsert[0], child);
+              let refNode = nodesToInsert[0];
+              for (let i = 1; i < nodesToInsert.length; i++) {
+                parent.insertBefore(nodesToInsert[i], refNode.nextSibling);
+                refNode = nodesToInsert[i];
+              }
+            }
+          }
+
+          const nextCurrentDir = dirname(componentPath);
+          const nextStack = [...componentStack, tagName];
+
+          for (const node of nodesToInsert) {
+            if ((node as any).nodeType === 1) {
+              const nestedChanged = await processComponents(
+                node,
+                nextCurrentDir,
+                rootDir,
+                nextStack,
+                depth + 1,
+                log,
+              );
+              hasChanges = hasChanges || nestedChanged;
             }
           }
         }
-
-        const nextCurrentDir = dirname(componentPath);
-        const nextStack = [...componentStack, tagName];
-
-        for (const node of nodesToInsert) {
-          if ((node as any).nodeType === 1) {
-            const nestedChanged = await processComponents(
-              node,
-              nextCurrentDir,
-              rootDir,
-              nextStack,
-              depth + 1,
-              log,
-            );
-            hasChanges = hasChanges || nestedChanged;
-          }
-        }
-      } else {
-        const childChanged = await processComponents(
-          child,
-          currentDir,
-          rootDir,
-          componentStack,
-          depth + 1,
-          log,
-        );
-        hasChanges = hasChanges || childChanged;
       }
-    } else {
-      const childChanged = await processComponents(
-        child,
-        currentDir,
-        rootDir,
-        componentStack,
-        depth + 1,
-        log,
-      );
-      hasChanges = hasChanges || childChanged;
     }
+
+    // Recursively process child elements
+    const childChanged = await processComponents(
+      child,
+      currentDir,
+      rootDir,
+      componentStack,
+      depth,
+      log,
+    );
+    hasChanges = hasChanges || childChanged;
   }
 
   return hasChanges;

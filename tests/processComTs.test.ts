@@ -1488,4 +1488,34 @@ com.innerHTML = \`<meta name="\${name}" content="\${content}">\`;`;
       }
     });
   });
+
+  describe("Component naming validation", () => {
+    it("should error on .com.ts component without hyphen in name", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-should-error-on-com-ts-without-hyphen",
+      );
+      const { logger } = createTestLogger();
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <hello></hello>
+</body>
+</html>`;
+
+        const componentTs = `com.innerHTML = "<div>Hi</div>";`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "hello.com.ts"), componentTs);
+
+        await expect(processComTs(TEST_DIR, { logger })).rejects.toThrow(
+          "Component name 'hello' must contain at least one hyphen",
+        );
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
 });

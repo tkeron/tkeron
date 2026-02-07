@@ -1,3 +1,15 @@
+# v4.0.0-beta.16
+
+## Improvements
+
+### Component Naming Validation
+
+- **New**: Build now validates that component names contain at least one hyphen (custom element requirement)
+- **Error message**: Clear error with file path and rename suggestion when invalid names are detected
+- **Example**: `greeting.com.html` → shows error suggesting `tk-greeting.com.html`
+- **Applies to**: Both `.com.html` and `.com.ts` components
+- **Documentation**: Updated TypeScript components docs to clarify naming rules
+
 # v4.0.0-beta.15
 
 ## Bug Fixes

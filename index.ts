@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import { getCommands } from "@tkeron/commands";
-import { build } from "./src/build";
+import { buildWrapper } from "./src/buildWrapper";
 import { develop } from "./src/develop";
 import { initWrapper } from "./src/initWrapper";
 import { showBanner } from "./src/banner";
@@ -17,7 +17,7 @@ getCommands()
   .addDescription("Build the project")
   .addPositionedArgument("sourceDir")
   .addPositionedArgument("targetDir")
-  .setCallback(build)
+  .setCallback(buildWrapper)
 
   .commands()
 

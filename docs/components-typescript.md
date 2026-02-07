@@ -7,7 +7,7 @@ TypeScript components (`.com.ts` files) let you create dynamic, logic-driven com
 Create a `.com.ts` file:
 
 ```typescript
-// greeting.com.ts
+// user-greeting.com.ts
 const name = com.getAttribute("name") || "World";
 com.innerHTML = `<h1>Hello, ${name}!</h1>`;
 ```
@@ -15,9 +15,9 @@ com.innerHTML = `<h1>Hello, ${name}!</h1>`;
 Use it with attributes:
 
 ```html
-<greeting name="Alice"></greeting>
-<greeting name="Bob"></greeting>
-<greeting></greeting>
+<user-greeting name="Alice"></user-greeting>
+<user-greeting name="Bob"></user-greeting>
+<user-greeting></user-greeting>
 ```
 
 Build output:
@@ -57,6 +57,27 @@ Build Time:
 Browser sees only:
 <div class="card">John</div>
 ```
+
+### Component Naming
+
+Component filenames must:
+
+- End with `.com.ts`
+- Match the custom element name (without `.com.ts`)
+- **Use lowercase with hyphens** (custom element requirement)
+
+**Examples:**
+
+| Filename              | Custom Element  | Valid?                    |
+| --------------------- | --------------- | ------------------------- |
+| `user-card.com.ts`    | `<user-card>`   | ✅ Yes                    |
+| `nav-menu.com.ts`     | `<nav-menu>`    | ✅ Yes                    |
+| `greeting.com.ts`     | `<greeting>`    | ❌ No (no hyphen)         |
+| `UserCard.com.ts`     | `<user-card>`   | ✅ Yes (case-insensitive) |
+
+**Why hyphens are required:**
+
+Custom elements in HTML must contain at least one hyphen to distinguish them from standard HTML elements. This is a web standard requirement. Tkeron validates this at build time and shows a clear error message if a component name doesn't follow this rule.
 
 ### Component Resolution
 
