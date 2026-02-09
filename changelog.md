@@ -1,3 +1,48 @@
+# v4.0.0-beta.17
+
+## MCP Server Updates
+
+### API Migration
+
+- **Changed**: Migrated MCP server to new SDK API (`McpServer`, `registerResource`, `registerTool`)
+- **Removed**: Legacy API (`Server`, `setRequestHandler`)
+- **Benefit**: Better compatibility with MCP SDK 1.26.0, cleaner code structure
+
+### Tools Simplification
+
+- **Removed**: `tkeron_init`, `tkeron_build`, `tkeron_develop` tools
+- **Rationale**: MCP server now focuses on documentation and examples only
+- **Alternative**: AI agents should use terminal commands (`tk init`, `tk build`, `tk dev`) instead
+- **Kept**: `list_examples` and `get_example` tools (read-only)
+- **Annotations**: Added `readOnlyHint: true` to remaining tools
+
+### New Testing Documentation
+
+- **New**: `tkeron://testing` resource with comprehensive testing guide
+- **Location**: `docs/testing.md`
+- **Coverage**:
+  - How to use `getBuildResult()` for testing tkeron projects
+  - Proper test structure with `beforeAll()` for concurrent safety
+  - Testing patterns: file existence, DOM elements, bounded content, transformations
+  - Complete examples with best practices
+  - Rules summary (8 key rules)
+- **Purpose**: Help users write reliable tests for their tkeron projects
+
+### Documentation Updates
+
+- **Updated**: `docs/mcp-server.md` to reflect new tools approach
+- **Clarified**: AI agents can access examples but must use terminal for project operations
+- **Updated**: MCP server tests to include new `testing` resource
+
+### Tests
+
+- **New**: `examples/basic_build/basic_build.test.ts` - complete test suite demonstrating testing patterns
+- **Purpose**: Reference implementation for testing tkeron projects
+
+## Dependency Updates
+
+- **Updated**: `@modelcontextprotocol/sdk` from `^1.25.3` to `^1.26.0`
+
 # v4.0.0-beta.16
 
 ## Improvements

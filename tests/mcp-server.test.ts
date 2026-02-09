@@ -49,6 +49,13 @@ const DOCS = [
     description: "Patterns, anti-patterns, and limitations",
     file: "best-practices.md",
   },
+  {
+    uri: "tkeron://testing",
+    name: "Testing Tkeron Projects",
+    description:
+      "How to test tkeron projects using getBuildResult(), DOM assertions, and bounded content verification",
+    file: "testing.md",
+  },
 ];
 
 // Simulate ListResources handler logic
@@ -97,7 +104,7 @@ function listTools() {
       {
         name: "get_tkeron_docs",
         description:
-          "Get Tkeron documentation. Available topics: overview, getting-started, components-html, components-typescript, pre-rendering, cli-reference, best-practices",
+          "Get Tkeron documentation. Available topics: overview, getting-started, components-html, components-typescript, pre-rendering, cli-reference, best-practices, testing",
         inputSchema: {
           type: "object",
           properties: {
@@ -112,6 +119,7 @@ function listTools() {
                 "pre-rendering",
                 "cli-reference",
                 "best-practices",
+                "testing",
               ],
             },
           },
@@ -155,9 +163,9 @@ function callTool(name: string, topic: string) {
 }
 
 describe("MCP Server - Resource Listing", () => {
-  it("should return all 7 documentation resources", () => {
+  it("should return all 8 documentation resources", () => {
     const result = listResources();
-    expect(result.resources.length).toBe(7);
+    expect(result.resources.length).toBe(8);
   });
 
   it("should return resources with valid MCP structure", () => {
@@ -192,6 +200,7 @@ describe("MCP Server - Resource Listing", () => {
     expect(names).toContain("Pre-rendering");
     expect(names).toContain("CLI Reference");
     expect(names).toContain("Best Practices");
+    expect(names).toContain("Testing Tkeron Projects");
   });
 });
 
@@ -269,7 +278,8 @@ describe("MCP Server - Tool Listing", () => {
     expect(enumValues).toContain("pre-rendering");
     expect(enumValues).toContain("cli-reference");
     expect(enumValues).toContain("best-practices");
-    expect(enumValues.length).toBe(7);
+    expect(enumValues).toContain("testing");
+    expect(enumValues.length).toBe(8);
   });
 });
 
@@ -291,6 +301,7 @@ describe("MCP Server - Tool Execution", () => {
       "pre-rendering",
       "cli-reference",
       "best-practices",
+      "testing",
     ];
 
     for (const topic of topics) {

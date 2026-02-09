@@ -5,7 +5,7 @@
     "": {
       "name": "tkeron",
       "dependencies": {
-        "@modelcontextprotocol/sdk": "^1.25.3",
+        "@modelcontextprotocol/sdk": "^1.26.0",
         "@tkeron/commands": "0.3.1",
         "@tkeron/html-parser": "1.5.3",
         "@tkeron/tools": "^0.2.2",

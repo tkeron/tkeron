@@ -99,6 +99,7 @@ The MCP server exposes the following documentation resources:
 | `tkeron://pre-rendering`         | Transform HTML at build time with .pre.ts files      |
 | `tkeron://cli-reference`         | Complete command-line interface documentation        |
 | `tkeron://best-practices`        | Patterns, anti-patterns, and limitations             |
+| `tkeron://testing`               | How to test tkeron projects with getBuildResult()    |
 
 ## What AI Agents Can Do
 
@@ -111,25 +112,19 @@ With access to the MCP server, AI agents can:
 - ✅ Provide accurate CLI commands and options
 - ✅ Debug common issues with components and pre-rendering
 - ✅ Recommend best practices and avoid anti-patterns
-- ✅ **Initialize new Tkeron projects directly**
-- ✅ **Build and develop Tkeron projects**
 - ✅ **List and explore example projects**
 - ✅ **Retrieve example code and structures**
+- ✅ **Initialize, build, and develop projects via terminal** (`tk init`, `tk build`, `tk dev`)
 
 ## Available Tools
 
 The MCP server provides the following tools for AI agents:
 
-### Documentation Tool
-
-- **`get_tkeron_docs`**: Retrieve specific documentation topics
-  - Parameters: `topic` (overview, getting-started, components-html, etc.)
-  - Returns the full markdown content of the requested documentation
-
 ### Example Management Tools
 
 - **`list_examples`**: List all available Tkeron example projects
-  - Shows example names, descriptions, and features
+  - No parameters required
+  - Returns example names, descriptions, and paths
   - Helps users discover what's possible with Tkeron
 
 - **`get_example`**: Get the complete source code of an example
@@ -137,22 +132,7 @@ The MCP server provides the following tools for AI agents:
   - Returns file structure and all source code
   - Useful for learning patterns and bootstrapping projects
 
-### Project Management Tools
-
-- **`tkeron_init`**: Initialize a new Tkeron project
-  - Parameters: `projectPath` (absolute path), `force` (optional boolean)
-  - Creates the standard Tkeron structure (websrc/ with sample files)
-  - AI agents can create projects without user intervention
-
-- **`tkeron_build`**: Build a Tkeron project
-  - Parameters: `sourceDir`, `targetDir` (optional)
-  - Processes all `.pre.ts`, `.com.html`, and `.com.ts` files
-  - Generates production-ready output
-
-- **`tkeron_develop`**: Start the development server
-  - Parameters: `sourceDir`, `outputDir`, `port`, `host` (all optional)
-  - Launches hot-reload development server
-  - AI agents can test projects immediately after creation
+> **Note:** The MCP server only provides documentation and examples. It does NOT modify files. The AI agent should use terminal commands (`tk init`, `tk build`, `tk dev`) to manage projects.
 
 ## Benefits
 
