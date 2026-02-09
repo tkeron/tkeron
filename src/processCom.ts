@@ -60,14 +60,14 @@ export const processCom = async (
   return hasChanges;
 };
 
-async function processComponents(
+const processComponents = async (
   element: any,
   currentDir: string,
   rootDir: string,
   componentStack: string[],
   depth: number = 0,
   log: Logger = silentLogger,
-): Promise<boolean> {
+): Promise<boolean> => {
   let hasChanges = false;
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
@@ -183,7 +183,6 @@ async function processComponents(
       }
     }
 
-    // Recursively process child elements
     const childChanged = await processComponents(
       child,
       currentDir,
@@ -196,4 +195,4 @@ async function processComponents(
   }
 
   return hasChanges;
-}
+};

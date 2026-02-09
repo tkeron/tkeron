@@ -24,10 +24,10 @@ export const build = async (options: BuildOptions) => {
     return;
   }
 
-  const source = await resolve(options.sourceDir || "websrc");
+  const source = resolve(options.sourceDir || "websrc");
   const target = options.targetDir
-    ? await resolve(options.targetDir)
-    : await resolve(dirname(source), "web");
+    ? resolve(options.targetDir)
+    : resolve(dirname(source), "web");
 
   const sourceParent = dirname(source);
   const tempDir = join(
@@ -67,14 +67,6 @@ export const build = async (options: BuildOptions) => {
         `\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`,
       );
       log.error(`   Expected: ${source}\n`);
-      process.exit(1);
-    }
-
-    if (
-      error.message &&
-      error.message.includes("must contain at least one hyphen")
-    ) {
-      process.exit(1);
     }
 
     throw error;

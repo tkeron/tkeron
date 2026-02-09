@@ -57,7 +57,7 @@ export const init = async (options: InitOptions) => {
 
           if (!shouldContinue) {
             log.log("\n❌ Operation cancelled.");
-            process.exit(0);
+            return;
           }
         }
 

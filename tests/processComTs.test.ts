@@ -325,7 +325,6 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // 5 * 3 + (5 + 3) = 15 + 8 = 23
         expect(result).toContain("<div>Result: 23</div>");
         expect(result).not.toContain("<calc-comp>");
       } finally {
@@ -591,7 +590,6 @@ com.innerHTML = \`<div>Result: \${result}</div>\`;
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Should keep original content since innerHTML wasn't modified
         expect(result).toContain("Original");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
@@ -780,7 +778,6 @@ com.innerHTML = "<div>Error</div>";
         writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
         writeFileSync(join(TEST_DIR, "error-comp.com.ts"), componentTs);
 
-        // Should throw or handle error
         await expect(processComTs(TEST_DIR)).rejects.toThrow();
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
@@ -809,7 +806,6 @@ com.innerHTML = "<div>Should not reach here</div>";
         writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
         writeFileSync(join(TEST_DIR, "runtime-error-comp.com.ts"), componentTs);
 
-        // Should throw error
         await expect(processComTs(TEST_DIR)).rejects.toThrow();
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
@@ -894,7 +890,6 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
           expect(result).not.toContain(`<${comp}>`);
         }
 
-        // Should complete in reasonable time
         expect(duration).toBeLessThan(5000);
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
@@ -924,17 +919,13 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
         writeFileSync(join(TEST_DIR, "both-comp.com.html"), htmlComponent);
         writeFileSync(join(TEST_DIR, "both-comp.com.ts"), tsComponent);
 
-        // This test follows the actual build flow: .com.html is processed first, then .com.ts
-        // First process .com.html
         const { processCom } = await import("../src/processCom");
         await processCom(TEST_DIR);
 
-        // Then process .com.ts (but component already replaced, so .com.ts won't find it)
         await processComTs(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Should have HTML version since it was processed first
         expect(result).toContain("<div>From HTML</div>");
         expect(result).not.toContain("<div>From TS</div>");
         expect(result).not.toContain("<both-comp>");
@@ -962,7 +953,6 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
 </body>
 </html>`;
 
-        // Component that clears its content
         const tsComponent = `com.innerHTML = "";`;
 
         writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
@@ -972,7 +962,6 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Component should be removed since it has no content
         expect(result).toContain("Before");
         expect(result).toContain("After");
         expect(result).not.toContain("empty-comp");
@@ -992,10 +981,8 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
       try {
         mkdirSync(TEST_DIR, { recursive: true });
 
-        // Create deeply nested structure
         let htmlContent = `<!DOCTYPE html><html><body>`;
 
-        // Create 52 levels of nesting (exceeds MAX_DEPTH of 50)
         for (let i = 0; i < 52; i++) {
           htmlContent += `<level-${i}>`;
         }
@@ -1006,7 +993,6 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
         htmlContent += `</body></html>`;
         writeFileSync(join(TEST_DIR, "index.html"), htmlContent);
 
-        // Create components that nest each other
         for (let i = 0; i < 52; i++) {
           const nextLevel =
             i < 51 ? `<level-${i + 1}></level-${i + 1}>` : "Bottom";
@@ -1018,7 +1004,6 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
 
         await processComTs(TEST_DIR, { logger: testLogger.logger });
 
-        // Should warn about exceeding MAX_DEPTH
         expect(testLogger.warns.length).toBeGreaterThan(0);
         expect(
           testLogger.warns.some((w) =>
@@ -1051,7 +1036,6 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Component should be removed, but surrounding content preserved
         expect(result).not.toContain("<empty-comp>");
         expect(result).toContain("<p>After</p>");
       } finally {
@@ -1072,7 +1056,6 @@ com.innerHTML = \`<div>Path: \${result}</div>\`;
   <div><orphan-comp></orphan-comp></div>
 </body></html>`;
 
-        // Component that returns empty/null innerHTML
         const componentTs = `
 // This component will have empty content
 com.innerHTML = "";
@@ -1085,7 +1068,6 @@ com.innerHTML = "";
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Component with empty content should be removed
         expect(result).not.toContain("orphan-comp");
         expect(result).toContain("<div></div>");
       } finally {
@@ -1178,7 +1160,6 @@ com.innerHTML = "";
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
 
-        // Check head components
         expect(result).toContain(
           '<meta property="og:title" content="Page Title">',
         );
@@ -1187,7 +1168,6 @@ com.innerHTML = "";
         );
         expect(result).not.toContain("<social-meta>");
 
-        // Check body components
         expect(result).toContain("<header>");
         expect(result).toContain("<h1>Welcome</h1>");
         expect(result).toContain("<nav>Navigation</nav>");
@@ -1444,12 +1424,10 @@ com.innerHTML = \`<meta name="\${name}" content="\${content}">\`;`;
     it("should return false and log error when tempDir is invalid", async () => {
       const { logger, errors } = createTestLogger();
 
-      // Test with empty string
       const result1 = await processComTs("", { logger });
       expect(result1).toBe(false);
       expect(errors.some((e) => e.includes("Invalid tempDir"))).toBe(true);
 
-      // Test with null-ish value
       const result2 = await processComTs(null as any, { logger });
       expect(result2).toBe(false);
     });
@@ -1471,7 +1449,6 @@ com.innerHTML = \`<meta name="\${name}" content="\${content}">\`;`;
 </body>
 </html>`;
 
-        // Component that produces completely empty content
         const emptyCompTs = `com.innerHTML = "";`;
 
         writeFileSync(join(TEST_DIR, "index.html"), indexHtml);

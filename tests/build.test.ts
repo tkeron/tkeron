@@ -1,4 +1,4 @@
-import { describe, it, expect, spyOn } from "bun:test";
+import { describe, it, expect } from "bun:test";
 import { build } from "../src/build";
 import {
   cleanupOrphanedTempDirs,
@@ -142,7 +142,6 @@ if (title) title.textContent = "Auto-generated";
     try {
       mkdirSync(TEST_SRC, { recursive: true });
       mkdirSync(TEST_OUT, { recursive: true });
-      // Create a file in target that shouldn't exist after build
       writeFileSync(join(TEST_OUT, "old-file.txt"), "should be deleted");
       const htmlContent = `<!DOCTYPE html>
 <html>
@@ -203,7 +202,6 @@ if (title) title.textContent = "Auto-generated";
 </html>`;
       writeFileSync(join(defaultSrc, "index.html"), htmlContent);
       writeFileSync(join(defaultSrc, "index.ts"), `console.log("default");`);
-      // Change to dir to test default behavior
       const originalCwd = process.cwd();
       process.chdir(dir);
       try {
@@ -252,23 +250,14 @@ document.body.appendChild(h2);
     const { dir } = getTestResources("build-source-directory-does-not-exist");
     const TEST_SRC = join(dir, "nonexistent-src");
     const TEST_OUT = join(dir, "web");
-    // Mock process.exit to throw instead of exiting
-    const processExitSpy = spyOn(process, "exit").mockImplementation((() => {
-      throw new Error("PROCESS_EXIT");
-    }) as any);
-    // Suppress console output during test
     try {
       await expect(async () => {
         await build({
           sourceDir: TEST_SRC,
           targetDir: TEST_OUT,
         });
-      }).toThrow("PROCESS_EXIT");
-      // Only verify that process.exit was called with 1
-      // Don't check console.error as it can be affected by concurrent tests
-      expect(processExitSpy).toHaveBeenCalledWith(1);
+      }).toThrow();
     } finally {
-      processExitSpy?.mockRestore();
       rmSync(dir, { recursive: true, force: true });
     }
   });
@@ -289,7 +278,6 @@ describe("temp directory cleanup", () => {
         sourceDir: TEST_SRC,
         targetDir: TEST_OUT,
       });
-      // Verify no temp directories remain
       const parentDir = dir;
       const entries = readdirSync(parentDir);
       const tempDirs = entries.filter((name) =>
@@ -306,7 +294,6 @@ describe("temp directory cleanup", () => {
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Create a .pre.ts file with invalid syntax that will cause processPre to fail
       const invalidPreContent = `
 // This will cause an error at runtime
 throw new Error("Intentional test error");
@@ -316,16 +303,13 @@ throw new Error("Intentional test error");
         join(TEST_SRC, "error.html"),
         "<!DOCTYPE html><html><body></body></html>",
       );
-      // Build should throw but temp should still be cleaned up
       try {
         await build({
           sourceDir: TEST_SRC,
           targetDir: TEST_OUT,
         });
-      } catch (error) {
-        // Expected to fail
-      }
-      // Verify no temp directories remain
+      } catch (error) {}
+
       const parentDir = dir;
       const entries = readdirSync(parentDir);
       const tempDirs = entries.filter((name) =>
@@ -342,13 +326,11 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Create some orphaned temp directories (simulating previous failed builds)
       const orphan1 = join(dir, `${TEMP_DIR_PREFIX}orphan-uuid-1`);
       const orphan2 = join(dir, `${TEMP_DIR_PREFIX}orphan-uuid-2`);
       mkdirSync(orphan1, { recursive: true });
       mkdirSync(orphan2, { recursive: true });
       writeFileSync(join(orphan1, "leftover.txt"), "leftover content");
-      // Verify orphans exist before build
       expect(existsSync(orphan1)).toBe(true);
       expect(existsSync(orphan2)).toBe(true);
       const htmlContent = `<!DOCTYPE html>
@@ -360,10 +342,8 @@ throw new Error("Intentional test error");
         sourceDir: TEST_SRC,
         targetDir: TEST_OUT,
       });
-      // Verify orphaned directories were cleaned up
       expect(existsSync(orphan1)).toBe(false);
       expect(existsSync(orphan2)).toBe(false);
-      // Verify no temp directories remain
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -379,7 +359,6 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Create directories that should NOT be deleted
       const regularDir = join(dir, "my-regular-folder");
       const dotDir = join(dir, ".hidden-folder");
       const similarNameDir = join(dir, "tktmp-but-no-underscore");
@@ -395,7 +374,6 @@ throw new Error("Intentional test error");
         sourceDir: TEST_SRC,
         targetDir: TEST_OUT,
       });
-      // Verify non-temp directories are preserved
       expect(existsSync(regularDir)).toBe(true);
       expect(existsSync(dotDir)).toBe(true);
       expect(existsSync(similarNameDir)).toBe(true);
@@ -407,7 +385,6 @@ throw new Error("Intentional test error");
     const { dir } = getTestResources("cleanup-empty-dir");
     try {
       mkdirSync(dir, { recursive: true });
-      // Should not throw on empty directory
       const { logger } = createTestLogger();
       await cleanupOrphanedTempDirs(dir, logger);
       expect(existsSync(dir)).toBe(true);
@@ -418,7 +395,6 @@ throw new Error("Intentional test error");
   it("cleanupOrphanedTempDirs should handle non-existent directory gracefully", async () => {
     const { dir } = getTestResources("cleanup-nonexistent-dir");
     const nonExistentDir = join(dir, "does-not-exist");
-    // Should not throw on non-existent directory
     const { logger } = createTestLogger();
     await cleanupOrphanedTempDirs(nonExistentDir, logger);
   });
@@ -426,17 +402,13 @@ throw new Error("Intentional test error");
     const { dir } = getTestResources("cleanup-only-dirs");
     try {
       mkdirSync(dir, { recursive: true });
-      // Create a file with the temp prefix (should NOT be deleted)
       const tempFile = join(dir, `${TEMP_DIR_PREFIX}some-file.txt`);
       writeFileSync(tempFile, "file content");
-      // Create a directory with the temp prefix (should be deleted)
       const tempDir = join(dir, `${TEMP_DIR_PREFIX}some-dir`);
       mkdirSync(tempDir, { recursive: true });
       const { logger } = createTestLogger();
       await cleanupOrphanedTempDirs(dir, logger);
-      // File should remain
       expect(existsSync(tempFile)).toBe(true);
-      // Directory should be removed
       expect(existsSync(tempDir)).toBe(false);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -452,7 +424,6 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Create a .pre.ts file that throws an error
       writeFileSync(
         join(TEST_SRC, "fail.pre.ts"),
         `throw new Error("processPre catastrophic failure");`,
@@ -464,11 +435,8 @@ throw new Error("Intentional test error");
 
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
-      } catch (e) {
-        // Expected to throw
-      }
+      } catch (e) {}
 
-      // Verify no temp directories remain
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -485,7 +453,6 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Create circular dependency that will cause processCom to throw
       writeFileSync(
         join(TEST_SRC, "index.html"),
         `<!DOCTYPE html><html><body><comp-a></comp-a></body></html>`,
@@ -501,11 +468,8 @@ throw new Error("Intentional test error");
 
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
-      } catch (e) {
-        // Expected to throw due to circular dependency
-      }
+      } catch (e) {}
 
-      // Verify no temp directories remain
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -522,7 +486,6 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Create a .com.ts file that throws
       writeFileSync(
         join(TEST_SRC, "index.html"),
         `<!DOCTYPE html><html><body><bad-comp></bad-comp></body></html>`,
@@ -534,11 +497,8 @@ throw new Error("Intentional test error");
 
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
-      } catch (e) {
-        // Expected to throw
-      }
+      } catch (e) {}
 
-      // Verify no temp directories remain
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -552,7 +512,6 @@ throw new Error("Intentional test error");
   it("should cleanup temp directory when buildDir fails due to invalid output path", async () => {
     const { dir } = getTestResources("cleanup-on-buildDir-failure");
     const TEST_SRC = join(dir, "src");
-    // Use /dev/null path which cannot be created as directory on Linux
     const TEST_OUT = "/dev/null/impossible/path";
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -563,11 +522,8 @@ throw new Error("Intentional test error");
 
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
-      } catch (e) {
-        // Expected to throw
-      }
+      } catch (e) {}
 
-      // Verify no temp directories remain in the source parent
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -584,14 +540,11 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Create components that keep inserting new components (up to MAX_DEPTH warning)
-      // This tests that even long-running builds cleanup properly
       writeFileSync(
         join(TEST_SRC, "index.html"),
         `<!DOCTYPE html><html><body><level-0></level-0></body></html>`,
       );
 
-      // Create many nested components
       for (let i = 0; i < 12; i++) {
         writeFileSync(
           join(TEST_SRC, `level-${i}.com.html`),
@@ -602,7 +555,6 @@ throw new Error("Intentional test error");
 
       await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
 
-      // Verify no temp directories remain
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -623,7 +575,6 @@ throw new Error("Intentional test error");
         join(TEST_SRC, "index.html"),
         `<!DOCTYPE html><html><body><syntax-err></syntax-err></body></html>`,
       );
-      // Invalid TypeScript syntax
       writeFileSync(
         join(TEST_SRC, "syntax-err.com.ts"),
         `com.innerHTML = {{{ invalid syntax`,
@@ -631,11 +582,8 @@ throw new Error("Intentional test error");
 
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
-      } catch (e) {
-        // May or may not throw depending on how syntax errors are handled
-      }
+      } catch (e) {}
 
-      // Verify no temp directories remain
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -652,7 +600,6 @@ throw new Error("Intentional test error");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
-      // Import a module that doesn't exist
       writeFileSync(
         join(TEST_SRC, "import-fail.pre.ts"),
         `import { nonexistent } from "./does-not-exist";`,
@@ -664,11 +611,8 @@ throw new Error("Intentional test error");
 
       try {
         await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT });
-      } catch (e) {
-        // Expected to throw
-      }
+      } catch (e) {}
 
-      // Verify no temp directories remain
       const entries = readdirSync(dir);
       const tempDirs = entries.filter((name) =>
         name.startsWith(TEMP_DIR_PREFIX),
@@ -693,7 +637,6 @@ throw new Error("Intentional test error");
 
       await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT, logger });
 
-      // Build should succeed - warns may or may not contain cleanup warnings
       expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -712,13 +655,11 @@ throw new Error("Intentional test error");
         "<!DOCTYPE html><html><body>Test</body></html>",
       );
 
-      // Create an orphaned temp directory
       const orphanedTempDir = join(dir, `${TEMP_DIR_PREFIX}orphaned-test`);
       mkdirSync(orphanedTempDir, { recursive: true });
 
       await build({ sourceDir: TEST_SRC, targetDir: TEST_OUT, logger });
 
-      // Build should succeed and cleanup orphaned dir
       expect(existsSync(join(TEST_OUT, "index.html"))).toBe(true);
       expect(
         logs.some((l) => l.includes("Cleaned up orphaned temp directory")),

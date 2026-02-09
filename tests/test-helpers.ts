@@ -11,7 +11,7 @@ const hashString = (str: string): number => {
   for (let i = 0; i < str.length; i++) {
     const char = str.charCodeAt(i);
     hash = (hash << 5) - hash + char;
-    hash = hash & hash; // Convert to 32bit integer
+    hash = hash & hash;
   }
   return Math.abs(hash);
 };
@@ -22,7 +22,7 @@ export const getTestResources = (
   testName: string,
 ): { port: number; dir: string } => {
   const hash = hashString(testName);
-  const port = 9000 + (hash % 10000); // Port range: 9000-18999
+  const port = 9000 + (hash % 10000);
   const uniqueId = `${hash}-${resourceCounter++}`;
   const dir = join(tmpdir(), `tkeron-test-${uniqueId}`);
 

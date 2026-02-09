@@ -1,3 +1,28 @@
+# v4.0.0-beta.18
+
+## Code Quality & Architecture
+
+### Bug Fixes
+
+- **Fixed**: Removed `process.exit()` from library code (`build.ts`, `develop.ts`, `init.ts`) — errors now propagate via `throw`, letting wrappers handle exit
+- **Fixed**: Moved `reloadClients` Set inside `develop()` to prevent shared state across multiple server instances
+- **Fixed**: Removed `await` on synchronous `path.resolve()` calls in `build.ts` and `develop.ts`
+- **Fixed**: `log.error()` called without arguments in `processPre.ts` — now passes empty string
+
+### Code Style
+
+- **Changed**: Converted all `function` declarations to arrow functions (`initWrapper`, `processComponents`, `processComponentsTs`)
+- **Removed**: Comments in source code (`processCom.ts`, `processComTs.ts`)
+- **Removed**: Dead re-export of `setupSigintHandler` from `develop.ts`
+
+### Tests
+
+- **Fixed**: TS2532 errors in `getBuildResult.test.ts` (proper handling of possibly undefined values)
+- **Updated**: Tests adapted to new error propagation (no more `process.exit` mocking in library tests)
+- **Removed**: Redundant/dead test cases for removed behavior
+
+---
+
 # v4.0.0-beta.17
 
 ## MCP Server Updates

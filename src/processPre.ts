@@ -89,7 +89,7 @@ export const processPre = async (
       if (stdout) {
         log.error(`\nOutput:\n${stdout}`);
       }
-      log.error();
+      log.error("");
       throw new Error(`Pre-rendering failed for ${preFile}`);
     }
   }

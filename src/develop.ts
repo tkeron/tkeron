@@ -13,8 +13,6 @@ export interface TkeronDevOptions {
   logger?: Logger;
 }
 
-const reloadClients = new Set<ReadableStreamDefaultController>();
-
 export interface DevelopServer {
   stop: () => Promise<void>;
   port: number;
@@ -28,6 +26,8 @@ export const develop = async (
     throw new Error("Invalid options provided for develop");
   }
 
+  const reloadClients = new Set<ReadableStreamDefaultController>();
+
   const {
     port = 3000,
     host = "localhost",
@@ -36,28 +36,13 @@ export const develop = async (
     logger: log = defaultLogger,
   } = options;
 
-  const source = await resolve(sourceDir || "websrc");
+  const source = resolve(sourceDir || "websrc");
   const target = outputDir
-    ? await resolve(outputDir)
-    : await resolve(dirname(source), "web");
+    ? resolve(outputDir)
+    : resolve(dirname(source), "web");
 
   log.log("🔨 Building project...");
-  try {
-    await build({ sourceDir: source, targetDir: target, logger: log });
-  } catch (error: any) {
-    if (error.code === "ENOENT") {
-      const actualSourceDir = sourceDir || "websrc";
-      log.error(
-        `\n❌ Error: Source directory "${actualSourceDir}" does not exist.`,
-      );
-      log.error(
-        `\n💡 Tip: Create the directory first, check the path, or run 'tk init' to create a new project.`,
-      );
-      log.error(`   Expected: ${source}\n`);
-      process.exit(1);
-    }
-    throw error;
-  }
+  await build({ sourceDir: source, targetDir: target, logger: log });
   log.log("✅ Build complete!");
 
   const server = Bun.serve({
@@ -182,5 +167,3 @@ export const develop = async (
     host: server.hostname ?? host,
   };
 };
-
-export { setupSigintHandler } from "./setupSigintHandler";

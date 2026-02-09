@@ -1,4 +1,4 @@
-import { it, expect, spyOn } from "bun:test";
+import { it, expect } from "bun:test";
 import { mkdir, writeFile, rm } from "fs/promises";
 import { join } from "path";
 import { develop } from "../src/develop";
@@ -318,9 +318,6 @@ it("develop handles nonexistent source directory error", async () => {
   );
   const sourceDir = join(dir, "nonexistent-websrc");
   const outputDir = join(dir, "web");
-  const processExitSpy = spyOn(process, "exit").mockImplementation((() => {
-    throw new Error("PROCESS_EXIT");
-  }) as any);
   try {
     await expect(async () => {
       await develop({
@@ -330,10 +327,8 @@ it("develop handles nonexistent source directory error", async () => {
         host: "localhost",
         logger: silentLogger,
       });
-    }).toThrow("PROCESS_EXIT");
-    expect(processExitSpy).toHaveBeenCalledWith(1);
+    }).toThrow();
   } finally {
-    processExitSpy?.mockRestore();
     await rm(dir, { recursive: true, force: true }).catch(() => {});
   }
 }, 3000);

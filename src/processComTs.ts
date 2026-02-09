@@ -61,7 +61,7 @@ export const processComTs = async (
   return hasChanges;
 };
 
-async function processComponentsTs(
+const processComponentsTs = async (
   element: any,
   currentDir: string,
   rootDir: string,
@@ -69,7 +69,7 @@ async function processComponentsTs(
   depth: number = 0,
   log: Logger = silentLogger,
   options: ProcessComTsOptions = {},
-): Promise<boolean> {
+): Promise<boolean> => {
   let hasChanges = false;
   const MAX_DEPTH = 50;
   if (depth > MAX_DEPTH) {
@@ -251,7 +251,6 @@ ${codeWithoutImports}
       }
     }
 
-    // Recursively process child elements
     const childChanged = await processComponentsTs(
       child,
       currentDir,
@@ -265,4 +264,4 @@ ${codeWithoutImports}
   }
 
   return hasChanges;
-}
+};

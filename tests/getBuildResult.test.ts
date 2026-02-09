@@ -38,7 +38,7 @@ describe("getBuildResult", () => {
         );
 
         const result = await getBuildResult(srcDir);
-        const dom = result["index.html"].dom;
+        const dom = result["index.html"]!.dom;
 
         expect(dom).toBeDefined();
         const myComponent = dom!.getElementById("my_component");
@@ -65,7 +65,7 @@ describe("getBuildResult", () => {
         );
 
         const result = await getBuildResult(srcDir);
-        const dom = result["index.html"].dom!;
+        const dom = result["index.html"]!.dom!;
 
         expect(dom.querySelector("header.main-header")).toBeDefined();
         expect(dom.querySelector("#nav a")?.getAttribute("href")).toBe("/");
@@ -90,7 +90,7 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(result["index.html"].fileName).toBe("index.html");
+        expect(result["index.html"]!.fileName).toBe("index.html");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -109,7 +109,7 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(result["index.html"].filePath).toBe("");
+        expect(result["index.html"]!.filePath).toBe("");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -128,7 +128,7 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(result["index.html"].path).toBe("index.html");
+        expect(result["index.html"]!.path).toBe("index.html");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -147,7 +147,7 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(result["index.html"].type).toBe("text/html");
+        expect(result["index.html"]!.type).toBe("text/html");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -164,8 +164,8 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(result["index.html"].size).toBeGreaterThan(0);
-        expect(typeof result["index.html"].size).toBe("number");
+        expect(result["index.html"]!.size).toBeGreaterThan(0);
+        expect(typeof result["index.html"]!.size).toBe("number");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -184,9 +184,9 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(result["index.html"].fileHash).toBeDefined();
-        expect(typeof result["index.html"].fileHash).toBe("string");
-        expect(result["index.html"].fileHash.length).toBeGreaterThan(0);
+        expect(result["index.html"]!.fileHash).toBeDefined();
+        expect(typeof result["index.html"]!.fileHash).toBe("string");
+        expect(result["index.html"]!.fileHash.length).toBeGreaterThan(0);
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -207,8 +207,8 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(typeof result["index.html"].getContentAsString).toBe("function");
-        const content = result["index.html"].getContentAsString!();
+        expect(typeof result["index.html"]!.getContentAsString).toBe("function");
+        const content = result["index.html"]!.getContentAsString!();
         expect(content).toContain("Test Content");
       } finally {
         rmSync(dir, { recursive: true, force: true });
@@ -231,8 +231,8 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["index.css"]).toBeDefined();
-        expect(result["index.css"].getContentAsString).toBeDefined();
-        expect(result["index.css"].getContentAsString!()).toContain(
+        expect(result["index.css"]!.getContentAsString).toBeDefined();
+        expect(result["index.css"]!.getContentAsString!()).toContain(
           "background",
         );
       } finally {
@@ -252,7 +252,7 @@ describe("getBuildResult", () => {
         );
 
         const result = await getBuildResult(srcDir);
-        const getter = result["index.html"].getContentAsString;
+        const getter = result["index.html"]!.getContentAsString;
 
         expect(typeof getter).toBe("function");
         const content1 = getter!();
@@ -280,8 +280,8 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["index.css"]).toBeDefined();
-        expect(result["index.css"].type).toBe("text/css");
-        expect(result["index.css"].dom).toBeUndefined();
+        expect(result["index.css"]!.type).toBe("text/css");
+        expect(result["index.css"]!.dom).toBeUndefined();
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -303,8 +303,8 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["index.css"]).toBeDefined();
-        expect(result["index.css"].dom).toBeUndefined();
-        expect(result["index.html"].dom).toBeDefined();
+        expect(result["index.css"]!.dom).toBeUndefined();
+        expect(result["index.html"]!.dom).toBeDefined();
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -335,7 +335,7 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["image.png"]).toBeDefined();
-        expect(result["image.png"].getContentAsString).toBeUndefined();
+        expect(result["image.png"]!.getContentAsString).toBeUndefined();
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -364,7 +364,7 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["photo.png"]).toBeDefined();
-        expect(result["photo.png"].type).toBe("image/png");
+        expect(result["photo.png"]!.type).toBe("image/png");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -393,7 +393,7 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["data.png"]).toBeDefined();
-        expect(result["data.png"].size).toBe(pngData.length);
+        expect(result["data.png"]!.size).toBe(pngData.length);
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -419,9 +419,9 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["pages/about.html"]).toBeDefined();
-        expect(result["pages/about.html"].fileName).toBe("about.html");
-        expect(result["pages/about.html"].filePath).toBe("pages");
-        expect(result["pages/about.html"].path).toBe("pages/about.html");
+        expect(result["pages/about.html"]!.fileName).toBe("about.html");
+        expect(result["pages/about.html"]!.filePath).toBe("pages");
+        expect(result["pages/about.html"]!.path).toBe("pages/about.html");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -448,7 +448,7 @@ describe("getBuildResult", () => {
         const result = await getBuildResult(srcDir);
 
         expect(result["logo.png"]).toBeDefined();
-        expect(result["logo.png"].type).toBe("image/png");
+        expect(result["logo.png"]!.type).toBe("image/png");
       } finally {
         rmSync(dir, { recursive: true, force: true });
       }
@@ -471,9 +471,9 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(result["index.html"].dom!.getElementById("home")).toBeDefined();
+        expect(result["index.html"]!.dom!.getElementById("home")).toBeDefined();
         expect(
-          result["pages/about.html"].dom!.getElementById("about"),
+          result["pages/about.html"]!.dom!.getElementById("about"),
         ).toBeDefined();
       } finally {
         rmSync(dir, { recursive: true, force: true });
@@ -562,7 +562,7 @@ describe("getBuildResult", () => {
         );
 
         const result = await getBuildResult(srcDir);
-        const dom = result["index.html"].dom!;
+        const dom = result["index.html"]!.dom!;
 
         expect(dom.getElementById("replaced")).toBeDefined();
         expect(dom.getElementById("replaced")!.innerHTML).toBe(
@@ -590,7 +590,7 @@ if (el) el.innerHTML = "Pre Generated";`,
         );
 
         const result = await getBuildResult(srcDir);
-        const dom = result["index.html"].dom!;
+        const dom = result["index.html"]!.dom!;
 
         expect(dom.getElementById("placeholder")).toBeDefined();
         expect(dom.getElementById("placeholder")!.innerHTML).toBe(
@@ -685,8 +685,8 @@ if (el) el.innerHTML = "Pre Generated";`,
         const result1 = await getBuildResult(srcDir);
         const result2 = await getBuildResult(srcDir);
 
-        expect(result1["index.html"].fileHash).toBe(
-          result2["index.html"].fileHash,
+        expect(result1["index.html"]!.fileHash).toBe(
+          result2["index.html"]!.fileHash,
         );
       } finally {
         rmSync(dir, { recursive: true, force: true });
@@ -704,14 +704,14 @@ if (el) el.innerHTML = "Pre Generated";`,
           "<!DOCTYPE html><html><head></head><body>Content A</body></html>",
         );
         const result1 = await getBuildResult(srcDir);
-        const hash1 = result1["index.html"].fileHash;
+        const hash1 = result1["index.html"]!.fileHash;
 
         writeFileSync(
           join(srcDir, "index.html"),
           "<!DOCTYPE html><html><head></head><body>Content B</body></html>",
         );
         const result2 = await getBuildResult(srcDir);
-        const hash2 = result2["index.html"].fileHash;
+        const hash2 = result2["index.html"]!.fileHash;
 
         expect(hash1).not.toBe(hash2);
       } finally {

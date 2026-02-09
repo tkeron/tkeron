@@ -9,7 +9,7 @@ export interface InitWrapperOptions {
   [key: string]: any;
 }
 
-export async function initWrapper(options: InitWrapperOptions) {
+export const initWrapper = async (options: InitWrapperOptions) => {
   const log = options?.logger || defaultLogger;
 
   if (!options || typeof options !== "object") {
@@ -60,4 +60,4 @@ export async function initWrapper(options: InitWrapperOptions) {
     }
     process.exit(1);
   }
-}
+};

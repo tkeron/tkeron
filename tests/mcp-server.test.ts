@@ -5,7 +5,6 @@ import { join } from "path";
 const projectRoot = join(import.meta.dir, "..");
 const docsDir = join(projectRoot, "docs");
 
-// Configuration that matches the actual MCP server
 const DOCS = [
   {
     uri: "tkeron://overview",
@@ -58,7 +57,6 @@ const DOCS = [
   },
 ];
 
-// Simulate ListResources handler logic
 function listResources() {
   return {
     resources: DOCS.map((doc) => ({
@@ -70,7 +68,6 @@ function listResources() {
   };
 }
 
-// Simulate ReadResource handler logic
 function readResource(uri: string) {
   const doc = DOCS.find((d) => d.uri === uri);
 
@@ -97,7 +94,6 @@ function readResource(uri: string) {
   };
 }
 
-// Simulate ListTools handler logic
 function listTools() {
   return {
     tools: [
@@ -130,7 +126,6 @@ function listTools() {
   };
 }
 
-// Simulate CallTool handler logic
 function callTool(name: string, topic: string) {
   if (name !== "get_tkeron_docs") {
     throw new Error(`Unknown tool: ${name}`);
@@ -240,7 +235,6 @@ describe("MCP Server - Resource Reading", () => {
     const result = readResource("tkeron://getting-started");
     const content = result.contents[0]!.text;
 
-    // Verify it contains expected sections
     expect(content).toContain("Installation");
     expect(content).toContain("tk");
   });
