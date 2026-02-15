@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "4.0.0-beta.18",
+  "version": "4.0.0",
   "description": "CLI tool for backend-driven frontend development with TypeScript.",
   "type": "module",
   "main": "./src/index.ts",
@@ -32,12 +32,12 @@
   "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.26.0",
-    "@tkeron/commands": "0.3.1",
-    "@tkeron/html-parser": "1.5.3",
-    "@tkeron/tools": "^0.2.2"
+    "@tkeron/commands": "0.4.6",
+    "@tkeron/html-parser": "1.5.5",
+    "@tkeron/tools": "^0.3.0"
   },
   "devDependencies": {
-    "@types/bun": "^1.3.8",
+    "@types/bun": "^1.3.9",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3"
   },
@@ -53,7 +53,11 @@
     "model-context-protocol",
     "ai-integration"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
-    "url": "git@github.com:tkeron/tkeron.git"
+    "type": "git",
+    "url": "git+https://github.com/tkeron/tkeron.git"
   }
 }

@@ -1,34 +1,29 @@
-name: cli package
+name: tkeron package
 on:
   push:
     branches:
       - master
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   build-test-publish:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4.0.3
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: 20.x
-          registry-url: "https://registry.npmjs.org/"
+          node-version: "lts/*"
+          registry-url: "https://registry.npmjs.org"
 
       - uses: oven-sh/setup-bun@v2
 
-      - name: Install dependencies
-        run: bun i
+      - run: npm install -g npm@latest
+      - run: bun i
+      - run: bun run test
 
-      - name: Run tests
-        run: bun test --concurrent --coverage
-
-      - name: Check version
-        id: check
-        run: bun check-versions.ts
-        continue-on-error: true
-
-      - name: Publish to npm
-        if: steps.check.outcome == 'success'
-        run: npm publish --access public --tag beta
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --provenance

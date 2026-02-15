@@ -1,3 +1,29 @@
+# v4.0.0
+
+## Stable Release
+
+- **Released**: First stable v4 release (out of beta)
+
+### CI/CD
+
+- **Changed**: Migrated to npm Trusted Publisher (OIDC provenance)
+- **Removed**: Manual NPM_TOKEN authentication
+- **Added**: `permissions: id-token: write` for OIDC support
+- **Changed**: `npm publish --provenance` replaces `npm publish --tag beta`
+
+### Dependencies
+
+- **Updated**: `@tkeron/commands` 0.3.1 → 0.4.6
+- **Updated**: `@tkeron/html-parser` 1.5.3 → 1.5.5
+- **Updated**: `@tkeron/tools` 0.2.2 → 0.3.0
+
+### Package
+
+- **Added**: `publishConfig.access: "public"`
+- **Fixed**: Repository URL format (SSH → HTTPS with `type: "git"`)
+
+---
+
 # v4.0.0-beta.18
 
 ## Code Quality & Architecture

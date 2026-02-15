@@ -5,7 +5,6 @@ import { develop } from "./src/develop";
 import { initWrapper } from "./src/initWrapper";
 import { showBanner } from "./src/banner";
 
-// Show banner if no arguments provided
 if (process.argv.length === 2) {
   await showBanner();
   process.exit(0);

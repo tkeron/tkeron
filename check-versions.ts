@@ -3,10 +3,6 @@
 import { readFileSync } from "fs";
 import { join } from "path";
 
-/**
- * Compares two semver versions including pre-release identifiers
- * Returns: 1 if v1 > v2, -1 if v1 < v2, 0 if equal
- */
 function compareVersions(v1: string, v2: string): number {
   const parseVersion = (version: string) => {
     const match = version.match(/^(\d+)\.(\d+)\.(\d+)(?:-(.+))?$/);
