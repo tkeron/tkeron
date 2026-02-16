@@ -99,6 +99,7 @@ The MCP server exposes the following documentation resources:
 | `tkeron://pre-rendering`         | Transform HTML at build time with .pre.ts files      |
 | `tkeron://cli-reference`         | Complete command-line interface documentation        |
 | `tkeron://best-practices`        | Patterns, anti-patterns, and limitations             |
+| `tkeron://common-issues`         | Troubleshooting guide and common mistakes            |
 | `tkeron://testing`               | How to test tkeron projects with getBuildResult()    |
 
 ## What AI Agents Can Do
@@ -112,6 +113,7 @@ With access to the MCP server, AI agents can:
 - ✅ Provide accurate CLI commands and options
 - ✅ Debug common issues with components and pre-rendering
 - ✅ Recommend best practices and avoid anti-patterns
+- ✅ **Prevent common mistakes** (script references, component naming, dependencies)
 - ✅ **List and explore example projects**
 - ✅ **Retrieve example code and structures**
 - ✅ **Initialize, build, and develop projects via terminal** (`tk init`, `tk build`, `tk dev`)

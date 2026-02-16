@@ -33,6 +33,10 @@ export const buildDir = async (
 
   const files = await buildEntrypoints(htmlFiles, sourceDir, { logger: log });
 
+  if (!files || !files.artifacts) {
+    throw new Error("Bundle failed");
+  }
+
   for (const a of files?.artifacts || []) {
     const outPath = join(targetDir, a.pathR);
     if (a.pathR.toLowerCase().endsWith(".html")) {

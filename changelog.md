@@ -1,3 +1,39 @@
+# v4.1.0
+
+## Documentation & Developer Experience
+
+### New Features
+
+- **Added**: `docs/common-issues.md` - Comprehensive troubleshooting guide
+  - Script tag references (most common issue)
+  - Component naming requirements (hyphen mandatory)
+  - File references and relative paths
+  - TypeScript compilation errors
+  - Component resolution rules
+  - Build performance tips
+  - Common AI agent mistakes prevention
+- **Added**: MCP server resource `tkeron://common-issues` for AI agents
+  - Exposes troubleshooting documentation via MCP
+  - Helps AI agents prevent common mistakes
+  - Improves guided project creation
+
+### Bug Fixes
+
+- **Improved**: Build error reporting in `buildEntrypoints.ts`
+  - Now shows detailed error messages from Bun.build()
+  - Displays file location and line numbers for errors
+  - Catches and reports exceptions with stack traces
+  - Better diagnosis of bundle failures
+- **Added**: Artifact validation in `buildDir.ts`
+  - Throws clear error if bundle fails
+  - Prevents silent failures
+
+### Documentation
+
+- **Updated**: `docs/mcp-server.md` - Documents new common-issues resource
+
+---
+
 # v4.0.1
 
 ## Logger System Migration

@@ -72,6 +72,13 @@ const DOCS = [
     file: "best-practices.md",
   },
   {
+    uri: "tkeron://common-issues",
+    name: "Common Issues and Solutions",
+    description:
+      "Troubleshooting guide: script references, component naming, dependencies, and common mistakes",
+    file: "common-issues.md",
+  },
+  {
     uri: "tkeron://testing",
     name: "Testing Tkeron Projects",
     description:
