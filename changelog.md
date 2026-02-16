@@ -1,3 +1,29 @@
+# v4.2.0
+
+## Developer Experience
+
+### New Features
+
+- **Added**: TypeScript configuration to `init_sample` example
+  - `tsconfig.json` - Minimal TypeScript configuration for IDE support
+  - `tkeron.d.ts` - Type definitions for `.com.ts` and `.pre.ts` files
+  - Enables IntelliSense for `com` variable in `.com.ts` files
+  - Enables IntelliSense for `document` variable in `.pre.ts` files
+  - Improves developer experience in VS Code and other IDEs
+
+### Bug Fixes
+
+- **Fixed**: Variable naming conflict in `init_sample/websrc/index.ts`
+  - Renamed `count` to `clickCount` to avoid TypeScript scope collision
+- **Fixed**: TypeScript type error in `init_sample/websrc/user-badge.com.ts`
+  - Added explicit `parseInt` radix parameter for type safety
+
+### Tests
+
+- **Updated**: Test expectations to match renamed variables in `init_sample`
+
+---
+
 # v4.1.0
 
 ## Documentation & Developer Experience

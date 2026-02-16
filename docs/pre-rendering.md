@@ -97,6 +97,26 @@ If the `.html` file doesn't exist, Tkeron creates a default one:
 
 Then your `.pre.ts` file runs on this template.
 
+### IDE Support & IntelliSense
+
+The `tkeron.d.ts` file in your project provides type definitions for the `document` variable:
+
+```typescript
+declare module "*.pre.ts" {
+  global {
+    const document: Document;
+  }
+}
+```
+
+This enables:
+
+- **IntelliSense** for `document.querySelector()`, `document.getElementById()`, etc.
+- **Type checking** for DOM manipulation
+- **Auto-completion** for all Document methods and properties
+
+The `tsconfig.json` ensures your IDE recognizes these types. Both files are automatically created by `tk init`.
+
 ## Basic Examples
 
 ### Set Page Title

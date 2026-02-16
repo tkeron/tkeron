@@ -345,7 +345,7 @@ describe("init", () => {
         join(projectPath, "websrc", "index.ts"),
         "utf-8",
       );
-      expect(indexTs).toContain("let count = 0");
+      expect(indexTs).toContain("let clickCount = 0");
       expect(indexTs).toContain("getElementById");
 
       const indexHtml = readFileSync(

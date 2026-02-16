@@ -86,6 +86,46 @@ Same as HTML components:
 1. **Same directory** as the file using it
 2. **Root directory** (`websrc/`)
 
+### IDE Support & IntelliSense
+
+For the best development experience, Tkeron projects include TypeScript configuration files:
+
+**`tkeron.d.ts`** - Provides type definitions:
+
+```typescript
+declare module "*.com.ts" {
+  global {
+    const com: HTMLElement;
+  }
+}
+```
+
+This tells your IDE that `com` is an `HTMLElement`, enabling:
+
+- **IntelliSense** for `com.getAttribute()`, `com.innerHTML`, etc.
+- **Type checking** for your component code
+- **Auto-completion** for DOM methods and properties
+
+**`tsconfig.json`** - TypeScript configuration:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
+    "moduleResolution": "bundler",
+    "strict": true,
+    "skipLibCheck": true
+  },
+  "include": ["websrc/**/*", "tkeron.d.ts"]
+}
+```
+
+Both files are automatically created when you run `tk init`. If you created your project manually, you can copy them from the [init_sample example](https://github.com/pablotk/tkeron/tree/master/examples/init_sample).
+
+**Note:** These files are only for IDE support and don't affect the build process. Tkeron uses Bun's built-in TypeScript support for compilation.
+
 ## Basic Examples
 
 ### Attribute-Based Content

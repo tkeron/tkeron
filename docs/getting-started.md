@@ -38,7 +38,8 @@ my-website/
 │   ├── index.ts         # TypeScript for index
 │   ├── index.pre.ts     # Pre-rendering script
 │   └── *.com.html       # Sample components
-└── tkeron.d.ts          # TypeScript definitions
+├── tkeron.d.ts          # TypeScript definitions
+└── tsconfig.json        # TypeScript configuration
 ```
 
 ### Initialize in Current Directory
