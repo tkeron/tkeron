@@ -3,8 +3,8 @@ import { rm, stat } from "fs/promises";
 import { getFilePaths } from "@tkeron/tools";
 import { parseHTML } from "@tkeron/html-parser";
 import { build } from "./build.js";
-import type { Logger } from "./logger.js";
-import { silentLogger } from "./logger.js";
+import type { Logger } from "@tkeron/tools";
+import { silentLogger } from "@tkeron/tools";
 
 export interface GetBuildResultOptions {
   logger?: Logger;

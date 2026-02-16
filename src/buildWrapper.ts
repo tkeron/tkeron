@@ -1,6 +1,6 @@
 import { build } from "./build";
-import type { Logger } from "./logger";
-import { logger as defaultLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { logger as defaultLogger } from "@tkeron/tools";
 
 export interface BuildWrapperOptions {
   sourceDir?: string;

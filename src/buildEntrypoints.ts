@@ -1,6 +1,6 @@
 import { normalize } from "path";
-import type { Logger } from "./logger";
-import { silentLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { silentLogger } from "@tkeron/tools";
 
 export interface BuildEntrypointsOptions {
   logger?: Logger;

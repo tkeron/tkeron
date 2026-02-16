@@ -207,7 +207,9 @@ describe("getBuildResult", () => {
 
         const result = await getBuildResult(srcDir);
 
-        expect(typeof result["index.html"]!.getContentAsString).toBe("function");
+        expect(typeof result["index.html"]!.getContentAsString).toBe(
+          "function",
+        );
         const content = result["index.html"]!.getContentAsString!();
         expect(content).toContain("Test Content");
       } finally {

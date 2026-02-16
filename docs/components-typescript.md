@@ -68,12 +68,12 @@ Component filenames must:
 
 **Examples:**
 
-| Filename              | Custom Element  | Valid?                    |
-| --------------------- | --------------- | ------------------------- |
-| `user-card.com.ts`    | `<user-card>`   | ✅ Yes                    |
-| `nav-menu.com.ts`     | `<nav-menu>`    | ✅ Yes                    |
-| `greeting.com.ts`     | `<greeting>`    | ❌ No (no hyphen)         |
-| `UserCard.com.ts`     | `<user-card>`   | ✅ Yes (case-insensitive) |
+| Filename           | Custom Element | Valid?                    |
+| ------------------ | -------------- | ------------------------- |
+| `user-card.com.ts` | `<user-card>`  | ✅ Yes                    |
+| `nav-menu.com.ts`  | `<nav-menu>`   | ✅ Yes                    |
+| `greeting.com.ts`  | `<greeting>`   | ❌ No (no hyphen)         |
+| `UserCard.com.ts`  | `<user-card>`  | ✅ Yes (case-insensitive) |
 
 **Why hyphens are required:**
 

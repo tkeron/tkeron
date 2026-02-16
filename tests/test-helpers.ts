@@ -1,7 +1,7 @@
 import { tmpdir } from "os";
 import { join } from "path";
-import { createTestLogger, silentLogger } from "../src/logger";
-import type { Logger } from "../src/logger";
+import { createTestLogger, silentLogger } from "@tkeron/tools";
+import type { Logger } from "@tkeron/tools";
 
 export { createTestLogger, silentLogger };
 export type { Logger };

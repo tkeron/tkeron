@@ -1,5 +1,5 @@
-import type { Logger } from "./logger";
-import { logger as defaultLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { logger as defaultLogger } from "@tkeron/tools";
 
 export const showBanner = async (log: Logger = defaultLogger) => {
   const packageJson = await import("../package.json");

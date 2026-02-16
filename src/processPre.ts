@@ -1,7 +1,7 @@
 import { join, dirname } from "path";
 import { getFilePaths } from "@tkeron/tools";
-import type { Logger } from "./logger";
-import { silentLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { silentLogger } from "@tkeron/tools";
 
 const packageJsonPath = join(import.meta.dir, "..", "package.json");
 const packageJson = await Bun.file(packageJsonPath).json();

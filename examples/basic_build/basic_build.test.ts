@@ -118,8 +118,12 @@ describe("basic_build example", () => {
   it("should have consistent hashes across multiple builds", async () => {
     const result2 = await getBuildResult(sourcePath);
 
-    expect(result?.["index.html"]?.fileHash).toBe(result2?.["index.html"]?.fileHash);
-    expect(result?.["index.js"]?.fileHash).toBe(result2?.["index.js"]?.fileHash);
+    expect(result?.["index.html"]?.fileHash).toBe(
+      result2?.["index.html"]?.fileHash,
+    );
+    expect(result?.["index.js"]?.fileHash).toBe(
+      result2?.["index.js"]?.fileHash,
+    );
   });
 
   it("should only have two files in output", () => {

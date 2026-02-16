@@ -1,8 +1,8 @@
 import { parseHTML } from "@tkeron/html-parser";
 import { getFilePaths } from "@tkeron/tools";
 import { join, dirname } from "path";
-import type { Logger } from "./logger";
-import { silentLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { silentLogger } from "@tkeron/tools";
 
 const DOCTYPE = "<!doctype html>\n";
 

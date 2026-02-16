@@ -2,7 +2,7 @@ import { it, describe, expect } from "bun:test";
 import { join } from "path";
 import { rm, mkdir } from "fs/promises";
 import { processPre } from "../src/processPre";
-import { createTestLogger } from "../src/logger";
+import { createTestLogger } from "@tkeron/tools";
 
 describe("processPre - Module Resolution", () => {
   it("should resolve modules from project root, not temp directory", async () => {
@@ -33,9 +33,9 @@ describe("processPre - Module Resolution", () => {
       });
 
       expect(result).toBe(true);
-      expect(
-        logs.some((log) => log.includes("Pre-rendering failed")),
-      ).toBe(false);
+      expect(logs.some((log) => log.includes("Pre-rendering failed"))).toBe(
+        false,
+      );
     } finally {
       await rm(testRoot, { recursive: true, force: true });
     }
@@ -65,9 +65,9 @@ describe("processPre - Module Resolution", () => {
       const result = await processPre(tempDir, { logger });
 
       expect(result).toBe(true);
-      expect(
-        logs.some((log) => log.includes("Pre-rendering failed")),
-      ).toBe(false);
+      expect(logs.some((log) => log.includes("Pre-rendering failed"))).toBe(
+        false,
+      );
     } finally {
       await rm(testRoot, { recursive: true, force: true });
     }

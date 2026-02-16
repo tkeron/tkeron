@@ -4,4 +4,4 @@ export type {
   FileInfo,
   BuildResult,
 } from "./getBuildResult.js";
-export type { Logger } from "./logger.js";
+export type { Logger } from "@tkeron/tools";

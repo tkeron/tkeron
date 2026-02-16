@@ -7,8 +7,8 @@ import {
   rmSync,
 } from "fs";
 import { join, resolve, basename } from "path";
-import type { Logger } from "./logger";
-import { silentLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { silentLogger } from "@tkeron/tools";
 import { promptUser } from "./promptUser";
 
 export interface InitOptions {

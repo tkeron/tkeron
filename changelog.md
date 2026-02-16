@@ -1,3 +1,29 @@
+# v4.0.1
+
+## Logger System Migration
+
+### Dependencies
+
+- **Updated**: `@tkeron/tools` 0.3.0 → 0.4.0 (published to npm)
+  - Migrated Logger system to @tkeron/tools package
+  - Logger now includes improved handling for undefined and Error objects
+
+### Refactoring
+
+- **Removed**: Local Logger implementation files (logger.ts, loggerObj.ts, silentLogger.ts, createTestLogger.ts)
+- **Removed**: Duplicate Logger tests (15 tests) - now tested in @tkeron/tools
+- **Changed**: All Logger imports now use `@tkeron/tools` instead of local files
+- **Impact**: No breaking changes - Logger interface remains identical
+- **Benefit**: Shared Logger implementation across tkeron ecosystem
+
+### Code Quality
+
+- **Reduced**: -158 lines (43 from src, 115 from tests)
+- **Tests**: 278 tests passing (focused on tkeron functionality)
+- **Rationale**: Logger tests belong in @tkeron/tools (109 tests there), not in tkeron
+
+---
+
 # v4.0.0
 
 ## Stable Release

@@ -4,8 +4,8 @@ import { processPre } from "./processPre";
 import { processCom } from "./processCom";
 import { processComTs } from "./processComTs";
 import { rm, exists, mkdir, cp } from "fs/promises";
-import type { Logger } from "./logger";
-import { silentLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { silentLogger } from "@tkeron/tools";
 import {
   cleanupOrphanedTempDirs,
   TEMP_DIR_PREFIX,

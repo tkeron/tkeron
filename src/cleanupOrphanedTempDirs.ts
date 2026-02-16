@@ -1,6 +1,6 @@
 import { readdir, rm } from "fs/promises";
 import { join } from "path";
-import type { Logger } from "./logger";
+import type { Logger } from "@tkeron/tools";
 
 export const TEMP_DIR_PREFIX = ".tktmp_build-";
 

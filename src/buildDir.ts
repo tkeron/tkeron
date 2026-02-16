@@ -1,8 +1,8 @@
 import { getPaths } from "@tkeron/tools";
 import { join } from "path";
 import { buildEntrypoints } from "./buildEntrypoints";
-import type { Logger } from "./logger";
-import { silentLogger } from "./logger";
+import type { Logger } from "@tkeron/tools";
+import { silentLogger } from "@tkeron/tools";
 
 export interface BuildDirOptions {
   logger?: Logger;
