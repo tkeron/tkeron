@@ -1,3 +1,11 @@
+# v4.3.1
+
+## Bug Fixes
+
+- **Fixed**: `tk -v` / `tk version` / `tk --version` incorrectly displayed `0.0.1` instead of the actual version — `getCommands()` was called without passing the version; now receives `packageJson.version`
+
+---
+
 # v4.3.0
 
 ## Markdown Components
