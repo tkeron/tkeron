@@ -1,3 +1,36 @@
+# v4.3.0
+
+## Markdown Components
+
+### New Features
+
+- **Added**: `.com.md` component type — write components in Markdown, rendered to HTML at build time using Bun's native `Bun.markdown.html()` API with full GFM support (headings, bold, italic, strikethrough, lists, tables, blockquotes, links, images, code)
+- **Added**: `src/processComMd.ts` — new processor following the same pattern as `processCom` and `processComTs`
+  - Circular dependency detection
+  - Max nesting depth (50 levels)
+  - Component resolution: local directory first, then root
+  - Returns `true` when changes were made (drives the build loop)
+
+### Breaking Changes (Build Behavior)
+
+- **Changed**: Component resolution priority is now enforced: `.com.ts` > `.com.html` > `.com.md`
+  - Previously the loop ran `processCom` (HTML) before `processComTs` (TS), giving `.com.html` effective priority over `.com.ts` when both existed for the same tag
+  - Now `.com.ts` is resolved first as intended
+  - **Impact**: If you had both a `.com.ts` and `.com.html` for the same component name and were relying on the `.com.html` being used, the `.com.ts` will now win
+
+### Documentation
+
+- **Added**: `docs/components-markdown.md` — full documentation for `.com.md` components including GFM features, naming rules, priority rules, and examples
+- **Updated**: `README.md` — `.com.md` added to features list and documentation links
+- **Updated**: `mcp-server.ts` — `tkeron://components-markdown` resource registered
+
+### Tests
+
+- **Added**: `tests/processComMd.test.ts` — 23 tests covering all behaviors
+- **Updated**: `tests/examples.test.ts` — updated `with_com_mixed_priority` tests to reflect correct `.com.ts` > `.com.html` priority
+
+---
+
 # v4.2.0
 
 ## Developer Experience

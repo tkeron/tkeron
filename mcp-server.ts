@@ -54,6 +54,12 @@ const DOCS = [
     file: "components-typescript.md",
   },
   {
+    uri: "tkeron://components-markdown",
+    name: "Markdown Components",
+    description: "Create components with Markdown using .com.md files",
+    file: "components-markdown.md",
+  },
+  {
     uri: "tkeron://pre-rendering",
     name: "Pre-rendering",
     description: "Transform HTML at build time with .pre.ts files",

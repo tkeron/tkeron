@@ -19,6 +19,7 @@ bun install -g tkeron
 - TypeScript → vanilla JavaScript
 - HTML components (`.com.html`) - inline at build time
 - TypeScript components (`.com.ts`) - dynamic generation
+- Markdown components (`.com.md`) - write content in Markdown, rendered to HTML at build time
 - Pre-rendering (`.pre.ts`) - DOM manipulation at build time
 - Dev server with hot reload
 - Zero config
@@ -72,6 +73,7 @@ document.getElementById("quote").textContent = data.content;
 - **[Getting Started](./docs/getting-started.md)** - Installation and first steps
 - **[HTML Components](./docs/components-html.md)** - Reusable markup with `.com.html`
 - **[TypeScript Components](./docs/components-typescript.md)** - Dynamic components with `.com.ts`
+- **[Markdown Components](./docs/components-markdown.md)** - Content in Markdown with `.com.md`
 - **[Pre-rendering](./docs/pre-rendering.md)** - Build-time HTML transformation
 - **[CLI Reference](./docs/cli-reference.md)** - All commands and options
 - **[Best Practices](./docs/best-practices.md)** - Patterns, limits, and anti-patterns

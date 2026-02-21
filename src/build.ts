@@ -3,6 +3,7 @@ import { buildDir } from "./buildDir";
 import { processPre } from "./processPre";
 import { processCom } from "./processCom";
 import { processComTs } from "./processComTs";
+import { processComMd } from "./processComMd";
 import { rm, exists, mkdir, cp } from "fs/promises";
 import type { Logger } from "@tkeron/tools";
 import { silentLogger } from "@tkeron/tools";
@@ -46,10 +47,11 @@ export const build = async (options: BuildOptions) => {
 
     const MAX_ITERATIONS = 10;
     for (let i = 0; i < MAX_ITERATIONS; i++) {
-      const htmlChanged = await processCom(tempDir, { logger: log });
       const tsChanged = await processComTs(tempDir, { logger: log });
+      const htmlChanged = await processCom(tempDir, { logger: log });
+      const mdChanged = await processComMd(tempDir, { logger: log });
 
-      if (!htmlChanged && !tsChanged) {
+      if (!tsChanged && !htmlChanged && !mdChanged) {
         break;
       }
     }

@@ -353,18 +353,15 @@ describe("Examples Build Tests", () => {
       expect(htmlContent).not.toContain("<footer-info>");
     });
 
-    it("dashboard/main.html should use root .com.html since it processes first", () => {
+    it("dashboard/main.html should use local .com.ts since it has priority over root .com.html", () => {
       const htmlContent = readFileSync(
         join(outDir, "dashboard/main.html"),
         "utf-8",
       );
 
-      // Should have root HTML header (processed first, so local .com.ts doesn't find the component)
-      expect(htmlContent).toContain("Root Header (HTML Component)");
-      expect(htmlContent).toContain(
-        "This is a static HTML component from root",
-      );
-      expect(htmlContent).not.toContain("Dashboard Header (Local TS Override)");
+      // Should have dashboard local TS header (.com.ts has priority over root .com.html)
+      expect(htmlContent).toContain("Dashboard Header (Local TS Override)");
+      expect(htmlContent).not.toContain("Root Header (HTML Component)");
 
       // Should have dashboard stats widget (local .com.ts, no .com.html conflict)
       expect(htmlContent).toContain("Dashboard Stats");
@@ -408,19 +405,19 @@ describe("Examples Build Tests", () => {
       expect(htmlContent).not.toContain("<activity-feed>");
     });
 
-    it("settings/config.html should show .com.html processes first", () => {
+    it("settings/config.html should show .com.ts has priority over .com.html", () => {
       const htmlContent = readFileSync(
         join(outDir, "settings/config.html"),
         "utf-8",
       );
 
-      // Should use HTML component (processed first, so .com.ts doesn't find the component)
-      expect(htmlContent).toContain("This is the HTML component");
-      expect(htmlContent).toContain(
+      // Should use TS component (.com.ts has priority over .com.html)
+      expect(htmlContent).toContain("TypeScript Component Wins!");
+      expect(htmlContent).toContain(".com.ts has priority over .com.html");
+      expect(htmlContent).not.toContain("This is the HTML component");
+      expect(htmlContent).not.toContain(
         "If you see this, the .com.ts version was NOT used",
       );
-      expect(htmlContent).not.toContain("TypeScript Component Wins!");
-      expect(htmlContent).not.toContain(".com.ts has priority over .com.html");
 
       // Should have feature-card from root .com.ts (no .com.html conflict)
       expect(htmlContent).toContain("Settings Feature");
