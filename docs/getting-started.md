@@ -65,21 +65,19 @@ tk init my-website --force
 Build your project to compile it into static files:
 
 ```bash
-tk build websrc web
-```
-
-**Parameters:**
-
-- First argument: source directory (default: `websrc`)
-- Second argument: output directory (default: `web`)
-
-**Shorthand:**
-
-```bash
 tk build
 ```
 
-This uses the defaults: `websrc` → `web`
+**Convention:**
+
+- Source: `websrc/` (relative to current directory)
+- Output: `web/` (sibling of `websrc/`)
+
+**Using alias:**
+
+```bash
+tk b
+```
 
 **Output structure:**
 
@@ -110,20 +108,18 @@ This will:
 **Custom configuration:**
 
 ```bash
-tk dev websrc web 8080 0.0.0.0
+tk dev 8080 0.0.0.0
 ```
 
 **Parameters:**
 
-- Source directory (default: `websrc`)
-- Output directory (default: `web`)
 - Port (default: `3000`)
 - Host (default: `localhost`)
 
 **Example with custom port:**
 
 ```bash
-tk dev websrc web 8080
+tk dev 8080
 ```
 
 Visit `http://localhost:8080` in your browser.
@@ -212,17 +208,14 @@ Open `web/index.html` in your browser. You'll see the greeting component inlined
 # Show help
 tk
 
-# Build with defaults
+# Build the project
 tk build
-
-# Build with custom directories
-tk build src dist
 
 # Start dev server
 tk dev
 
 # Start dev server on port 8080
-tk dev websrc web 8080
+tk dev 8080
 
 # Initialize new project
 tk init my-project
@@ -248,14 +241,14 @@ Now that you have a basic understanding:
 
 ### "Source directory does not exist"
 
-Make sure you're running commands from the right directory:
+Make sure you're running commands from the right directory and that `websrc/` exists:
 
 ```bash
 # Check if websrc exists
 ls websrc
 
-# Or specify the correct path
-tk build path/to/websrc path/to/web
+# Or run tk init to create a new project
+tk init .
 ```
 
 ### "Command not found: tk"
@@ -271,7 +264,7 @@ bun install -g tkeron
 Use a different port:
 
 ```bash
-tk dev websrc web 3001
+tk dev 3001
 ```
 
 ### Components not working

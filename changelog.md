@@ -1,3 +1,38 @@
+# v5.0.0
+
+## Breaking: sourceDir and targetDir removed as CLI arguments
+
+- `tk build` and `tk dev` no longer accept positional directory arguments
+- Fixed convention: source in `websrc/`, output in `web/`
+- To migrate: rename your source directory to `websrc/` (`mv your-dir websrc`)
+- Output is always `web/` (sibling of `websrc/`) — no longer configurable via CLI
+- `port` and `host` remain as positional arguments for `tk dev`
+
+## Fix: pre-rendering module resolution in projects without node_modules
+
+- `processPre.ts` now injects the absolute resolved path of `@tkeron/html-parser` instead of the bare specifier
+- Fixes failure when the user's project lives inside a workspace root with a `node_modules/` that doesn't include `@tkeron` dependencies
+
+### Migration
+
+```bash
+# Before (v4.x)
+tk build src dist
+tk dev src dist 8080
+
+# After (v5.0)
+tk build
+tk dev 8080
+```
+
+### What changed
+
+- `buildWrapper` no longer forwards `sourceDir`/`targetDir` to `build()`
+- CLI positioned arguments for directories removed from `build` and `develop` commands
+- Documentation updated (cli-reference, getting-started)
+
+---
+
 # v4.5.0
 
 ## tsconfig.json Generation on Init

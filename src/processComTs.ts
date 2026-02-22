@@ -137,7 +137,9 @@ const processComponentsTs = async (
 
           const elementHTML = (child as any).outerHTML;
 
-          log.info(`Processing component <${tagName}> from ${componentPath}`);
+          log.info(
+            `Processing component <${tagName}> from ${componentPath.replace(rootDir, ".")}`,
+          );
 
           const tempDoc = parseHTML(
             "<html><body>" + elementHTML + "</body></html>",
@@ -199,7 +201,9 @@ ${codeWithoutImports}
               await executeComponent(com);
             }
           } catch (execError: any) {
-            log.error(`\n❌ Error executing component <${tagName}>:`);
+            log.error(
+              `\n❌ Error executing component <${tagName}>: ${componentPath.replace(rootDir, ".")}`,
+            );
             log.error(`   ${execError.message}`);
             throw execError;
           }

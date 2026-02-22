@@ -4,7 +4,6 @@ import {
   mkdirSync,
   copyFileSync,
   readFileSync,
-  writeFileSync,
   readdirSync,
   rmSync,
 } from "fs";
@@ -12,6 +11,7 @@ import { join, resolve, basename } from "path";
 import type { Logger } from "@tkeron/tools";
 import { silentLogger } from "@tkeron/tools";
 import { promptUser } from "./promptUser";
+import { ensureTsconfig } from "./ensureTsconfig";
 
 export interface InitOptions {
   projectName: string;
@@ -29,6 +29,8 @@ export const init = async (options: InitOptions) => {
 
   const targetPath = resolve(process.cwd(), projectName);
   const isCurrentDir = projectName === "." || targetPath === process.cwd();
+
+  let skipWebsrc = false;
 
   if (existsSync(targetPath)) {
     if (!isCurrentDir) {
@@ -57,18 +59,22 @@ export const init = async (options: InitOptions) => {
             "\nDo you want to overwrite them? (y/N): ",
           );
 
-          if (!shouldContinue) {
-            log.log("\n❌ Operation cancelled.");
-            return;
+          if (shouldContinue) {
+            existingTkeronFiles.forEach((file) => {
+              const filePath = join(targetPath, file);
+              rmSync(filePath, { recursive: true, force: true });
+            });
+            log.log("✓ Cleaned existing tkeron files");
+          } else {
+            skipWebsrc = existingTkeronFiles.includes("websrc");
           }
+        } else {
+          existingTkeronFiles.forEach((file) => {
+            const filePath = join(targetPath, file);
+            rmSync(filePath, { recursive: true, force: true });
+          });
+          log.log("✓ Cleaned existing tkeron files");
         }
-
-        existingTkeronFiles.forEach((file) => {
-          const filePath = join(targetPath, file);
-          rmSync(filePath, { recursive: true, force: true });
-        });
-
-        log.log("✓ Cleaned existing tkeron files");
       }
     }
   }
@@ -91,36 +97,27 @@ export const init = async (options: InitOptions) => {
   }
 
   const tsconfigPath = join(targetPath, "tsconfig.json");
-  let existingTsconfig: Record<string, unknown> | null = null;
-  if (isCurrentDir && existsSync(tsconfigPath)) {
+  let previousTsconfig: Record<string, unknown> | undefined;
+  if (existsSync(tsconfigPath)) {
     try {
-      existingTsconfig = JSON.parse(readFileSync(tsconfigPath, "utf-8"));
+      previousTsconfig = JSON.parse(readFileSync(tsconfigPath, "utf-8"));
     } catch {
-      existingTsconfig = null;
+      previousTsconfig = undefined;
     }
   }
 
   mkdirSync(targetPath, { recursive: true });
-  cpSync(templatePath, targetPath, { recursive: true });
+  const websrcInTemplate = join(templatePath, "websrc");
+  cpSync(templatePath, targetPath, {
+    recursive: true,
+    filter: skipWebsrc
+      ? (src: string) =>
+          src !== websrcInTemplate && !src.startsWith(websrcInTemplate + "/")
+      : undefined,
+  });
   copyFileSync(tkeronDtsPath, join(targetPath, "tkeron.d.ts"));
 
-  if (existingTsconfig !== null) {
-    const templateTsconfig = JSON.parse(readFileSync(tsconfigPath, "utf-8"));
-    const requiredIncludes: string[] = Array.isArray(templateTsconfig.include)
-      ? (templateTsconfig.include as string[])
-      : [];
-    const existingIncludes: string[] = Array.isArray(existingTsconfig.include)
-      ? (existingTsconfig.include as string[])
-      : [];
-    const mergedIncludes = [...existingIncludes];
-    for (const entry of requiredIncludes) {
-      if (!mergedIncludes.includes(entry)) {
-        mergedIncludes.push(entry);
-      }
-    }
-    const merged = { ...existingTsconfig, include: mergedIncludes };
-    writeFileSync(tsconfigPath, JSON.stringify(merged, null, 2));
-  }
+  ensureTsconfig(targetPath, previousTsconfig);
 
   const projectDisplayName = isCurrentDir ? basename(targetPath) : projectName;
   log.log(`✓ Created project "${projectDisplayName}"`);

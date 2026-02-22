@@ -52,30 +52,22 @@ Build your project by processing source files into static output.
 **Usage:**
 
 ```bash
-tk build [sourceDir] [targetDir]
+tk build
 ```
 
-**Arguments:**
+**Convention:**
 
-| Argument    | Type   | Default  | Description                                    |
-| ----------- | ------ | -------- | ---------------------------------------------- |
-| `sourceDir` | string | `websrc` | Source directory containing your project files |
-| `targetDir` | string | `web`    | Output directory for built files               |
+- Source directory: `websrc/` (relative to current directory)
+- Output directory: `web/` (sibling of `websrc/`)
 
 **Examples:**
 
 ```bash
-# Build with defaults (websrc → web)
+# Build the project
 tk build
 
-# Build with custom source directory
-tk build src web
-
-# Build to custom output directory
-tk build websrc dist
-
-# Build with both custom
-tk build source output
+# Using alias
+tk b
 ```
 
 **Build Process:**
@@ -120,17 +112,20 @@ Start a development server with hot reload.
 **Usage:**
 
 ```bash
-tk develop [sourceDir] [outputDir] [port] [host]
+tk develop [port] [host]
 ```
 
 **Arguments:**
 
-| Argument    | Type   | Default     | Description                 |
-| ----------- | ------ | ----------- | --------------------------- |
-| `sourceDir` | string | `websrc`    | Source directory to watch   |
-| `outputDir` | string | `web`       | Output directory for builds |
-| `port`      | number | `3000`      | Port for development server |
-| `host`      | string | `localhost` | Host to bind server to      |
+| Argument | Type   | Default     | Description                 |
+| -------- | ------ | ----------- | --------------------------- |
+| `port`   | number | `3000`      | Port for development server |
+| `host`   | string | `localhost` | Host to bind server to      |
+
+**Convention:**
+
+- Source directory: `websrc/` (relative to current directory)
+- Output directory: `web/` (sibling of `websrc/`)
 
 **Examples:**
 
@@ -138,17 +133,14 @@ tk develop [sourceDir] [outputDir] [port] [host]
 # Start with defaults
 tk dev
 
-# Custom source and output
-tk dev src dist
-
 # Custom port
-tk dev websrc web 8080
+tk dev 8080
 
 # Bind to all interfaces
-tk dev websrc web 3000 0.0.0.0
+tk dev 3000 0.0.0.0
 
 # Complete custom configuration
-tk develop source output 8080 0.0.0.0
+tk develop 8080 0.0.0.0
 ```
 
 **What It Does:**
@@ -317,7 +309,7 @@ tk init . --force
 cd my-website
 
 # Start development server
-tk dev websrc
+tk dev
 
 # Open http://localhost:3000
 ```
@@ -356,7 +348,7 @@ Quick reference for command shortcuts:
 ```bash
 tk b                    # Same as: tk build
 tk d                    # Same as: tk develop
-tk dev websrc web 8080  # Same as: tk develop websrc web 8080
+tk dev 8080             # Same as: tk develop 8080
 tk i my-site            # Same as: tk init my-site
 ```
 
@@ -430,22 +422,19 @@ Tkeron uses **convention over configuration**. There are no configuration files.
 
 **Project Structure Convention:**
 
-- Source directory: `websrc/` (default)
-- Output directory: `web/` (default)
+- Source directory: `websrc/` (fixed)
+- Output directory: `web/` (fixed)
 - Component files: `*.com.html` and `*.com.ts`
 - Pre-render files: `*.pre.ts`
 - Type definitions: `tkeron.d.ts`
 
 **Customization:**
 
-All customization is done via command-line arguments:
+Server configuration is done via command-line arguments:
 
 ```bash
-# Custom directories
-tk build src dist
-
 # Custom server config
-tk dev src dist 8080 0.0.0.0
+tk dev 8080 0.0.0.0
 ```
 
 ---
@@ -580,7 +569,7 @@ Error: Port 3000 is already in use
 
 ```bash
 # Use different port
-tk dev websrc web 3001
+tk dev 3001
 ```
 
 ### Source Directory Not Found
@@ -597,8 +586,8 @@ tk dev websrc web 3001
 # Create directory
 mkdir websrc
 
-# Or use correct path
-tk build src web
+# Or initialize a new project
+tk init .
 ```
 
 ### Permission Denied
@@ -668,11 +657,8 @@ tk dev
 # Build for production
 NODE_ENV=production tk build
 
-# Build to custom directory
-tk build websrc dist
-
 # Development on port 8080
-tk dev websrc web 8080
+tk dev 8080
 
 # Initialize in current directory
 tk init .

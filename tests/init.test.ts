@@ -439,9 +439,8 @@ describe("init", () => {
         join(projectPath, "tkeron.d.ts"),
         "utf-8",
       );
-      expect(dtsContent).toContain("declare module");
-      expect(dtsContent).toContain("*.pre.ts");
-      expect(dtsContent).toContain("*.com.ts");
+      expect(dtsContent).toContain("declare const com");
+      expect(dtsContent).toContain("HTMLElement");
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -465,8 +464,7 @@ describe("init", () => {
         join(projectPath, "tkeron.d.ts"),
         "utf-8",
       );
-      expect(dtsContent).toContain("const document: Document");
-      expect(dtsContent).toContain("const com: HTMLElement");
+      expect(dtsContent).toContain("declare const com: HTMLElement");
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -836,9 +834,24 @@ describe("init", () => {
           logger: testLogger.logger,
         });
 
+        const websrcContent = readFileSync(
+          join(currentDir, "websrc", "index.html"),
+          "utf-8",
+        );
+        expect(websrcContent).toBe("<h1>Old</h1>");
+
+        const dtsContent = readFileSync(
+          join(currentDir, "tkeron.d.ts"),
+          "utf-8",
+        );
+        expect(dtsContent).not.toBe("// old");
+
+        expect(
+          testLogger.logs.some((l) => l.includes("✓ Created project")),
+        ).toBe(true);
         expect(
           testLogger.logs.some((l) => l.includes("❌ Operation cancelled.")),
-        ).toBe(true);
+        ).toBe(false);
       } finally {
         process.chdir(originalCwd);
       }
