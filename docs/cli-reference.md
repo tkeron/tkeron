@@ -75,16 +75,20 @@ tk b
 1. Creates temporary directory as sibling to source
 2. Copies source to temp directory
 3. Runs `.pre.ts` files (pre-rendering)
-4. Processes `.com.ts` components (TypeScript components)
-5. Processes `.com.html` components (HTML components)
-6. Compiles TypeScript to JavaScript
-7. Copies result to target directory
-8. Cleans up temporary directory
+4. Iterative component processing (up to 10 iterations):
+   - Processes `.com.ts` components (TypeScript components)
+   - Processes `.com.html` components (HTML components)
+   - Processes `.com.md` components (Markdown components)
+   - Repeats until no changes are detected
+5. Compiles TypeScript to JavaScript
+6. Copies result to target directory
+7. Cleans up temporary directory
 
 **Files Excluded from Output:**
 
 - `*.com.html` - HTML components (inlined)
 - `*.com.ts` - TypeScript components (inlined)
+- `*.com.md` - Markdown components (inlined)
 - `*.pre.ts` - Pre-rendering scripts (executed)
 
 **Exit Codes:**
@@ -448,8 +452,8 @@ Tkeron doesn't require a `tsconfig.json`, but you can add one for editor support
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
+    "lib": ["ESNext", "DOM"],
     "moduleResolution": "bundler",
-    "types": ["bun-types"],
     "strict": true,
     "skipLibCheck": true
   },
@@ -635,7 +639,7 @@ tk
 This document! Also available at:
 
 - [GitHub Repository](https://github.com/tkeron/tkeron)
-- [Documentation Site](https://tkeron.dev/docs)
+- [Documentation Site](https://tkeron.com)
 
 ### Report Issues
 

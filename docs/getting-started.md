@@ -88,7 +88,7 @@ web/
 └── ...              # Other processed files
 ```
 
-Notice that `.com.html`, `.com.ts`, and `.pre.ts` files are **not** copied to output - they're processed and inlined.
+Notice that `.com.html`, `.com.ts`, `.com.md`, and `.pre.ts` files are **not** copied to output - they're processed and inlined.
 
 ## Start Development Server
 
@@ -198,6 +198,7 @@ Open `web/index.html` in your browser. You'll see the greeting component inlined
 | `.ts` / `.js`       | Scripts for pages     | ✅ Yes (compiled) |
 | `.com.html`         | HTML components       | ❌ No (inlined)   |
 | `.com.ts`           | TypeScript components | ❌ No (inlined)   |
+| `.com.md`           | Markdown components   | ❌ No (inlined)   |
 | `.pre.ts`           | Pre-rendering scripts | ❌ No (executed)  |
 | `.css`              | Stylesheets           | ✅ Yes            |
 | Images, fonts, etc. | Static assets         | ✅ Yes            |
@@ -271,4 +272,4 @@ tk dev 3001
 
 - Component names **must** contain a hyphen: `user-card`, not `usercard`
 - File must be named exactly: `user-card.com.html`
-- Component files must be in `websrc/` or the same directory as the page using them
+- Component files can be anywhere in the source tree — Tkeron searches the same directory first, then the entire source via glob

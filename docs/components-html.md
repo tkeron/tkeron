@@ -7,7 +7,7 @@ HTML components (`.com.html` files) are the simplest way to create reusable piec
 Create a file named with `.com.html` extension:
 
 ```html
-<!-- button.com.html -->
+<!-- my-button.com.html -->
 <button class="btn">Click me</button>
 ```
 
@@ -15,7 +15,7 @@ Use it with a matching custom element:
 
 ```html
 <!-- index.html -->
-<button></button>
+<my-button></my-button>
 ```
 
 Build, and the custom element is replaced with the component's content.
@@ -36,7 +36,7 @@ Component filenames must:
 | -------------------- | -------------- | ------------------------- |
 | `user-card.com.html` | `<user-card>`  | ✅ Yes                    |
 | `nav-menu.com.html`  | `<nav-menu>`   | ✅ Yes                    |
-| `header.com.html`    | `<header>`     | ❌ No (no hyphen)         |
+| `card.com.html`      | `<card>`       | ❌ No (no hyphen)         |
 | `UserCard.com.html`  | `<user-card>`  | ✅ Yes (case-insensitive) |
 
 ### 2. Component Resolution
@@ -44,23 +44,25 @@ Component filenames must:
 Tkeron looks for components in this order:
 
 1. **Same directory** as the file using it
-2. **Root directory** (`websrc/`)
+2. **Any directory** in the source tree (via glob search)
 
 **Example structure:**
 
 ```
 websrc/
 ├── index.html
-├── header.com.html          # Available to all files
+├── site-header.com.html        # Available to all files
+├── components/
+│   └── blog-comment.com.html   # Also available to all files
 ├── blog/
 │   ├── post.html
-│   └── comment.com.html     # Available only to blog/post.html
+│   └── blog-comment.com.html   # Takes priority for blog/post.html
 ```
 
 In `blog/post.html`:
 
-- `<comment>` → Finds `blog/comment.com.html` first
-- `<header>` → Falls back to `websrc/header.com.html`
+- `<blog-comment>` → Finds `blog/blog-comment.com.html` first (same directory)
+- `<site-header>` → Found via glob search in the source tree
 
 ### 3. Build Process
 

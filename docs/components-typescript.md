@@ -84,7 +84,7 @@ Custom elements in HTML must contain at least one hyphen to distinguish them fro
 Same as HTML components:
 
 1. **Same directory** as the file using it
-2. **Root directory** (`websrc/`)
+2. **Any directory** in the source tree (via glob search)
 
 ### IDE Support & IntelliSense
 

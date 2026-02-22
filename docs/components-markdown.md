@@ -50,23 +50,23 @@ Component filenames must:
 Tkeron looks for components in this order:
 
 1. **Same directory** as the file using it
-2. **Root directory** (`websrc/`)
+2. **Any directory** in the source tree (via glob search)
 
 **Example structure:**
 
 ```
 websrc/
 ├── index.html
-├── site-intro.com.md         # Available to all files
+├── site-intro.com.md           # Available to all files
 ├── blog/
 │   ├── post.html
-│   └── post-footer.com.md    # Available only to blog/post.html
+│   └── post-footer.com.md      # Takes priority for blog/post.html
 ```
 
 In `blog/post.html`:
 
-- `<post-footer>` → Finds `blog/post-footer.com.md` first
-- `<site-intro>` → Falls back to `websrc/site-intro.com.md`
+- `<post-footer>` → Finds `blog/post-footer.com.md` first (same directory)
+- `<site-intro>` → Found via glob search in the source tree
 
 ### 3. Component Priority
 

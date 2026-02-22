@@ -1,3 +1,21 @@
+# v5.0.1
+
+## Documentation fixes and dependency updates
+
+- Fix: `tk build` and `tk dev` CLI signatures corrected in README (removed wrong `[src] [out]` args, aligned with v5.0 breaking change)
+- Fix: Component resolution docs updated to reflect actual glob search behavior (not limited to root `websrc/`)
+- Fix: Build process docs updated to include `.com.md` processing step and iterative loop (up to 10 iterations)
+- Fix: `tsconfig.json` example corrected to match real config (`lib: ["ESNext", "DOM"]`, removed `types: ["bun-types"]`)
+- Fix: TypeScript compilation docs clarified — Bun transpiler does NOT type-check, only transpiles
+- Fix: Broken link `tkeron.dev/docs` → `tkeron.com`
+- Fix: `components-html.md` quick start used `<button>` (reserved HTML tag, no hyphen) — replaced with `<my-button>`
+- Fix: `best-practices.md` Summary had orphaned/corrupted code fragment — removed
+- Fix: Added `.com.md` to all feature lists, tables, and build process diagrams across all docs
+- Fix: `package.json` description updated to reflect actual purpose
+- Deps: `bun update --latest` — updated all dependencies
+
+---
+
 # v5.0.0
 
 ## Breaking: sourceDir and targetDir removed as CLI arguments

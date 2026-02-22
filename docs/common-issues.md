@@ -125,9 +125,9 @@ blog-post.com.ts      → <blog-post>
 
 ## TypeScript Compilation
 
-### Issue: TypeScript Errors Prevent Build
+### Issue: TypeScript Errors in Source
 
-**Problem:** Type errors block compilation
+**Problem:** TypeScript code has type errors
 
 ```typescript
 // ❌ WRONG
@@ -135,17 +135,23 @@ const user = { name: "Alice" };
 user.age = 30; // Error: Property 'age' does not exist
 ```
 
-**Why this happens:**
+**Why this matters:**
 
-- Tkeron uses Bun's TypeScript transpiler
-- Type errors can prevent successful builds
-- Missing types for global variables
+- Tkeron uses Bun's TypeScript transpiler, which **does NOT type-check** — it only transpiles
+- Type errors won't prevent the build from running
+- However, type errors may indicate real bugs in your code
+- Missing types for global variables can confuse your IDE
 
 **Solution:**
 
+- Run `tsc --noEmit` separately to catch type errors before building
 - Use `tkeron.d.ts` for global type declarations
-- Fix type errors before building
 - Use `any` strategically if types are complex
+
+```bash
+# Check types, then build
+tsc --noEmit && tk build
+```
 
 ```typescript
 // ✅ CORRECT
@@ -166,16 +172,17 @@ user.age = 30; // OK
 
 **Why this happens:**
 
-- Tkeron searches in 2 locations only:
+- Tkeron searches in 2 ways:
   1. Same directory as HTML file
-  2. Root directory (`websrc/`)
-- Not in subdirectories or parent directories (except root)
+  2. Glob search across the entire source tree
+- If no match is found in either, the element remains unchanged
 
 **Solution:**
-Either place component:
+Place the component file anywhere in the source tree — Tkeron will find it via glob search. For clarity, common locations:
 
-- In `blog/user-card.com.html` (next to `post.html`)
-- Or in `websrc/user-card.com.html` (root, available everywhere)
+- In `blog/user-card.com.html` (next to `post.html` — higher priority)
+- In `websrc/user-card.com.html` (root)
+- In `websrc/components/user-card.com.html` (organized in a subfolder)
 
 ## Build Performance
 

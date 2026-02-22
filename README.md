@@ -82,8 +82,8 @@ document.getElementById("quote").textContent = data.content;
 
 ```bash
 tk init <name>           # Initialize new project
-tk build [src] [out]     # Build project (default: websrc → web)
-tk dev [src] [out]       # Dev server with hot reload (port 3000)
+tk build                 # Build project (websrc → web)
+tk dev [port] [host]     # Dev server with hot reload (default: localhost:3000)
 ```
 
 **Aliases:** `tk i`, `tk b`, `tk d`

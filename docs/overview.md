@@ -11,6 +11,7 @@ Powered by [Bun](https://bun.sh).
 - Compiles TypeScript to JavaScript
 - Inlines HTML components (`.com.html`)
 - Executes TypeScript components (`.com.ts`) at build time
+- Renders Markdown components (`.com.md`) at build time
 - Runs pre-rendering scripts (`.pre.ts`)
 - Copies assets
 - Dev server with hot reload
@@ -107,11 +108,12 @@ websrc/               Build Steps           web/
 ├── index.html    →  1. .pre.ts        →  ├── index.html
 ├── index.ts         2. .com.ts           ├── index.js
 ├── index.pre.ts     3. .com.html
-├── nav.com.html     4. TypeScript
-└── card.com.ts      5. Assets
+├── nav.com.html     4. .com.md
+├── card.com.ts      5. TypeScript
+└── info.com.md      6. Assets
 ```
 
-Component files (`.com.html`, `.com.ts`, `.pre.ts`) are not copied to output.
+Component files (`.com.html`, `.com.ts`, `.com.md`, `.pre.ts`) are not copied to output.
 
 ---
 

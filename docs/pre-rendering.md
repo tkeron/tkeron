@@ -71,10 +71,13 @@ This is the parsed DOM from the corresponding `.html` file.
 
 ```
 1. Run .pre.ts files    → Modify HTML documents
-2. Process .com.ts      → Replace TypeScript components
-3. Process .com.html    → Replace HTML components
-4. Compile .ts to .js   → TypeScript compilation
-5. Copy to output       → Final build
+2. Iterative component processing (up to 10 iterations):
+   a. Process .com.ts   → Replace TypeScript components
+   b. Process .com.html → Replace HTML components
+   c. Process .com.md   → Replace Markdown components
+   d. Repeat until no changes
+3. Compile .ts to .js   → TypeScript compilation
+4. Copy to output       → Final build
 ```
 
 Pre-rendering happens **first**, so you can inject components dynamically.

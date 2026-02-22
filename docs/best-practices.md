@@ -231,23 +231,20 @@ document.getElementById("stars").textContent = data.public_repos;
 
 - HTML components: static markup
 - TypeScript components: dynamic generation
+- Markdown components: content in Markdown
 - Pre-rendering: DOM manipulation at build time
 - Browser code: regular TypeScript/JavaScript
 - No bundling of npm packages
 - No type checking (use `tsc --noEmit`)
 - Powered by Bun
-  document.querySelectorAll('.my-button').forEach(btn => {
-  btn.addEventListener('click', handleClick);
-  });
-  });
 
-````
+---
 
 ```typescript
 // ❌ Don't try to maintain state
 let count = 0; // This is meaningless
 com.innerHTML = `<button>Count: ${count}</button>`;
-````
+```
 
 **Solution:** Use client-side JavaScript for stateful UI.
 
