@@ -85,11 +85,8 @@ const processComponentsTs = async (
     if (tagName) {
       if (!tagName.includes("-")) {
         const localPath = join(currentDir, `${tagName}.com.ts`);
-        const rootPath = join(rootDir, `${tagName}.com.ts`);
-        if (
-          (await Bun.file(localPath).exists()) ||
-          (await Bun.file(rootPath).exists())
-        ) {
+        const globMatches = getFilePaths(rootDir, `**/${tagName}.com.ts`, true);
+        if ((await Bun.file(localPath).exists()) || globMatches.length > 0) {
           log.error(
             `\n❌ Error: Component name '${tagName}' must contain at least one hyphen.`,
           );
@@ -98,7 +95,7 @@ const processComponentsTs = async (
             `   Rename '${tagName}.com.ts' to 'tk-${tagName}.com.ts' or similar.`,
           );
           log.error(
-            `   File: ${(await Bun.file(localPath).exists()) ? localPath : rootPath}\n`,
+            `   File: ${(await Bun.file(localPath).exists()) ? localPath : globMatches[0]}\n`,
           );
           throw new Error(
             `Component name '${tagName}' must contain at least one hyphen`,
@@ -106,14 +103,20 @@ const processComponentsTs = async (
         }
       } else {
         const localPath = join(currentDir, `${tagName}.com.ts`);
-        const rootPath = join(rootDir, `${tagName}.com.ts`);
 
         let componentPath: string | null = null;
 
         if (await Bun.file(localPath).exists()) {
           componentPath = localPath;
-        } else if (await Bun.file(rootPath).exists()) {
-          componentPath = rootPath;
+        } else {
+          const globMatches = getFilePaths(
+            rootDir,
+            `**/${tagName}.com.ts`,
+            true,
+          );
+          if (globMatches.length > 0) {
+            componentPath = globMatches[0];
+          }
         }
 
         if (componentPath) {

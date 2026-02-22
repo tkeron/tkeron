@@ -931,4 +931,112 @@ describe("processCom - Component substitution", () => {
       }
     });
   });
+
+  describe("Subdirectory component lookup", () => {
+    it("should find .com.html in a subdirectory of rootDir", async () => {
+      const { dir: TEST_DIR } = getTestResources("processCom-subdir-lookup");
+
+      try {
+        mkdirSync(join(TEST_DIR, "components"), { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><my-widget></my-widget></body></html>`;
+        const componentHtml = `<div>Widget from subdir</div>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "components", "my-widget.com.html"),
+          componentHtml,
+        );
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain("<div>Widget from subdir</div>");
+        expect(result).not.toContain("<my-widget>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should prioritize currentDir over subdirectory", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-subdir-priority-currentdir",
+      );
+
+      try {
+        mkdirSync(join(TEST_DIR, "sub"), { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><my-card></my-card></body></html>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "my-card.com.html"),
+          "<div>From currentDir</div>",
+        );
+        writeFileSync(
+          join(TEST_DIR, "sub", "my-card.com.html"),
+          "<div>From subdir</div>",
+        );
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain("From currentDir");
+        expect(result).not.toContain("From subdir");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should find component in deeply nested subdirectory", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-subdir-deep-nested",
+      );
+
+      try {
+        mkdirSync(join(TEST_DIR, "a", "b", "c"), { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><deep-comp></deep-comp></body></html>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "a", "b", "c", "deep-comp.com.html"),
+          "<span>Deep</span>",
+        );
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain("<span>Deep</span>");
+        expect(result).not.toContain("<deep-comp>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should detect hyphen-less component in subdirectory", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-subdir-hyphenless-error",
+      );
+      const { logger } = createTestLogger();
+
+      try {
+        mkdirSync(join(TEST_DIR, "sub"), { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><footer></footer></body></html>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "sub", "footer.com.html"),
+          "<div>Footer</div>",
+        );
+
+        await expect(processCom(TEST_DIR, { logger })).rejects.toThrow(
+          "Component name 'footer' must contain at least one hyphen",
+        );
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
 });

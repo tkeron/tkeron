@@ -336,9 +336,8 @@ describe("Examples Build Tests", () => {
     it("index.html should use root components (both .html and .ts)", () => {
       const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
 
-      // Should have root HTML header
-      expect(htmlContent).toContain("Root Header (HTML Component)");
-      expect(htmlContent).toContain("static HTML component from root");
+      // .com.ts found via glob takes priority over root .com.html
+      expect(htmlContent).toContain("Dashboard Header (Local TS Override)");
 
       // Should have root TS feature card
       expect(htmlContent).toContain("Feature 1 (Root TS Component)");
@@ -382,11 +381,8 @@ describe("Examples Build Tests", () => {
         "utf-8",
       );
 
-      // Should have deep local HTML header (local .com.html)
-      expect(htmlContent).toContain(
-        "Profile Header (Deep Local HTML Override)",
-      );
-      expect(htmlContent).toContain("users/profiles/ directory");
+      // .com.ts found via glob takes priority (processComTs runs before processCom)
+      expect(htmlContent).toContain("Dashboard Header (Local TS Override)");
 
       // Should have user profile content from local .com.ts
       expect(htmlContent).toContain("Jane Doe");

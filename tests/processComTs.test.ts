@@ -1495,4 +1495,87 @@ com.innerHTML = \`<meta name="\${name}" content="\${content}">\`;`;
       }
     });
   });
+
+  describe("Subdirectory component lookup", () => {
+    it("should find .com.ts in a subdirectory of rootDir", async () => {
+      const { dir: TEST_DIR } = getTestResources("processComTs-subdir-lookup");
+
+      try {
+        mkdirSync(join(TEST_DIR, "components"), { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><my-widget></my-widget></body></html>`;
+        const componentTs = `com.innerHTML = "<div>Widget from subdir</div>";`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "components", "my-widget.com.ts"),
+          componentTs,
+        );
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain("<div>Widget from subdir</div>");
+        expect(result).not.toContain("<my-widget>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should prioritize currentDir over subdirectory", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-subdir-priority-currentdir",
+      );
+
+      try {
+        mkdirSync(join(TEST_DIR, "sub"), { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><my-card></my-card></body></html>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "my-card.com.ts"),
+          `com.innerHTML = "<div>From currentDir</div>";`,
+        );
+        writeFileSync(
+          join(TEST_DIR, "sub", "my-card.com.ts"),
+          `com.innerHTML = "<div>From subdir</div>";`,
+        );
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain("From currentDir");
+        expect(result).not.toContain("From subdir");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should find component in deeply nested subdirectory", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-subdir-deep-nested",
+      );
+
+      try {
+        mkdirSync(join(TEST_DIR, "a", "b", "c"), { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><deep-comp></deep-comp></body></html>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "a", "b", "c", "deep-comp.com.ts"),
+          `com.innerHTML = "<span>Deep</span>";`,
+        );
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain("<span>Deep</span>");
+        expect(result).not.toContain("<deep-comp>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
 });

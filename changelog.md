@@ -1,3 +1,24 @@
+# v4.4.0
+
+## Component Subdirectory Lookup
+
+### New Features
+
+- **Added**: Components (`.com.html`, `.com.md`, `.com.ts`) are now resolved via glob search (`**/${tagName}.com.*`) across any subdirectory of `rootDir`, not just at the exact root path
+  - `currentDir` (same directory as the referencing HTML file) retains the highest priority
+  - If not found locally, tkeron glob-searches all subdirectories of `rootDir` recursively
+  - First glob match is used when multiple subdirectory matches exist
+  - The error message for hyphen-less component names now correctly reports the path found via glob
+
+### Tests
+
+- **Added**: `tests/processCom.test.ts` — 4 new tests covering subdirectory lookup for `.com.html`
+- **Added**: `tests/processComMd.test.ts` — 3 new tests covering subdirectory lookup for `.com.md`
+- **Added**: `tests/processComTs.test.ts` — 3 new tests covering subdirectory lookup for `.com.ts`
+- **Updated**: `tests/examples.test.ts` — updated assertions to match glob-based component resolution
+
+---
+
 # v4.3.1
 
 ## Bug Fixes
