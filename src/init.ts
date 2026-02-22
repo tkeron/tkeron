@@ -3,6 +3,8 @@ import {
   existsSync,
   mkdirSync,
   copyFileSync,
+  readFileSync,
+  writeFileSync,
   readdirSync,
   rmSync,
 } from "fs";
@@ -88,9 +90,37 @@ export const init = async (options: InitOptions) => {
     throw new Error("tkeron.d.ts not found");
   }
 
+  const tsconfigPath = join(targetPath, "tsconfig.json");
+  let existingTsconfig: Record<string, unknown> | null = null;
+  if (isCurrentDir && existsSync(tsconfigPath)) {
+    try {
+      existingTsconfig = JSON.parse(readFileSync(tsconfigPath, "utf-8"));
+    } catch {
+      existingTsconfig = null;
+    }
+  }
+
   mkdirSync(targetPath, { recursive: true });
   cpSync(templatePath, targetPath, { recursive: true });
   copyFileSync(tkeronDtsPath, join(targetPath, "tkeron.d.ts"));
+
+  if (existingTsconfig !== null) {
+    const templateTsconfig = JSON.parse(readFileSync(tsconfigPath, "utf-8"));
+    const requiredIncludes: string[] = Array.isArray(templateTsconfig.include)
+      ? (templateTsconfig.include as string[])
+      : [];
+    const existingIncludes: string[] = Array.isArray(existingTsconfig.include)
+      ? (existingTsconfig.include as string[])
+      : [];
+    const mergedIncludes = [...existingIncludes];
+    for (const entry of requiredIncludes) {
+      if (!mergedIncludes.includes(entry)) {
+        mergedIncludes.push(entry);
+      }
+    }
+    const merged = { ...existingTsconfig, include: mergedIncludes };
+    writeFileSync(tsconfigPath, JSON.stringify(merged, null, 2));
+  }
 
   const projectDisplayName = isCurrentDir ? basename(targetPath) : projectName;
   log.log(`✓ Created project "${projectDisplayName}"`);

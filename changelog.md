@@ -1,3 +1,21 @@
+# v4.5.0
+
+## tsconfig.json Generation on Init
+
+### New Features
+
+- **Added**: `tk i` now generates a `tsconfig.json` in the project root, allowing the IDE/TypeScript language server to detect `tkeron.d.ts` and provide full autocompletion and type checking for `.com.ts` and `.pre.ts` files
+  - New projects receive the full tkeron tsconfig template (`"include": ["websrc/**/*", "tkeron.d.ts"]`)
+  - Existing projects with a custom `tsconfig.json` are **not overwritten** — tkeron merges only the required `include` entries (`"websrc/**/*"` and `"tkeron.d.ts"`), preserving all other settings (`compilerOptions`, `exclude`, custom includes, etc.)
+  - Duplicate entries are never added
+  - `tsconfig.json` is not treated as a tkeron-managed file and does not appear in the overwrite warning
+
+### Tests
+
+- **Added**: `tests/init.test.ts` — 10 new tests covering tsconfig creation, IDE detection includes, websrc includes, current-directory init, no-warning behavior, merge scenarios (missing entries, no-op when already present, no duplicates, no include field, preserving all existing settings)
+
+---
+
 # v4.4.0
 
 ## Component Subdirectory Lookup

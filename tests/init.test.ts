@@ -1071,4 +1071,329 @@ describe("init", () => {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
   });
+
+  it("should create tsconfig.json when creating a new project", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-create-tsconfig-json-new-project",
+    );
+
+    try {
+      const projectName = "tsconfig-test";
+      const projectPath = join(TEST_DIR, projectName);
+
+      await init({
+        projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
+      });
+
+      expect(existsSync(join(projectPath, "tsconfig.json"))).toBe(true);
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should create tsconfig.json that includes tkeron.d.ts for IDE detection", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-create-tsconfig-with-tkeron-dts",
+    );
+
+    try {
+      const projectName = "tsconfig-dts-test";
+      const projectPath = join(TEST_DIR, projectName);
+
+      await init({
+        projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
+      });
+
+      const tsconfig = JSON.parse(
+        readFileSync(join(projectPath, "tsconfig.json"), "utf-8"),
+      );
+      expect(tsconfig.include).toBeDefined();
+      expect(tsconfig.include).toContain("tkeron.d.ts");
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should create tsconfig.json that includes websrc sources", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-create-tsconfig-with-websrc",
+    );
+
+    try {
+      const projectName = "tsconfig-websrc-test";
+      const projectPath = join(TEST_DIR, projectName);
+
+      await init({
+        projectName: join(TEST_DIR, projectName),
+        logger: silentLogger,
+      });
+
+      const tsconfig = JSON.parse(
+        readFileSync(join(projectPath, "tsconfig.json"), "utf-8"),
+      );
+      expect(tsconfig.include).toBeDefined();
+      const hasWebsrc = tsconfig.include.some((entry: string) =>
+        entry.includes("websrc"),
+      );
+      expect(hasWebsrc).toBe(true);
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should create tsconfig.json when initializing in current directory", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-create-tsconfig-current-dir",
+    );
+
+    try {
+      const currentDir = join(TEST_DIR, "my-project");
+      mkdirSync(currentDir, { recursive: true });
+
+      const originalCwd = process.cwd();
+      process.chdir(currentDir);
+
+      try {
+        await init({ projectName: ".", logger: silentLogger });
+
+        expect(existsSync(join(currentDir, "tsconfig.json"))).toBe(true);
+        const tsconfig = JSON.parse(
+          readFileSync(join(currentDir, "tsconfig.json"), "utf-8"),
+        );
+        expect(tsconfig.include).toContain("tkeron.d.ts");
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should not include tsconfig.json in tkeron-managed files warning", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-not-include-tsconfig-in-tkeron-files-warning",
+    );
+    const testLogger = createTestLogger();
+
+    try {
+      const currentDir = join(TEST_DIR, "current");
+      mkdirSync(currentDir, { recursive: true });
+      mkdirSync(join(currentDir, "websrc"), { recursive: true });
+      writeFileSync(join(currentDir, "tsconfig.json"), "{}");
+
+      const originalCwd = process.cwd();
+      process.chdir(currentDir);
+
+      try {
+        const mockPrompt = async (_question: string) => false;
+
+        await init({
+          projectName: ".",
+          promptFn: mockPrompt,
+          logger: testLogger.logger,
+        });
+
+        const warningLog = testLogger.logs.find((l) =>
+          l.includes("tkeron files already exist"),
+        );
+        expect(warningLog).not.toContain("tsconfig.json");
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should merge tkeron.d.ts into existing tsconfig include", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-merge-tkeron-dts-into-existing-tsconfig",
+    );
+
+    try {
+      const currentDir = join(TEST_DIR, "current");
+      mkdirSync(currentDir, { recursive: true });
+      writeFileSync(
+        join(currentDir, "tsconfig.json"),
+        JSON.stringify({
+          compilerOptions: { target: "ESNext", strict: true },
+          include: ["src/**/*"],
+        }),
+      );
+
+      const originalCwd = process.cwd();
+      process.chdir(currentDir);
+
+      try {
+        await init({ projectName: ".", logger: silentLogger });
+
+        const tsconfig = JSON.parse(
+          readFileSync(join(currentDir, "tsconfig.json"), "utf-8"),
+        );
+        expect(tsconfig.include).toContain("tkeron.d.ts");
+        expect(tsconfig.include).toContain("src/**/*");
+        expect(tsconfig.compilerOptions.strict).toBe(true);
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should merge websrc into existing tsconfig include", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-merge-websrc-into-existing-tsconfig",
+    );
+
+    try {
+      const currentDir = join(TEST_DIR, "current");
+      mkdirSync(currentDir, { recursive: true });
+      writeFileSync(
+        join(currentDir, "tsconfig.json"),
+        JSON.stringify({ include: ["other/**/*"] }),
+      );
+
+      const originalCwd = process.cwd();
+      process.chdir(currentDir);
+
+      try {
+        await init({ projectName: ".", logger: silentLogger });
+
+        const tsconfig = JSON.parse(
+          readFileSync(join(currentDir, "tsconfig.json"), "utf-8"),
+        );
+        const hasWebsrc = tsconfig.include.some((e: string) =>
+          e.includes("websrc"),
+        );
+        expect(hasWebsrc).toBe(true);
+        expect(tsconfig.include).toContain("other/**/*");
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should not duplicate entries when merging into existing tsconfig", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-not-duplicate-tsconfig-entries",
+    );
+
+    try {
+      const currentDir = join(TEST_DIR, "current");
+      mkdirSync(currentDir, { recursive: true });
+      writeFileSync(
+        join(currentDir, "tsconfig.json"),
+        JSON.stringify({ include: ["websrc/**/*", "tkeron.d.ts"] }),
+      );
+
+      const originalCwd = process.cwd();
+      process.chdir(currentDir);
+
+      try {
+        await init({ projectName: ".", logger: silentLogger });
+
+        const tsconfig = JSON.parse(
+          readFileSync(join(currentDir, "tsconfig.json"), "utf-8"),
+        );
+        const dtsCount = tsconfig.include.filter(
+          (e: string) => e === "tkeron.d.ts",
+        ).length;
+        const websrcCount = tsconfig.include.filter((e: string) =>
+          e.includes("websrc"),
+        ).length;
+        expect(dtsCount).toBe(1);
+        expect(websrcCount).toBe(1);
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should create include array in existing tsconfig that has none", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-add-include-to-tsconfig-without-include",
+    );
+
+    try {
+      const currentDir = join(TEST_DIR, "current");
+      mkdirSync(currentDir, { recursive: true });
+      writeFileSync(
+        join(currentDir, "tsconfig.json"),
+        JSON.stringify({ compilerOptions: { strict: true } }),
+      );
+
+      const originalCwd = process.cwd();
+      process.chdir(currentDir);
+
+      try {
+        await init({ projectName: ".", logger: silentLogger });
+
+        const tsconfig = JSON.parse(
+          readFileSync(join(currentDir, "tsconfig.json"), "utf-8"),
+        );
+        expect(tsconfig.include).toBeDefined();
+        expect(tsconfig.include).toContain("tkeron.d.ts");
+        const hasWebsrc = tsconfig.include.some((e: string) =>
+          e.includes("websrc"),
+        );
+        expect(hasWebsrc).toBe(true);
+        expect(tsconfig.compilerOptions.strict).toBe(true);
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
+
+  it("should preserve existing tsconfig settings when merging", async () => {
+    const { dir: TEST_DIR } = getTestResources(
+      "init-should-preserve-tsconfig-settings-on-merge",
+    );
+
+    try {
+      const currentDir = join(TEST_DIR, "current");
+      mkdirSync(currentDir, { recursive: true });
+      writeFileSync(
+        join(currentDir, "tsconfig.json"),
+        JSON.stringify({
+          compilerOptions: {
+            target: "ES2020",
+            strict: false,
+            paths: { "@/*": ["./src/*"] },
+          },
+          exclude: ["node_modules", "dist"],
+          include: ["src/**/*"],
+        }),
+      );
+
+      const originalCwd = process.cwd();
+      process.chdir(currentDir);
+
+      try {
+        await init({ projectName: ".", logger: silentLogger });
+
+        const tsconfig = JSON.parse(
+          readFileSync(join(currentDir, "tsconfig.json"), "utf-8"),
+        );
+        expect(tsconfig.compilerOptions.target).toBe("ES2020");
+        expect(tsconfig.compilerOptions.strict).toBe(false);
+        expect(tsconfig.compilerOptions.paths).toEqual({ "@/*": ["./src/*"] });
+        expect(tsconfig.exclude).toEqual(["node_modules", "dist"]);
+        expect(tsconfig.include).toContain("src/**/*");
+        expect(tsconfig.include).toContain("tkeron.d.ts");
+      } finally {
+        process.chdir(originalCwd);
+      }
+    } finally {
+      rmSync(TEST_DIR, { recursive: true, force: true });
+    }
+  });
 });
