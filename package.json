@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "CLI build tool for vanilla web development with TypeScript.",
   "type": "module",
   "main": "./src/index.ts",

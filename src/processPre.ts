@@ -4,8 +4,14 @@ import type { Logger } from "@tkeron/tools";
 import { silentLogger } from "@tkeron/tools";
 
 const packageJsonPath = join(import.meta.dir, "..", "package.json");
-const packageJson = await Bun.file(packageJsonPath).json();
-const TKERON_VERSION = packageJson.version;
+
+let _tkeronVersion: string | null = null;
+const getTkeronVersion = async (): Promise<string> => {
+  if (_tkeronVersion) return _tkeronVersion;
+  const packageJson = await Bun.file(packageJsonPath).json();
+  _tkeronVersion = packageJson.version;
+  return _tkeronVersion!;
+};
 
 const HTML_PARSER_PATH = import.meta.resolve("@tkeron/html-parser");
 
@@ -39,6 +45,8 @@ export const processPre = async (
   const preFiles = getFilePaths(tempDir, "**/*.pre.ts", true);
 
   const hasChanges = preFiles.length > 0;
+
+  const TKERON_VERSION = hasChanges ? await getTkeronVersion() : "";
 
   for (const preFile of preFiles) {
     const htmlFile = preFile.replace(/\.pre\.ts$/, ".html");

@@ -1,3 +1,15 @@
+# v5.0.2
+
+## Performance: component processing optimization
+
+- Perf: single glob scan per build pass to pre-load all component paths into a `Map<tagName, filePath[]>` — eliminates O(pages × components) filesystem scans in `processCom`, `processComTs`, `processComMd`
+- Perf: `Map<path, content>` cache avoids redundant disk reads when the same component is used across multiple pages
+- Perf: `Map<code, jsCode>` transpilation cache in `processComTs` — `Bun.Transpiler.transformSync` result reused for unchanged `.com.ts` files
+- Perf: parallel page processing via `Promise.all` instead of sequential `for...of` — independent pages now process concurrently
+- Perf: lazy `package.json` read in `processPre` — removed top-level `await` that ran on module import regardless of whether pre-rendering was needed
+
+---
+
 # v5.0.1
 
 ## Documentation fixes and dependency updates

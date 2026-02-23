@@ -12,9 +12,49 @@ const ensureHtmlDocument = (html: string): string => {
   return `${DOCTYPE}<html><head></head><body>${html}</body></html>`;
 };
 
+interface ComponentCache {
+  componentMap: Map<string, string[]>;
+  contentCache: Map<string, string>;
+}
+
+const buildComponentMap = (rootDir: string): Map<string, string[]> => {
+  const allFiles = getFilePaths(rootDir, "**/*.com.html", true);
+  const map = new Map<string, string[]>();
+  for (const file of allFiles) {
+    const basename = file.split("/").pop()!;
+    const tagName = basename.replace(/\.com\.html$/, "");
+    if (!map.has(tagName)) map.set(tagName, []);
+    map.get(tagName)!.push(file);
+  }
+  return map;
+};
+
+const getCachedContent = async (
+  path: string,
+  cache: Map<string, string>,
+): Promise<string> => {
+  const cached = cache.get(path);
+  if (cached !== undefined) return cached;
+  const content = await Bun.file(path).text();
+  cache.set(path, content);
+  return content;
+};
+
 export interface ProcessComOptions {
   logger?: Logger;
 }
+
+const resolveComponent = (
+  tagName: string,
+  currentDir: string,
+  componentMap: Map<string, string[]>,
+): string | null => {
+  const matches = componentMap.get(tagName);
+  if (!matches || matches.length === 0) return null;
+  const localPath = join(currentDir, `${tagName}.com.html`);
+  if (matches.includes(localPath)) return localPath;
+  return matches[0]!;
+};
 
 export const processCom = async (
   tempDir: string,
@@ -27,37 +67,45 @@ export const processCom = async (
     return false;
   }
 
+  const componentMap = buildComponentMap(tempDir);
+  const cache: ComponentCache = {
+    componentMap,
+    contentCache: new Map(),
+  };
+
   const htmlFiles = getFilePaths(tempDir, "**/*.html", true).filter(
     (p) => !p.endsWith(".com.html"),
   );
 
-  let hasChanges = false;
+  const results = await Promise.all(
+    htmlFiles.map(async (htmlFile) => {
+      const htmlContent = await Bun.file(htmlFile).text();
+      const document = parseHTML(ensureHtmlDocument(htmlContent));
 
-  for (const htmlFile of htmlFiles) {
-    const htmlContent = await Bun.file(htmlFile).text();
-    const document = parseHTML(ensureHtmlDocument(htmlContent));
+      const htmlElement =
+        document.querySelector("html") || document.documentElement;
+      let changed = false;
+      if (htmlElement) {
+        changed = await processComponents(
+          htmlElement,
+          dirname(htmlFile),
+          tempDir,
+          [],
+          0,
+          log,
+          cache,
+        );
+      }
 
-    const htmlElement =
-      document.querySelector("html") || document.documentElement;
-    if (htmlElement) {
-      const changed = await processComponents(
-        htmlElement,
-        dirname(htmlFile),
-        tempDir,
-        [],
-        0,
-        log,
-      );
-      hasChanges = hasChanges || changed;
-    }
+      const output =
+        DOCTYPE +
+        (htmlElement?.outerHTML || document.documentElement?.outerHTML || "");
+      await Bun.write(htmlFile, output);
+      return changed;
+    }),
+  );
 
-    const output =
-      DOCTYPE +
-      (htmlElement?.outerHTML || document.documentElement?.outerHTML || "");
-    await Bun.write(htmlFile, output);
-  }
-
-  return hasChanges;
+  return results.some(Boolean);
 };
 
 const processComponents = async (
@@ -67,6 +115,7 @@ const processComponents = async (
   componentStack: string[],
   depth: number = 0,
   log: Logger = silentLogger,
+  cache: ComponentCache,
 ): Promise<boolean> => {
   let hasChanges = false;
   const MAX_DEPTH = 50;
@@ -82,13 +131,10 @@ const processComponents = async (
 
     if (tagName) {
       if (!tagName.includes("-")) {
-        const localPath = join(currentDir, `${tagName}.com.html`);
-        const globMatches = getFilePaths(
-          rootDir,
-          `**/${tagName}.com.html`,
-          true,
-        );
-        if ((await Bun.file(localPath).exists()) || globMatches.length > 0) {
+        const matches = cache.componentMap.get(tagName);
+        if (matches && matches.length > 0) {
+          const localPath = join(currentDir, `${tagName}.com.html`);
+          const filePath = matches.includes(localPath) ? localPath : matches[0];
           log.error(
             `\n❌ Error: Component name '${tagName}' must contain at least one hyphen.`,
           );
@@ -96,30 +142,17 @@ const processComponents = async (
           log.error(
             `   Rename '${tagName}.com.html' to 'tk-${tagName}.com.html' or similar.`,
           );
-          log.error(
-            `   File: ${(await Bun.file(localPath).exists()) ? localPath : globMatches[0]}\n`,
-          );
+          log.error(`   File: ${filePath}\n`);
           throw new Error(
             `Component name '${tagName}' must contain at least one hyphen`,
           );
         }
       } else {
-        const localPath = join(currentDir, `${tagName}.com.html`);
-
-        let componentPath: string | null = null;
-
-        if (await Bun.file(localPath).exists()) {
-          componentPath = localPath;
-        } else {
-          const globMatches = getFilePaths(
-            rootDir,
-            `**/${tagName}.com.html`,
-            true,
-          );
-          if (globMatches.length > 0) {
-            componentPath = globMatches[0];
-          }
-        }
+        const componentPath = resolveComponent(
+          tagName,
+          currentDir,
+          cache.componentMap,
+        );
 
         if (componentPath) {
           hasChanges = true;
@@ -137,7 +170,10 @@ const processComponents = async (
             throw new Error(`Circular dependency: ${chain}`);
           }
 
-          const componentHtml = await Bun.file(componentPath).text();
+          const componentHtml = await getCachedContent(
+            componentPath,
+            cache.contentCache,
+          );
 
           const tempDoc = parseHTML(
             `<html><body><div id="__tkeron_component_root__">${componentHtml}</div></body></html>`,
@@ -182,6 +218,7 @@ const processComponents = async (
                 nextStack,
                 depth + 1,
                 log,
+                cache,
               );
               hasChanges = hasChanges || nestedChanged;
             }
@@ -197,6 +234,7 @@ const processComponents = async (
       componentStack,
       depth,
       log,
+      cache,
     );
     hasChanges = hasChanges || childChanged;
   }

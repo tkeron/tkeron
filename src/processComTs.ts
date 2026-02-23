@@ -12,6 +12,47 @@ const ensureHtmlDocument = (html: string): string => {
   return `${DOCTYPE}<html><head></head><body>${html}</body></html>`;
 };
 
+interface ComponentCache {
+  componentMap: Map<string, string[]>;
+  contentCache: Map<string, string>;
+  transpileCache: Map<string, string>;
+}
+
+const buildComponentMap = (rootDir: string): Map<string, string[]> => {
+  const allFiles = getFilePaths(rootDir, "**/*.com.ts", true);
+  const map = new Map<string, string[]>();
+  for (const file of allFiles) {
+    const basename = file.split("/").pop()!;
+    const tagName = basename.replace(/\.com\.ts$/, "");
+    if (!map.has(tagName)) map.set(tagName, []);
+    map.get(tagName)!.push(file);
+  }
+  return map;
+};
+
+const getCachedContent = async (
+  path: string,
+  cache: Map<string, string>,
+): Promise<string> => {
+  const cached = cache.get(path);
+  if (cached !== undefined) return cached;
+  const content = await Bun.file(path).text();
+  cache.set(path, content);
+  return content;
+};
+
+const getCachedTranspile = (
+  tsCode: string,
+  cache: Map<string, string>,
+): string => {
+  const cached = cache.get(tsCode);
+  if (cached !== undefined) return cached;
+  const transpiler = new Bun.Transpiler({ loader: "ts" });
+  const jsCode = transpiler.transformSync(tsCode);
+  cache.set(tsCode, jsCode);
+  return jsCode;
+};
+
 export interface ProcessComTsOptions {
   logger?: Logger;
 }
@@ -27,38 +68,59 @@ export const processComTs = async (
     return false;
   }
 
+  const componentMap = buildComponentMap(tempDir);
+  const cache: ComponentCache = {
+    componentMap,
+    contentCache: new Map(),
+    transpileCache: new Map(),
+  };
+
   const htmlFiles = getFilePaths(tempDir, "**/*.html", true).filter(
     (p) => !p.endsWith(".com.html"),
   );
 
-  let hasChanges = false;
+  const results = await Promise.all(
+    htmlFiles.map(async (htmlFile) => {
+      const htmlContent = await Bun.file(htmlFile).text();
+      const document = parseHTML(ensureHtmlDocument(htmlContent));
 
-  for (const htmlFile of htmlFiles) {
-    const htmlContent = await Bun.file(htmlFile).text();
-    const document = parseHTML(ensureHtmlDocument(htmlContent));
+      const htmlElement =
+        document.querySelector("html") || document.documentElement;
+      let changed = false;
+      if (htmlElement) {
+        changed = await processComponentsTs(
+          htmlElement,
+          dirname(htmlFile),
+          tempDir,
+          [],
+          0,
+          log,
+          options,
+          cache,
+        );
+      }
 
-    const htmlElement =
-      document.querySelector("html") || document.documentElement;
-    if (htmlElement) {
-      const changed = await processComponentsTs(
-        htmlElement,
-        dirname(htmlFile),
-        tempDir,
-        [],
-        0,
-        log,
-        options,
-      );
-      hasChanges = hasChanges || changed;
-    }
+      const output =
+        DOCTYPE +
+        (htmlElement?.outerHTML || document.documentElement?.outerHTML || "");
+      await Bun.write(htmlFile, output);
+      return changed;
+    }),
+  );
 
-    const output =
-      DOCTYPE +
-      (htmlElement?.outerHTML || document.documentElement?.outerHTML || "");
-    await Bun.write(htmlFile, output);
-  }
+  return results.some(Boolean);
+};
 
-  return hasChanges;
+const resolveComponent = (
+  tagName: string,
+  currentDir: string,
+  componentMap: Map<string, string[]>,
+): string | null => {
+  const matches = componentMap.get(tagName);
+  if (!matches || matches.length === 0) return null;
+  const localPath = join(currentDir, `${tagName}.com.ts`);
+  if (matches.includes(localPath)) return localPath;
+  return matches[0]!;
 };
 
 const processComponentsTs = async (
@@ -69,6 +131,7 @@ const processComponentsTs = async (
   depth: number = 0,
   log: Logger = silentLogger,
   options: ProcessComTsOptions = {},
+  cache: ComponentCache,
 ): Promise<boolean> => {
   let hasChanges = false;
   const MAX_DEPTH = 50;
@@ -84,9 +147,10 @@ const processComponentsTs = async (
 
     if (tagName) {
       if (!tagName.includes("-")) {
-        const localPath = join(currentDir, `${tagName}.com.ts`);
-        const globMatches = getFilePaths(rootDir, `**/${tagName}.com.ts`, true);
-        if ((await Bun.file(localPath).exists()) || globMatches.length > 0) {
+        const matches = cache.componentMap.get(tagName);
+        if (matches && matches.length > 0) {
+          const localPath = join(currentDir, `${tagName}.com.ts`);
+          const filePath = matches.includes(localPath) ? localPath : matches[0];
           log.error(
             `\n❌ Error: Component name '${tagName}' must contain at least one hyphen.`,
           );
@@ -94,30 +158,17 @@ const processComponentsTs = async (
           log.error(
             `   Rename '${tagName}.com.ts' to 'tk-${tagName}.com.ts' or similar.`,
           );
-          log.error(
-            `   File: ${(await Bun.file(localPath).exists()) ? localPath : globMatches[0]}\n`,
-          );
+          log.error(`   File: ${filePath}\n`);
           throw new Error(
             `Component name '${tagName}' must contain at least one hyphen`,
           );
         }
       } else {
-        const localPath = join(currentDir, `${tagName}.com.ts`);
-
-        let componentPath: string | null = null;
-
-        if (await Bun.file(localPath).exists()) {
-          componentPath = localPath;
-        } else {
-          const globMatches = getFilePaths(
-            rootDir,
-            `**/${tagName}.com.ts`,
-            true,
-          );
-          if (globMatches.length > 0) {
-            componentPath = globMatches[0];
-          }
-        }
+        const componentPath = resolveComponent(
+          tagName,
+          currentDir,
+          cache.componentMap,
+        );
 
         if (componentPath) {
           hasChanges = true;
@@ -133,7 +184,10 @@ const processComponentsTs = async (
             throw new Error(`Circular dependency: ${chain}`);
           }
 
-          const originalComponentCode = await Bun.file(componentPath).text();
+          const originalComponentCode = await getCachedContent(
+            componentPath,
+            cache.contentCache,
+          );
 
           const elementHTML = (child as any).outerHTML;
 
@@ -187,13 +241,15 @@ ${codeWithoutImports}
                 await module.component(com);
               } finally {
                 try {
-                  const fs = await import("fs/promises");
-                  await fs.unlink(tempPath);
+                  const { unlink } = await import("fs/promises");
+                  await unlink(tempPath);
                 } catch {}
               }
             } else {
-              const transpiler = new Bun.Transpiler({ loader: "ts" });
-              const jsCode = transpiler.transformSync(originalComponentCode);
+              const jsCode = getCachedTranspile(
+                originalComponentCode,
+                cache.transpileCache,
+              );
               const AsyncFunction = Object.getPrototypeOf(
                 async function () {},
               ).constructor;
@@ -232,6 +288,7 @@ ${codeWithoutImports}
             depth + 1,
             log,
             options,
+            cache,
           );
 
           const nodesToInsert = Array.from((div as any).childNodes || []).map(
@@ -266,6 +323,7 @@ ${codeWithoutImports}
       depth,
       log,
       options,
+      cache,
     );
     hasChanges = hasChanges || childChanged;
   }
