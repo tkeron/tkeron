@@ -106,6 +106,8 @@ const EXAMPLE_DESCRIPTIONS: { [key: string]: string } = {
     "TypeScript components (.com.ts) with local override priority",
   with_com_mixed_priority:
     "Mixed .com.html and .com.ts showing processing order",
+  with_com_html_in_ts:
+    "HTML template (.com.html) injected into .com.ts as com.innerHTML before execution",
   with_component_iteration:
     "Component iteration: .com.ts with logic, .com.html for templates",
 };

@@ -1578,4 +1578,429 @@ com.innerHTML = \`<meta name="\${name}" content="\${content}">\`;`;
       }
     });
   });
+
+  describe(".com.html template injection into .com.ts", () => {
+    it("should inject .com.html content as innerHTML before executing .com.ts", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-injection-basic",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-card></my-card>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div class="card"><h2>Title</h2><p>Description</p></div>`;
+        const tsComponent = `
+const h2 = com.querySelector("h2");
+if (h2) h2.textContent = "Modified Title";
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "my-card.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "my-card.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("Modified Title");
+        expect(result).toContain('<div class="card">');
+        expect(result).toContain("<p>Description</p>");
+        expect(result).not.toContain("<my-card>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should pass original innerHTML from HTML when .com.ts reads it", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-read-innerhtml",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <info-box></info-box>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div class="info"><span>Template content</span></div>`;
+        const tsComponent = `
+const content = com.innerHTML;
+com.innerHTML = \`<div class="wrapper">\${content}</div>\`;
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "info-box.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "info-box.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain('<div class="wrapper">');
+        expect(result).toContain("Template content");
+        expect(result).not.toContain("<info-box>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should allow .com.ts to completely override .com.html template", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-override",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-widget></my-widget>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div>Original template</div>`;
+        const tsComponent = `com.innerHTML = "<div>Completely replaced</div>";`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "my-widget.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "my-widget.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("<div>Completely replaced</div>");
+        expect(result).not.toContain("Original template");
+        expect(result).not.toContain("<my-widget>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should work without .com.html (backwards compatible)", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-no-html-backwards-compat",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <solo-comp></solo-comp>
+</body>
+</html>`;
+
+        const tsComponent = `com.innerHTML = "<div>Only TS</div>";`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "solo-comp.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("<div>Only TS</div>");
+        expect(result).not.toContain("<solo-comp>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should combine attributes and .com.html template in .com.ts", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-with-attributes",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <user-card data-name="Alice" data-role="Dev"></user-card>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div class="card"><h3 class="name"></h3><span class="role"></span></div>`;
+        const tsComponent = `
+const name = com.getAttribute("data-name") || "";
+const role = com.getAttribute("data-role") || "";
+const nameEl = com.querySelector(".name");
+const roleEl = com.querySelector(".role");
+if (nameEl) nameEl.textContent = name;
+if (roleEl) roleEl.textContent = role;
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "user-card.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "user-card.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("Alice");
+        expect(result).toContain("Dev");
+        expect(result).toContain('<div class="card">');
+        expect(result).not.toContain("<user-card");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should find .com.html from same directory as resolved .com.ts", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-same-dir-as-ts",
+      );
+
+      try {
+        mkdirSync(join(TEST_DIR, "components"), { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <nav-bar></nav-bar>
+</body>
+</html>`;
+
+        const htmlTemplate = `<nav><ul><li>Home</li><li>About</li></ul></nav>`;
+        const tsComponent = `
+const items = com.querySelectorAll("li");
+for (const item of items) {
+  item.textContent = item.textContent + " (active)";
+}
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "components", "nav-bar.com.html"),
+          htmlTemplate,
+        );
+        writeFileSync(
+          join(TEST_DIR, "components", "nav-bar.com.ts"),
+          tsComponent,
+        );
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("Home (active)");
+        expect(result).toContain("About (active)");
+        expect(result).not.toContain("<nav-bar>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should find .com.html in root when .com.ts is also in root", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-root-both",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <site-footer></site-footer>
+</body>
+</html>`;
+
+        const htmlTemplate = `<footer><p>Copyright 2026</p></footer>`;
+        const tsComponent = `
+const p = com.querySelector("p");
+if (p) p.textContent = p.textContent + " - All rights reserved";
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "site-footer.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "site-footer.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("Copyright 2026 - All rights reserved");
+        expect(result).not.toContain("<site-footer>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should handle multiple components with mixed .com.html templates", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-multiple-mixed",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <with-template></with-template>
+  <without-template></without-template>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div class="templated"><p>From template</p></div>`;
+        const tsWithTemplate = `
+const p = com.querySelector("p");
+if (p) p.textContent = "Template modified";
+`;
+        const tsWithoutTemplate = `com.innerHTML = "<div>No template</div>";`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "with-template.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "with-template.com.ts"), tsWithTemplate);
+        writeFileSync(
+          join(TEST_DIR, "without-template.com.ts"),
+          tsWithoutTemplate,
+        );
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("Template modified");
+        expect(result).toContain('<div class="templated">');
+        expect(result).toContain("<div>No template</div>");
+        expect(result).not.toContain("<with-template>");
+        expect(result).not.toContain("<without-template>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should use .com.html adjacent to resolved .com.ts path", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-adjacent-resolution",
+      );
+
+      try {
+        mkdirSync(join(TEST_DIR, "section"), { recursive: true });
+
+        const sectionHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <my-panel></my-panel>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div class="panel"><p>Panel template</p></div>`;
+        const tsComponent = `
+const p = com.querySelector("p");
+if (p) p.textContent = "Panel from section";
+`;
+
+        writeFileSync(join(TEST_DIR, "section", "page.html"), sectionHtml);
+        writeFileSync(
+          join(TEST_DIR, "section", "my-panel.com.html"),
+          htmlTemplate,
+        );
+        writeFileSync(
+          join(TEST_DIR, "section", "my-panel.com.ts"),
+          tsComponent,
+        );
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(
+          join(TEST_DIR, "section", "page.html"),
+          "utf-8",
+        );
+
+        expect(result).toContain("Panel from section");
+        expect(result).toContain('<div class="panel">');
+        expect(result).not.toContain("<my-panel>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should inject .com.html template even when tag has slot content", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-with-slot-content",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <alert-box>User provided content</alert-box>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div class="alert"><span class="icon">!</span><span class="msg"></span></div>`;
+        const tsComponent = `
+const msg = com.querySelector(".msg");
+if (msg) msg.textContent = "Alert triggered";
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "alert-box.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "alert-box.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("Alert triggered");
+        expect(result).toContain('<div class="alert">');
+        expect(result).not.toContain("User provided content");
+        expect(result).not.toContain("<alert-box>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should not use .com.html from processCom when .com.ts with template exists", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processComTs-html-template-not-double-processed",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+
+        const indexHtml = `<!DOCTYPE html>
+<html>
+<body>
+  <dual-comp></dual-comp>
+</body>
+</html>`;
+
+        const htmlTemplate = `<div><p>Template</p></div>`;
+        const tsComponent = `
+const p = com.querySelector("p");
+if (p) p.textContent = "TS processed template";
+`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "dual-comp.com.html"), htmlTemplate);
+        writeFileSync(join(TEST_DIR, "dual-comp.com.ts"), tsComponent);
+
+        await processComTs(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+
+        expect(result).toContain("TS processed template");
+        expect(result).not.toContain("<dual-comp>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
 });

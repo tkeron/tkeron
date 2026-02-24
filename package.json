@@ -1,6 +1,6 @@
 {
   "name": "tkeron",
-  "version": "5.0.2",
+  "version": "5.1.0",
   "description": "CLI build tool for vanilla web development with TypeScript.",
   "type": "module",
   "main": "./src/index.ts",
@@ -26,12 +26,13 @@
     "sample5": "bun . build examples/with_com_ts/src",
     "sample6": "bun . build examples/with_com_ts_priority/src",
     "sample7": "bun . build examples/with_com_mixed_priority/src",
-    "build_examples": "bun run sample1 && bun run sample2 && bun run sample3 && bun run sample4 && bun run sample5 && bun run sample6 && bun run sample7"
+    "sample8": "bun . build examples/with_com_html_in_ts/src",
+    "build_examples": "bun run sample1 && bun run sample2 && bun run sample3 && bun run sample4 && bun run sample5 && bun run sample6 && bun run sample7 && bun run sample8"
   },
   "author": "tkeron",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.26.0",
+    "@modelcontextprotocol/sdk": "^1.27.0",
     "@tkeron/commands": "0.4.6",
     "@tkeron/html-parser": "1.5.5",
     "@tkeron/tools": "^0.4.0"

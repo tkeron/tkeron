@@ -76,6 +76,8 @@ When multiple component types exist for the same name, Tkeron uses this priority
 2. **`.com.html`** (HTML components)
 3. **`.com.md`** (Markdown components — lowest priority)
 
+**Special case:** When both `.com.ts` and `.com.html` exist for the same name, the `.com.html` is loaded as the template (`com.innerHTML`) before the `.com.ts` executes. See [TypeScript Components — HTML Template + TypeScript Logic](./components-typescript.md#html-template--typescript-logic).
+
 If both `hero-text.com.html` and `hero-text.com.md` exist, the `.com.html` version is used and `.com.md` is ignored.
 
 ### 4. Build Process

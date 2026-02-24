@@ -1,3 +1,15 @@
+# v5.1.0
+
+## Feature: .com.html template injection into .com.ts components
+
+- When both `name.com.html` and `name.com.ts` exist for the same component, the `.com.html` content is loaded as `com.innerHTML` before executing the `.com.ts` code
+- The `.com.html` acts as a static template that `.com.ts` can read, modify, or override
+- Template resolution uses the same priority system: adjacent to `.com.ts` first, then fallback to root
+- Fully backwards compatible: `.com.ts`-only components work exactly as before
+- Added example `with_com_html_in_ts` demonstrating the feature
+
+---
+
 # v5.0.2
 
 ## Performance: component processing optimization

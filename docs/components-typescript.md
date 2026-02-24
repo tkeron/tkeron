@@ -540,6 +540,65 @@ If a component doesn't need attributes or logic, use [HTML components](./compone
 </footer>
 ```
 
+## HTML Template + TypeScript Logic
+
+When both `name.com.html` and `name.com.ts` exist for the same component, the `.com.html` content is loaded as `com.innerHTML` **before** the `.com.ts` code executes. This lets you separate structure from logic.
+
+### How It Works
+
+```
+1. Tkeron finds <user-card name="Alice">
+2. Loads user-card.com.html content into com.innerHTML
+3. Executes user-card.com.ts (com already has the template)
+4. Replaces <user-card> with the final com.innerHTML
+```
+
+### Example
+
+**Template** (`user-card.com.html`):
+
+```html
+<div class="card">
+  <h3 class="name"></h3>
+  <p class="role"></p>
+</div>
+```
+
+**Logic** (`user-card.com.ts`):
+
+```typescript
+const name = com.getAttribute("data-name") || "Unknown";
+const role = com.getAttribute("data-role") || "N/A";
+
+const nameEl = com.querySelector(".name");
+const roleEl = com.querySelector(".role");
+
+if (nameEl) nameEl.textContent = name;
+if (roleEl) roleEl.textContent = `Role: ${role}`;
+```
+
+**Usage:**
+
+```html
+<user-card data-name="Alice" data-role="Developer"></user-card>
+```
+
+**Output:**
+
+```html
+<div class="card">
+  <h3 class="name">Alice</h3>
+  <p class="role">Role: Developer</p>
+</div>
+```
+
+### Key Points
+
+- The `.com.ts` can read, modify, or completely override the template
+- If only `.com.ts` exists (no `.com.html`), it works exactly as before
+- Template resolution follows the same directory priority as components (adjacent first, then root)
+- Great for separating HTML structure from dynamic logic
+
 ## Debugging
 
 ### Log at Build Time

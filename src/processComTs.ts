@@ -14,6 +14,7 @@ const ensureHtmlDocument = (html: string): string => {
 
 interface ComponentCache {
   componentMap: Map<string, string[]>;
+  htmlTemplateMap: Map<string, string[]>;
   contentCache: Map<string, string>;
   transpileCache: Map<string, string>;
 }
@@ -24,6 +25,18 @@ const buildComponentMap = (rootDir: string): Map<string, string[]> => {
   for (const file of allFiles) {
     const basename = file.split("/").pop()!;
     const tagName = basename.replace(/\.com\.ts$/, "");
+    if (!map.has(tagName)) map.set(tagName, []);
+    map.get(tagName)!.push(file);
+  }
+  return map;
+};
+
+const buildHtmlTemplateMap = (rootDir: string): Map<string, string[]> => {
+  const allFiles = getFilePaths(rootDir, "**/*.com.html", true);
+  const map = new Map<string, string[]>();
+  for (const file of allFiles) {
+    const basename = file.split("/").pop()!;
+    const tagName = basename.replace(/\.com\.html$/, "");
     if (!map.has(tagName)) map.set(tagName, []);
     map.get(tagName)!.push(file);
   }
@@ -69,8 +82,10 @@ export const processComTs = async (
   }
 
   const componentMap = buildComponentMap(tempDir);
+  const htmlTemplateMap = buildHtmlTemplateMap(tempDir);
   const cache: ComponentCache = {
     componentMap,
+    htmlTemplateMap,
     contentCache: new Map(),
     transpileCache: new Map(),
   };
@@ -120,6 +135,18 @@ const resolveComponent = (
   if (!matches || matches.length === 0) return null;
   const localPath = join(currentDir, `${tagName}.com.ts`);
   if (matches.includes(localPath)) return localPath;
+  return matches[0]!;
+};
+
+const resolveHtmlTemplate = (
+  tagName: string,
+  tsDir: string,
+  htmlTemplateMap: Map<string, string[]>,
+): string | null => {
+  const matches = htmlTemplateMap.get(tagName);
+  if (!matches || matches.length === 0) return null;
+  const adjacentPath = join(tsDir, `${tagName}.com.html`);
+  if (matches.includes(adjacentPath)) return adjacentPath;
   return matches[0]!;
 };
 
@@ -207,6 +234,19 @@ const processComponentsTs = async (
             throw new Error(
               `Failed to create component element for ${tagName}`,
             );
+          }
+
+          const htmlTemplatePath = resolveHtmlTemplate(
+            tagName,
+            dirname(componentPath),
+            cache.htmlTemplateMap,
+          );
+          if (htmlTemplatePath) {
+            const templateContent = await getCachedContent(
+              htmlTemplatePath,
+              cache.contentCache,
+            );
+            com.innerHTML = templateContent;
           }
 
           const hasImports = /^\s*import\s+/m.test(originalComponentCode);
