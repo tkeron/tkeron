@@ -3,7 +3,7 @@ import { getBuildResult, type BuildResult } from "tkeron";
 import { join } from "path";
 
 describe("basic_build example", () => {
-  const sourcePath = join(import.meta.dir, "src");
+  const sourcePath = join(import.meta.dir, "websrc");
   let result: BuildResult;
 
   beforeAll(async () => {

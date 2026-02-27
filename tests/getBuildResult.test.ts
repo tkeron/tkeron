@@ -8,7 +8,7 @@ describe("getBuildResult", () => {
   describe("basic HTML build", () => {
     it("should return BuildResult with index.html entry", async () => {
       const { dir } = getTestResources("getBuildResult-basic-html");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -28,7 +28,7 @@ describe("getBuildResult", () => {
 
     it("should include parsed DOM for HTML files", async () => {
       const { dir } = getTestResources("getBuildResult-dom-parsed");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -51,7 +51,7 @@ describe("getBuildResult", () => {
 
     it("should allow querying DOM elements", async () => {
       const { dir } = getTestResources("getBuildResult-dom-query");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -79,7 +79,7 @@ describe("getBuildResult", () => {
   describe("file metadata", () => {
     it("should include fileName property", async () => {
       const { dir } = getTestResources("getBuildResult-fileName");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -98,7 +98,7 @@ describe("getBuildResult", () => {
 
     it("should include filePath property (empty for root files)", async () => {
       const { dir } = getTestResources("getBuildResult-filePath-root");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -117,7 +117,7 @@ describe("getBuildResult", () => {
 
     it("should include path property (full relative path)", async () => {
       const { dir } = getTestResources("getBuildResult-path");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -136,7 +136,7 @@ describe("getBuildResult", () => {
 
     it("should include correct MIME type for HTML", async () => {
       const { dir } = getTestResources("getBuildResult-mime-html");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -155,7 +155,7 @@ describe("getBuildResult", () => {
 
     it("should include size in bytes", async () => {
       const { dir } = getTestResources("getBuildResult-size");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const content = "<!DOCTYPE html><html><head></head><body></body></html>";
 
       try {
@@ -173,7 +173,7 @@ describe("getBuildResult", () => {
 
     it("should include fileHash", async () => {
       const { dir } = getTestResources("getBuildResult-hash");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -196,7 +196,7 @@ describe("getBuildResult", () => {
   describe("getContentAsString", () => {
     it("should include getContentAsString for text files", async () => {
       const { dir } = getTestResources("getBuildResult-getContent");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -219,7 +219,7 @@ describe("getBuildResult", () => {
 
     it("should return correct content for CSS linked in HTML", async () => {
       const { dir } = getTestResources("getBuildResult-css-linked");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const cssContent = "body { background: red; }";
 
       try {
@@ -244,7 +244,7 @@ describe("getBuildResult", () => {
 
     it("should be a lazy function (closure)", async () => {
       const { dir } = getTestResources("getBuildResult-lazy");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -269,7 +269,7 @@ describe("getBuildResult", () => {
   describe("multiple file types", () => {
     it("should handle CSS files linked in HTML with correct MIME type", async () => {
       const { dir } = getTestResources("getBuildResult-css-mime");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -291,7 +291,7 @@ describe("getBuildResult", () => {
 
     it("should NOT include dom for non-HTML files", async () => {
       const { dir } = getTestResources("getBuildResult-no-dom-css");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -316,7 +316,7 @@ describe("getBuildResult", () => {
   describe("binary files referenced in HTML", () => {
     it("should NOT include getContentAsString for binary image files", async () => {
       const { dir } = getTestResources("getBuildResult-binary-no-content");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const pngData = Buffer.from([
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
         0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
@@ -345,7 +345,7 @@ describe("getBuildResult", () => {
 
     it("should have correct MIME type for PNG images", async () => {
       const { dir } = getTestResources("getBuildResult-png-mime");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const pngData = Buffer.from([
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
         0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
@@ -374,7 +374,7 @@ describe("getBuildResult", () => {
 
     it("should include size for image files", async () => {
       const { dir } = getTestResources("getBuildResult-binary-size");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const pngData = Buffer.from([
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
         0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
@@ -405,7 +405,7 @@ describe("getBuildResult", () => {
   describe("directory structure", () => {
     it("should handle HTML files in subdirectories with correct paths", async () => {
       const { dir } = getTestResources("getBuildResult-subdirs");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(join(srcDir, "pages"), { recursive: true });
@@ -431,7 +431,7 @@ describe("getBuildResult", () => {
 
     it("should handle images referenced in HTML", async () => {
       const { dir } = getTestResources("getBuildResult-images");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const pngData = Buffer.from([
         0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d,
         0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01,
@@ -458,7 +458,7 @@ describe("getBuildResult", () => {
 
     it("should handle multiple HTML files in different directories", async () => {
       const { dir } = getTestResources("getBuildResult-multi-html");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(join(srcDir, "pages"), { recursive: true });
@@ -486,7 +486,7 @@ describe("getBuildResult", () => {
   describe("logger option", () => {
     it("should accept custom logger", async () => {
       const { dir } = getTestResources("getBuildResult-custom-logger");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const { logger } = createTestLogger();
 
       try {
@@ -506,7 +506,7 @@ describe("getBuildResult", () => {
 
     it("should work without logger (silent by default)", async () => {
       const { dir } = getTestResources("getBuildResult-no-logger");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -527,7 +527,7 @@ describe("getBuildResult", () => {
   describe("cleanup", () => {
     it("should not leave temporary directories", async () => {
       const { dir } = getTestResources("getBuildResult-cleanup");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -550,7 +550,7 @@ describe("getBuildResult", () => {
   describe("component substitution", () => {
     it("should process .com.html components", async () => {
       const { dir } = getTestResources("getBuildResult-com-html");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -577,7 +577,7 @@ describe("getBuildResult", () => {
 
     it("should process .pre.ts files", async () => {
       const { dir } = getTestResources("getBuildResult-pre-ts");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -607,7 +607,7 @@ if (el) el.innerHTML = "Pre Generated";`,
   describe("edge cases", () => {
     it("should handle empty project (only index.html)", async () => {
       const { dir } = getTestResources("getBuildResult-minimal");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });
@@ -628,7 +628,7 @@ if (el) el.innerHTML = "Pre Generated";`,
 
     it("should return Record indexed by path", async () => {
       const { dir } = getTestResources("getBuildResult-record-type");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(join(srcDir, "pages"), { recursive: true });
@@ -653,7 +653,7 @@ if (el) el.innerHTML = "Pre Generated";`,
 
     it("should handle files with special characters in name (HTML files keep names)", async () => {
       const { dir } = getTestResources("getBuildResult-special-chars");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(join(srcDir, "pages"), { recursive: true });
@@ -676,7 +676,7 @@ if (el) el.innerHTML = "Pre Generated";`,
 
     it("should produce consistent hash for same content", async () => {
       const { dir } = getTestResources("getBuildResult-hash-consistent");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
       const content =
         "<!DOCTYPE html><html><head></head><body>Same Content</body></html>";
 
@@ -697,7 +697,7 @@ if (el) el.innerHTML = "Pre Generated";`,
 
     it("should produce different hash for different content", async () => {
       const { dir } = getTestResources("getBuildResult-hash-different");
-      const srcDir = join(dir, "src");
+      const srcDir = join(dir, "websrc");
 
       try {
         mkdirSync(srcDir, { recursive: true });

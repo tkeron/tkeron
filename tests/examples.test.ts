@@ -22,11 +22,16 @@ describe("Examples Build Tests", () => {
     await Promise.all(
       examples.map((example) =>
         build({
-          sourceDir: join(EXAMPLES_DIR, example, "src"),
+          sourceDir: join(EXAMPLES_DIR, example, "websrc"),
           targetDir: join(EXAMPLES_DIR, example, "web"),
         }),
       ),
     );
+
+    await build({
+      sourceDir: join(EXAMPLES_DIR, "with_com_html_in_ts", "websrc"),
+      targetDir: join(EXAMPLES_DIR, "with_com_html_in_ts", "web"),
+    });
   }, 30000);
 
   describe("basic_build", () => {
@@ -479,6 +484,74 @@ describe("Examples Build Tests", () => {
       expect(htmlContent).toContain(
         "Iteration 2: user-card.com.ts passes data to nested components",
       );
+    });
+  });
+
+  describe("with_com_html_in_ts", () => {
+    const outDir = join(EXAMPLES_DIR, "with_com_html_in_ts/web");
+
+    it("should generate index.html and index.js", () => {
+      expect(existsSync(join(outDir, "index.html"))).toBe(true);
+      expect(existsSync(join(outDir, "index.js"))).toBe(true);
+    });
+
+    it("should not include .com.html or .com.ts files in output", () => {
+      expect(existsSync(join(outDir, "user-card.com.html"))).toBe(false);
+      expect(existsSync(join(outDir, "user-card.com.ts"))).toBe(false);
+      expect(existsSync(join(outDir, "info-panel.com.html"))).toBe(false);
+      expect(existsSync(join(outDir, "info-panel.com.ts"))).toBe(false);
+    });
+
+    it("should render user-card using .com.html template + .com.ts logic", () => {
+      const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
+      const doc = parseHTML(htmlContent);
+
+      // Both user-card elements should be replaced (no custom element tags remain)
+      expect(htmlContent).not.toContain("<user-card");
+
+      // Alice card: name and role rendered via .com.ts reading .com.html template
+      expect(htmlContent).toContain("Alice");
+      expect(htmlContent).toContain("Role: Developer");
+
+      // Bob card: name and role rendered via .com.ts reading .com.html template
+      expect(htmlContent).toContain("Bob");
+      expect(htmlContent).toContain("Role: Designer");
+
+      // Template structure from .com.html should be present
+      const nameEls = doc.querySelectorAll(".name");
+      expect(nameEls.length).toBe(2);
+
+      const roleEls = doc.querySelectorAll(".role");
+      expect(roleEls.length).toBe(2);
+    });
+
+    it("should render info-panel using .com.html template + .com.ts logic with data-items", () => {
+      const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
+      const doc = parseHTML(htmlContent);
+
+      // info-panel should be replaced (no custom element tag remains)
+      expect(htmlContent).not.toContain("<info-panel");
+
+      // Title rendered via .com.ts reading data-title attribute
+      expect(htmlContent).toContain("Features");
+
+      // Items rendered via .com.ts parsing data-items attribute
+      const lis = doc.querySelectorAll(".items li");
+      expect(lis.length).toBe(3);
+      expect(htmlContent).toContain("HTML templates for structure");
+      expect(htmlContent).toContain("TypeScript for logic");
+      expect(htmlContent).toContain("Clean separation of concerns");
+    });
+
+    it("index.html should have valid structure with script injection", () => {
+      const htmlContent = readFileSync(join(outDir, "index.html"), "utf-8");
+      const doc = parseHTML(htmlContent);
+
+      expect(htmlContent).toContain("<!doctype html>");
+      const script = doc.querySelector('script[type="module"]');
+      expect(script).toBeTruthy();
+      expect(script?.getAttribute("src")).toBe("./index.js");
+      expect(script?.hasAttribute("crossorigin")).toBe(true);
     });
   });
 });

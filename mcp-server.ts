@@ -177,8 +177,7 @@ server.registerTool(
       const examplePath = join(EXAMPLES_DIR, name);
       return (
         statSync(examplePath).isDirectory() &&
-        (existsSync(join(examplePath, "src")) ||
-          existsSync(join(examplePath, "websrc")))
+        existsSync(join(examplePath, "websrc"))
       );
     });
 
@@ -228,17 +227,14 @@ server.registerTool(
       };
     }
 
-    let srcPath = join(examplePath, "src");
-    if (!existsSync(srcPath)) {
-      srcPath = join(examplePath, "websrc");
-    }
+    const srcPath = join(examplePath, "websrc");
 
     if (!existsSync(srcPath)) {
       return {
         content: [
           {
             type: "text" as const,
-            text: `Example ${exampleName} does not have a src or websrc directory`,
+            text: `Example ${exampleName} does not have a websrc directory`,
           },
         ],
         isError: true,

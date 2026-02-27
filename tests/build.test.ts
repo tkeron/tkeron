@@ -17,7 +17,7 @@ import { getTestResources, createTestLogger } from "./test-helpers";
 describe("build", () => {
   it("should build HTML with TypeScript and inject bundled script", async () => {
     const { dir } = getTestResources("build-html-with-typescript");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -46,7 +46,7 @@ describe("build", () => {
   });
   it("should handle multiple HTML files in subdirectories", async () => {
     const { dir } = getTestResources("build-multiple-html-subdirs");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(join(TEST_SRC, "section"), { recursive: true });
@@ -85,7 +85,7 @@ describe("build", () => {
   });
   it("should process .pre.ts files and generate HTML", async () => {
     const { dir } = getTestResources("build-process-pre-ts");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -115,7 +115,7 @@ document.body.appendChild(h1);
   });
   it("should create default HTML for .pre.ts without corresponding .html", async () => {
     const { dir } = getTestResources("build-pre-ts-default-html");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -137,7 +137,7 @@ if (title) title.textContent = "Auto-generated";
   });
   it("should clean existing target directory before building", async () => {
     const { dir } = getTestResources("build-clean-target-directory");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -164,7 +164,7 @@ if (title) title.textContent = "Auto-generated";
   });
   it("should handle HTML without scripts", async () => {
     const { dir } = getTestResources("build-html-without-scripts");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -217,7 +217,7 @@ if (title) title.textContent = "Auto-generated";
   });
   it("should handle .pre.ts files in subdirectories", async () => {
     const { dir } = getTestResources("build-pre-ts-subdirectories");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(join(TEST_SRC, "nested"), { recursive: true });
@@ -265,7 +265,7 @@ document.body.appendChild(h2);
 describe("temp directory cleanup", () => {
   it("should cleanup temp directory after successful build", async () => {
     const { dir } = getTestResources("cleanup-temp-after-success");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -290,7 +290,7 @@ describe("temp directory cleanup", () => {
   });
   it("should cleanup temp directory after build failure", async () => {
     const { dir } = getTestResources("cleanup-temp-after-failure");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -322,7 +322,7 @@ throw new Error("Intentional test error");
   });
   it("should cleanup orphaned temp directories from previous failed builds", async () => {
     const { dir } = getTestResources("cleanup-orphaned-temp-dirs");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -355,7 +355,7 @@ throw new Error("Intentional test error");
   });
   it("should not delete non-temp directories during cleanup", async () => {
     const { dir } = getTestResources("preserve-non-temp-dirs");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -420,7 +420,7 @@ throw new Error("Intentional test error");
 
   it("should cleanup temp directory when processPre throws", async () => {
     const { dir } = getTestResources("cleanup-on-processPre-failure");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -449,7 +449,7 @@ throw new Error("Intentional test error");
 
   it("should cleanup temp directory when processCom throws circular dependency error", async () => {
     const { dir } = getTestResources("cleanup-on-processCom-circular");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -482,7 +482,7 @@ throw new Error("Intentional test error");
 
   it("should cleanup temp directory when processComTs throws runtime error", async () => {
     const { dir } = getTestResources("cleanup-on-processComTs-failure");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -511,7 +511,7 @@ throw new Error("Intentional test error");
 
   it("should cleanup temp directory when buildDir fails due to invalid output path", async () => {
     const { dir } = getTestResources("cleanup-on-buildDir-failure");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = "/dev/null/impossible/path";
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -536,7 +536,7 @@ throw new Error("Intentional test error");
 
   it("should cleanup temp directory when multiple iterations cause MAX_ITERATIONS to be reached", async () => {
     const { dir } = getTestResources("cleanup-on-max-iterations");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -567,7 +567,7 @@ throw new Error("Intentional test error");
 
   it("should cleanup temp directory when .com.ts has syntax error", async () => {
     const { dir } = getTestResources("cleanup-on-comts-syntax-error");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -596,7 +596,7 @@ throw new Error("Intentional test error");
 
   it("should cleanup temp directory when .pre.ts has import resolution failure", async () => {
     const { dir } = getTestResources("cleanup-on-import-failure");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     try {
       mkdirSync(TEST_SRC, { recursive: true });
@@ -625,7 +625,7 @@ throw new Error("Intentional test error");
 
   it("should handle warning when cleanup fails", async () => {
     const { dir } = getTestResources("cleanup-warning-on-failure");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     const { logger } = createTestLogger();
     try {
@@ -645,7 +645,7 @@ throw new Error("Intentional test error");
 
   it("should log warning when cleanup of orphaned temp directory fails", async () => {
     const { dir } = getTestResources("orphan-cleanup-warning");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "web");
     const { logger, logs } = createTestLogger();
     try {

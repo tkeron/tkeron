@@ -1,7 +1,6 @@
 node_modules
 coverage
 web
-websrc
 local_test
 **/web/
 .tktmp_*

@@ -48,7 +48,7 @@ describe("buildDir", () => {
 
   it("should build HTML files to target directory", async () => {
     const { dir } = getTestResources("buildDir-build-html");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "out");
 
     try {
@@ -70,7 +70,7 @@ describe("buildDir", () => {
 
   it("should filter out .com.html files", async () => {
     const { dir } = getTestResources("buildDir-filter-com-html");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "out");
 
     try {
@@ -95,7 +95,7 @@ describe("buildDir", () => {
 
   it("should normalize doctype to lowercase", async () => {
     const { dir } = getTestResources("buildDir-normalize-doctype");
-    const TEST_SRC = join(dir, "src");
+    const TEST_SRC = join(dir, "websrc");
     const TEST_OUT = join(dir, "out");
 
     try {

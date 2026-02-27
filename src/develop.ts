@@ -130,30 +130,45 @@ export const develop = async (
 
   log.log(`🚀 Development server running at http://${host}:${port}`);
 
+  let currentBuild: Promise<void> | null = null;
+  let isStopped = false;
+
   const watcher = watch(
     source,
     { recursive: true },
     async (event, filename) => {
-      if (filename) {
-        log.log(`📝 File changed: ${filename}`);
-        log.log("🔨 Rebuilding...");
-        await build({ sourceDir: source, targetDir: target, logger: log });
-        log.log("✅ Build complete!");
-
-        reloadClients.forEach((controller) => {
-          try {
-            controller.enqueue("data: reload\n\n");
-          } catch (e) {
-            reloadClients.delete(controller);
-          }
-        });
+      if (!filename || isStopped || currentBuild) return;
+      log.log(`📝 File changed: ${filename}`);
+      log.log("🔨 Rebuilding...");
+      const buildPromise = build({
+        sourceDir: source,
+        targetDir: target,
+        logger: log,
+      });
+      currentBuild = buildPromise;
+      try {
+        await buildPromise;
+      } finally {
+        if (currentBuild === buildPromise) currentBuild = null;
       }
+      if (isStopped) return;
+      log.log("✅ Build complete!");
+
+      reloadClients.forEach((controller) => {
+        try {
+          controller.enqueue("data: reload\n\n");
+        } catch (e) {
+          reloadClients.delete(controller);
+        }
+      });
     },
   );
 
   const stop = async () => {
     log.log("\n👋 Shutting down server...");
+    isStopped = true;
     watcher.close();
+    await currentBuild?.catch(() => {});
     server.stop();
 
     await new Promise((resolve) => setTimeout(resolve, 100));
