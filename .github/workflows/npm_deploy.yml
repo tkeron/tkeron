@@ -26,4 +26,11 @@ jobs:
       - run: bun i
       - run: bun run test
 
-      - run: npm publish --provenance
+      - name: Check if new version
+        id: check_version
+        run: bun check-versions.ts
+        continue-on-error: true
+
+      - name: Publish to npm
+        if: steps.check_version.outcome == 'success'
+        run: npm publish --provenance
