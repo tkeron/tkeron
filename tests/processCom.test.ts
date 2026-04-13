@@ -1039,4 +1039,137 @@ describe("processCom - Component substitution", () => {
       }
     });
   });
+
+  describe("data-tk-id on style elements", () => {
+    it("should add data-tk-id to a root-level style element in .com.html", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-data-tk-id-root-style",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><styled-comp></styled-comp></body></html>`;
+
+        const componentHtml = `<style>.foo { color: red; }</style><div class="foo">Hello</div>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "styled-comp.com.html"),
+          componentHtml,
+        );
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain('data-tk-id="styled-comp"');
+        expect(result).toContain(".foo { color: red; }");
+        expect(result).not.toContain("<styled-comp>");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should add data-tk-id to a nested style element inside a wrapper", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-data-tk-id-nested-style",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><wrap-comp></wrap-comp></body></html>`;
+
+        const componentHtml = `<div><style>.bar { font-size: 2rem; }</style><p>Text</p></div>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "wrap-comp.com.html"), componentHtml);
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain('data-tk-id="wrap-comp"');
+        expect(result).toContain(".bar { font-size: 2rem; }");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should add data-tk-id to all style elements when component has multiple", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-data-tk-id-multiple-styles",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><multi-style></multi-style></body></html>`;
+
+        const componentHtml = `<style>.a { color: blue; }</style><div><style>.b { color: green; }</style></div>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "multi-style.com.html"), componentHtml);
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        const matches = result.match(/data-tk-id="multi-style"/g);
+        expect(matches).toBeTruthy();
+        expect(matches?.length).toBe(2);
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should not add data-tk-id when component has no style elements", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-data-tk-id-no-style",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><plain-comp></plain-comp></body></html>`;
+
+        const componentHtml = `<div><p>No styles here</p></div>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(join(TEST_DIR, "plain-comp.com.html"), componentHtml);
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).not.toContain("data-tk-id");
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+
+    it("should use the component tag name as data-tk-id value", async () => {
+      const { dir: TEST_DIR } = getTestResources(
+        "processCom-data-tk-id-tagname-value",
+      );
+
+      try {
+        mkdirSync(TEST_DIR, { recursive: true });
+        const indexHtml = `<!DOCTYPE html>
+<html><head></head><body><my-special-widget></my-special-widget></body></html>`;
+
+        const componentHtml = `<style>.widget { display: flex; }</style>`;
+
+        writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
+        writeFileSync(
+          join(TEST_DIR, "my-special-widget.com.html"),
+          componentHtml,
+        );
+
+        await processCom(TEST_DIR);
+
+        const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
+        expect(result).toContain('data-tk-id="my-special-widget"');
+      } finally {
+        rmSync(TEST_DIR, { recursive: true, force: true });
+      }
+    });
+  });
 });

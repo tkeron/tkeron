@@ -441,6 +441,8 @@ describe("init", () => {
       );
       expect(dtsContent).toContain("declare const com");
       expect(dtsContent).toContain("HTMLElement");
+      expect(dtsContent).toContain("declare const document");
+      expect(dtsContent).toContain("Document");
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -465,6 +467,7 @@ describe("init", () => {
         "utf-8",
       );
       expect(dtsContent).toContain("declare const com: HTMLElement");
+      expect(dtsContent).toContain("declare const document: Document");
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }

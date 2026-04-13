@@ -1,3 +1,22 @@
+# v5.2.0
+
+## Feature: `.post.ts` post-processing support
+
+- New file type `.post.ts`: runs after the build to post-process the corresponding `.html` file
+- The `.post.ts` script receives a `document` object (parsed from the HTML) and writes the result back to the HTML file after execution
+- Executes with `bun run` in the project root context
+- Useful for final DOM manipulation, injecting metadata, or any transformation after components are resolved
+- `processPost` returns `false` when no `.post.ts` files are found (no-op)
+
+## Feature: `data-tk-id` attribute on component `<style>` elements
+
+- Root-level `<style>` elements in component output now receive a `data-tk-id="component-name"` attribute
+- Nested `<style>` elements (inside wrappers) also receive `data-tk-id`
+- Applies to both `.com.html` and `.com.ts` components
+- Enables per-component style scoping and identification in the final HTML
+
+---
+
 # v5.1.0
 
 ## Feature: .com.html template injection into .com.ts components

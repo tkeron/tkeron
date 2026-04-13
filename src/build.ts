@@ -4,6 +4,7 @@ import { processPre } from "./processPre";
 import { processCom } from "./processCom";
 import { processComTs } from "./processComTs";
 import { processComMd } from "./processComMd";
+import { processPost } from "./processPost";
 import { rm, exists, mkdir, cp } from "fs/promises";
 import type { Logger } from "@tkeron/tools";
 import { silentLogger } from "@tkeron/tools";
@@ -55,6 +56,8 @@ export const build = async (options: BuildOptions) => {
         break;
       }
     }
+
+    await processPost(tempDir, { logger: log, projectRoot: sourceParent });
 
     if (await exists(target)) {
       await rm(target, { recursive: true, force: true });

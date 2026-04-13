@@ -335,6 +335,18 @@ ${codeWithoutImports}
             (node: any) => (node?.cloneNode ? node.cloneNode(true) : node),
           );
 
+          for (const node of nodesToInsert) {
+            if ((node as any).nodeType === 1) {
+              if ((node as any).tagName?.toLowerCase() === "style") {
+                (node as any).setAttribute("data-tk-id", tagName);
+              }
+              const nested = (node as any).querySelectorAll?.("style") || [];
+              for (const styleEl of nested) {
+                (styleEl as any).setAttribute("data-tk-id", tagName);
+              }
+            }
+          }
+
           const parent = (child as any).parentNode;
 
           if (parent) {
