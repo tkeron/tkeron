@@ -1,3 +1,15 @@
+# v5.3.0
+
+## Feature: Automatic component style deduplication
+
+- Component `<style data-tk-com>` elements are now automatically deduplicated at build time
+- When a component is used multiple times, only one copy of its `<style>` is kept — moved to `<head>`
+- Runs as a new build step (`deduplicateComStyles`) between component resolution and `.post.ts` execution
+- The `.post.ts` script now receives an already-clean DOM with no duplicate styles
+- Added example `with_style_dedup` demonstrating the feature
+
+---
+
 # v5.2.0
 
 ## Feature: `.post.ts` post-processing support
@@ -8,10 +20,10 @@
 - Useful for final DOM manipulation, injecting metadata, or any transformation after components are resolved
 - `processPost` returns `false` when no `.post.ts` files are found (no-op)
 
-## Feature: `data-tk-id` attribute on component `<style>` elements
+## Feature: `data-tk-com` attribute on component `<style>` elements
 
-- Root-level `<style>` elements in component output now receive a `data-tk-id="component-name"` attribute
-- Nested `<style>` elements (inside wrappers) also receive `data-tk-id`
+- Root-level `<style>` elements in component output now receive a `data-tk-com="component-name"` attribute
+- Nested `<style>` elements (inside wrappers) also receive `data-tk-com`
 - Applies to both `.com.html` and `.com.ts` components
 - Enables per-component style scoping and identification in the final HTML
 

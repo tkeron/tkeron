@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Style Deduplication Example</title>
+  </head>
+  <body>
+    <h1>Auto Style Deduplication</h1>
+    <p>
+      Each <code>&lt;tag-chip&gt;</code> component has its own
+      <code>&lt;style&gt;</code>. tkeron automatically keeps only one copy in
+      <code>&lt;head&gt;</code> — no matter how many times the component is
+      used.
+    </p>
+
+    <tag-chip label="TypeScript"></tag-chip>
+    <tag-chip label="HTML"></tag-chip>
+    <tag-chip label="CSS"></tag-chip>
+    <tag-chip label="Bun"></tag-chip>
+    <tag-chip label="tkeron"></tag-chip>
+    <tag-chip label="zero deps"></tag-chip>
+
+    <p>
+      6 chips above → 1 <code>&lt;style data-tk-com="tag-chip"&gt;</code> in
+      <code>&lt;head&gt;</code>.
+    </p>
+  </body>
+</html>

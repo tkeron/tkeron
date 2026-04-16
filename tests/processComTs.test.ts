@@ -2004,10 +2004,10 @@ if (p) p.textContent = "TS processed template";
     });
   });
 
-  describe("data-tk-id on style elements", () => {
-    it("should add data-tk-id to a root-level style in com.innerHTML", async () => {
+  describe("data-tk-com on style elements", () => {
+    it("should add data-tk-com to a root-level style in com.innerHTML", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processComTs-data-tk-id-root-style",
+        "processComTs-data-tk-com-root-style",
       );
 
       try {
@@ -2023,7 +2023,7 @@ if (p) p.textContent = "TS processed template";
         await processComTs(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).toContain('data-tk-id="styled-ts"');
+        expect(result).toContain('data-tk-com="styled-ts"');
         expect(result).toContain(".foo { color: red; }");
         expect(result).not.toContain("<styled-ts>");
       } finally {
@@ -2031,9 +2031,9 @@ if (p) p.textContent = "TS processed template";
       }
     });
 
-    it("should add data-tk-id to a nested style inside a wrapper", async () => {
+    it("should add data-tk-com to a nested style inside a wrapper", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processComTs-data-tk-id-nested-style",
+        "processComTs-data-tk-com-nested-style",
       );
 
       try {
@@ -2049,16 +2049,16 @@ if (p) p.textContent = "TS processed template";
         await processComTs(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).toContain('data-tk-id="wrap-ts"');
+        expect(result).toContain('data-tk-com="wrap-ts"');
         expect(result).toContain(".bar { margin: 0; }");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });
 
-    it("should add data-tk-id to all style elements when component has multiple", async () => {
+    it("should add data-tk-com to all style elements when component has multiple", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processComTs-data-tk-id-multiple-styles",
+        "processComTs-data-tk-com-multiple-styles",
       );
 
       try {
@@ -2074,7 +2074,7 @@ if (p) p.textContent = "TS processed template";
         await processComTs(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        const matches = result.match(/data-tk-id="multi-ts"/g);
+        const matches = result.match(/data-tk-com="multi-ts"/g);
         expect(matches).toBeTruthy();
         expect(matches?.length).toBe(2);
       } finally {
@@ -2082,9 +2082,9 @@ if (p) p.textContent = "TS processed template";
       }
     });
 
-    it("should not add data-tk-id when component has no style elements", async () => {
+    it("should not add data-tk-com when component has no style elements", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processComTs-data-tk-id-no-style",
+        "processComTs-data-tk-com-no-style",
       );
 
       try {
@@ -2100,15 +2100,15 @@ if (p) p.textContent = "TS processed template";
         await processComTs(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).not.toContain("data-tk-id");
+        expect(result).not.toContain("data-tk-com");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });
 
-    it("should use the component tag name as data-tk-id value", async () => {
+    it("should use the component tag name as data-tk-com value", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processComTs-data-tk-id-tagname-value",
+        "processComTs-data-tk-com-tagname-value",
       );
 
       try {
@@ -2124,7 +2124,7 @@ if (p) p.textContent = "TS processed template";
         await processComTs(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).toContain('data-tk-id="my-ts-widget"');
+        expect(result).toContain('data-tk-com="my-ts-widget"');
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }

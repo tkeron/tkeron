@@ -338,11 +338,11 @@ ${codeWithoutImports}
           for (const node of nodesToInsert) {
             if ((node as any).nodeType === 1) {
               if ((node as any).tagName?.toLowerCase() === "style") {
-                (node as any).setAttribute("data-tk-id", tagName);
+                (node as any).setAttribute("data-tk-com", tagName);
               }
               const nested = (node as any).querySelectorAll?.("style") || [];
               for (const styleEl of nested) {
-                (styleEl as any).setAttribute("data-tk-id", tagName);
+                (styleEl as any).setAttribute("data-tk-com", tagName);
               }
             }
           }

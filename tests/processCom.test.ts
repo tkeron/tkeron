@@ -1040,10 +1040,10 @@ describe("processCom - Component substitution", () => {
     });
   });
 
-  describe("data-tk-id on style elements", () => {
-    it("should add data-tk-id to a root-level style element in .com.html", async () => {
+  describe("data-tk-com on style elements", () => {
+    it("should add data-tk-com to a root-level style element in .com.html", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processCom-data-tk-id-root-style",
+        "processCom-data-tk-com-root-style",
       );
 
       try {
@@ -1062,7 +1062,7 @@ describe("processCom - Component substitution", () => {
         await processCom(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).toContain('data-tk-id="styled-comp"');
+        expect(result).toContain('data-tk-com="styled-comp"');
         expect(result).toContain(".foo { color: red; }");
         expect(result).not.toContain("<styled-comp>");
       } finally {
@@ -1070,9 +1070,9 @@ describe("processCom - Component substitution", () => {
       }
     });
 
-    it("should add data-tk-id to a nested style element inside a wrapper", async () => {
+    it("should add data-tk-com to a nested style element inside a wrapper", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processCom-data-tk-id-nested-style",
+        "processCom-data-tk-com-nested-style",
       );
 
       try {
@@ -1088,16 +1088,16 @@ describe("processCom - Component substitution", () => {
         await processCom(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).toContain('data-tk-id="wrap-comp"');
+        expect(result).toContain('data-tk-com="wrap-comp"');
         expect(result).toContain(".bar { font-size: 2rem; }");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });
 
-    it("should add data-tk-id to all style elements when component has multiple", async () => {
+    it("should add data-tk-com to all style elements when component has multiple", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processCom-data-tk-id-multiple-styles",
+        "processCom-data-tk-com-multiple-styles",
       );
 
       try {
@@ -1113,7 +1113,7 @@ describe("processCom - Component substitution", () => {
         await processCom(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        const matches = result.match(/data-tk-id="multi-style"/g);
+        const matches = result.match(/data-tk-com="multi-style"/g);
         expect(matches).toBeTruthy();
         expect(matches?.length).toBe(2);
       } finally {
@@ -1121,9 +1121,9 @@ describe("processCom - Component substitution", () => {
       }
     });
 
-    it("should not add data-tk-id when component has no style elements", async () => {
+    it("should not add data-tk-com when component has no style elements", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processCom-data-tk-id-no-style",
+        "processCom-data-tk-com-no-style",
       );
 
       try {
@@ -1139,15 +1139,15 @@ describe("processCom - Component substitution", () => {
         await processCom(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).not.toContain("data-tk-id");
+        expect(result).not.toContain("data-tk-com");
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }
     });
 
-    it("should use the component tag name as data-tk-id value", async () => {
+    it("should use the component tag name as data-tk-com value", async () => {
       const { dir: TEST_DIR } = getTestResources(
-        "processCom-data-tk-id-tagname-value",
+        "processCom-data-tk-com-tagname-value",
       );
 
       try {
@@ -1166,7 +1166,7 @@ describe("processCom - Component substitution", () => {
         await processCom(TEST_DIR);
 
         const result = readFileSync(join(TEST_DIR, "index.html"), "utf-8");
-        expect(result).toContain('data-tk-id="my-special-widget"');
+        expect(result).toContain('data-tk-com="my-special-widget"');
       } finally {
         rmSync(TEST_DIR, { recursive: true, force: true });
       }

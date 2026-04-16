@@ -5,6 +5,7 @@ import { processCom } from "./processCom";
 import { processComTs } from "./processComTs";
 import { processComMd } from "./processComMd";
 import { processPost } from "./processPost";
+import { deduplicateComStyles } from "./deduplicateComStyles";
 import { rm, exists, mkdir, cp } from "fs/promises";
 import type { Logger } from "@tkeron/tools";
 import { silentLogger } from "@tkeron/tools";
@@ -56,6 +57,8 @@ export const build = async (options: BuildOptions) => {
         break;
       }
     }
+
+    await deduplicateComStyles(tempDir);
 
     await processPost(tempDir, { logger: log, projectRoot: sourceParent });
 
