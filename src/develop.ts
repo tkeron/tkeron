@@ -2,8 +2,7 @@ import { resolve, dirname } from "path";
 import { watch } from "fs";
 import { build } from "./build";
 import type { Logger } from "@tkeron/tools";
-import { logger as defaultLogger } from "@tkeron/tools";
-import { setupSigintHandler } from "./setupSigintHandler";
+import { logger as defaultLogger, setupSigintHandler } from "@tkeron/tools";
 
 export interface TkeronDevOptions {
   outputDir?: string;

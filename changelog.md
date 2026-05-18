@@ -1,3 +1,40 @@
+# v6.0.0
+
+## BREAKING: remove MCP server
+
+- Removed the `tkeron-mcp` bin and the entire MCP server implementation (`mcp-server.ts`, `docs/mcp-server.md`, `tests/mcp-server.test.ts`)
+- Removed `@modelcontextprotocol/sdk` dependency
+- AI agent integration is now provided through the new `tk skills` command (see below)
+- Migration: replace any `tkeron-mcp` MCP server configuration with `tk skills` to drop the skill files directly into your project
+
+## Feature: `tk skills` command
+
+- New CLI subcommand: `tk skills [target] [--force] [--dry-run]`
+- Installs bundled AI agent skills (Markdown `SKILL.md` files) into the chosen directory (default `./skills/`)
+- Auto-detects target environment (Copilot, Cursor, Claude) and applies environment-specific transforms (e.g. Cursor frontmatter `alwaysApply: false`)
+- Bundled skills: `tkeron`, `tkeron-components`, `tkeron-organization`, `tkeron-patterns`, `tkeron-testing`, `tkeron-troubleshooting`
+
+## Refactor: extract generic utilities to @tkeron/tools
+
+- Five internal helpers moved to `@tkeron/tools@0.5.0`: `addFrontmatterField`, `promptUser`, `setupSigintHandler`, `detectEnvironments`, `cleanupOrphanedTempDirs`
+- All imports now resolve through `@tkeron/tools`
+- `TEMP_DIR_PREFIX` stays in `build.ts` (still `.tktmp_build-`) and is now passed explicitly to `cleanupOrphanedTempDirs`
+
+## Dependencies
+
+- `@tkeron/commands` 0.4.7 → 0.4.8
+- `@tkeron/html-parser` 1.5.6 → 1.5.7
+- `@tkeron/tools` ^0.4.1 → ^0.5.0
+- Removed `@modelcontextprotocol/sdk`
+- Dev: `@types/bun` ^1.3.11 → ^1.3.14, `prettier` ^3.8.1 → ^3.8.3, `typescript` ^6.0.2 → ^6.0.3
+
+## Docs & packaging
+
+- README rewritten: MCP section replaced with `tk skills` usage and AI agent integration docs
+- Package keywords updated to reflect new direction (`ai-agents` replaces `mcp`, `model-context-protocol`, `ai-integration`)
+
+---
+
 # v5.3.0
 
 ## Feature: Automatic component style deduplication

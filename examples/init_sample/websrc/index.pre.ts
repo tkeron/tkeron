@@ -1,8 +1,12 @@
 // Pre-rendering - runs at build time
 // Demonstrates importing any TypeScript module for pre-rendering
-import { getRandomQuote, getBuildMetadata, getCryptoPrices } from './api-service';
+import {
+  getRandomQuote,
+  getBuildMetadata,
+  getCryptoPrices,
+} from "./api-service";
 
-const buildTimeElement = document.getElementById('build-time');
+const buildTimeElement = document.getElementById("build-time");
 
 if (buildTimeElement) {
   const now = new Date();
@@ -10,7 +14,7 @@ if (buildTimeElement) {
 }
 
 // Fetch data from external API at build time
-const quoteElement = document.getElementById('pre-rendered-quote');
+const quoteElement = document.getElementById("pre-rendered-quote");
 if (quoteElement) {
   const quote = await getRandomQuote();
   quoteElement.innerHTML = `
@@ -22,7 +26,7 @@ if (quoteElement) {
 }
 
 // Add build metadata
-const metadataElement = document.getElementById('build-metadata');
+const metadataElement = document.getElementById("build-metadata");
 if (metadataElement) {
   const metadata = await getBuildMetadata();
   metadataElement.innerHTML = `
@@ -38,15 +42,17 @@ if (metadataElement) {
 }
 
 // Fetch crypto prices at build time
-const cryptoPricesElement = document.getElementById('crypto-prices');
+const cryptoPricesElement = document.getElementById("crypto-prices");
 if (cryptoPricesElement) {
   const prices = await getCryptoPrices();
-  
-  const pricesHtml = prices.map(crypto => {
-    const changeColor = crypto.price_change_percentage_24h >= 0 ? '#10b981' : '#ef4444';
-    const changeSymbol = crypto.price_change_percentage_24h >= 0 ? '▲' : '▼';
-    
-    return `
+
+  const pricesHtml = prices
+    .map((crypto) => {
+      const changeColor =
+        crypto.price_change_percentage_24h >= 0 ? "#10b981" : "#ef4444";
+      const changeSymbol = crypto.price_change_percentage_24h >= 0 ? "▲" : "▼";
+
+      return `
       <div class="crypto-card">
         <div class="crypto-header">
           <span class="crypto-name">${crypto.name}</span>
@@ -58,9 +64,8 @@ if (cryptoPricesElement) {
         </div>
       </div>
     `;
-  }).join('');
-  
+    })
+    .join("");
+
   cryptoPricesElement.innerHTML = pricesHtml;
 }
-
-

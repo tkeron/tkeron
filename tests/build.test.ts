@@ -1,9 +1,6 @@
 import { describe, it, expect } from "bun:test";
-import { build } from "../src/build";
-import {
-  cleanupOrphanedTempDirs,
-  TEMP_DIR_PREFIX,
-} from "../src/cleanupOrphanedTempDirs";
+import { build, TEMP_DIR_PREFIX } from "../src/build";
+import { cleanupOrphanedTempDirs } from "@tkeron/tools";
 import {
   rmSync,
   existsSync,
@@ -386,7 +383,7 @@ throw new Error("Intentional test error");
     try {
       mkdirSync(dir, { recursive: true });
       const { logger } = createTestLogger();
-      await cleanupOrphanedTempDirs(dir, logger);
+      await cleanupOrphanedTempDirs(dir, TEMP_DIR_PREFIX, logger);
       expect(existsSync(dir)).toBe(true);
     } finally {
       rmSync(dir, { recursive: true, force: true });
@@ -396,7 +393,7 @@ throw new Error("Intentional test error");
     const { dir } = getTestResources("cleanup-nonexistent-dir");
     const nonExistentDir = join(dir, "does-not-exist");
     const { logger } = createTestLogger();
-    await cleanupOrphanedTempDirs(nonExistentDir, logger);
+    await cleanupOrphanedTempDirs(nonExistentDir, TEMP_DIR_PREFIX, logger);
   });
   it("cleanupOrphanedTempDirs should only remove directories, not files", async () => {
     const { dir } = getTestResources("cleanup-only-dirs");
@@ -407,7 +404,7 @@ throw new Error("Intentional test error");
       const tempDir = join(dir, `${TEMP_DIR_PREFIX}some-dir`);
       mkdirSync(tempDir, { recursive: true });
       const { logger } = createTestLogger();
-      await cleanupOrphanedTempDirs(dir, logger);
+      await cleanupOrphanedTempDirs(dir, TEMP_DIR_PREFIX, logger);
       expect(existsSync(tempFile)).toBe(true);
       expect(existsSync(tempDir)).toBe(false);
     } finally {

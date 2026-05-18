@@ -84,37 +84,38 @@ document.getElementById("quote").textContent = data.content;
 tk init <name>           # Initialize new project
 tk build                 # Build project (websrc → web)
 tk dev [port] [host]     # Dev server with hot reload (default: localhost:3000)
+tk skills [target]       # Install AI agent skills into <target>/ (default: skills/)
 ```
 
 **Aliases:** `tk i`, `tk b`, `tk d`
 
 See [CLI Reference](./docs/cli-reference.md) for all options.
 
-## MCP Server (AI Integration)
+## AI Agent Integration
 
-Tkeron includes a Model Context Protocol server for AI agents.
+Tkeron ships with **AI agent skills** — Markdown files an AI coding agent can read to understand the entire tkeron workflow (CLI, folder structure, file types, components, build lifecycle, testing, best practices and common pitfalls).
 
-**Setup:**
+Install them into your project with:
 
 ```bash
-bun install -g tkeron
+tk skills                  # copies skills into ./skills/
+tk skills agent-skills     # custom target directory
+tk skills --force          # overwrite existing files
 ```
 
-**Configure in VS Code** (`~/.config/Code/User/mcp.json`):
+This drops the bundled skills into the chosen directory:
 
-```json
-{
-  "servers": {
-    "tkeron": {
-      "command": "tkeron-mcp"
-    }
-  }
-}
+```
+skills/
+├── tkeron/
+│   └── SKILL.md                    # Core: CLI, build, file types, testing
+├── tkeron-components/
+│   └── SKILL.md                    # Components & pre/post-rendering deep dive
+└── tkeron-best-practices/
+    └── SKILL.md                    # Patterns, anti-patterns, organization
 ```
 
-**Note:** Other editors may use different configuration formats.
-
-See [MCP Documentation](./docs/mcp-server.md) for details.
+Point your agent's skill loader (e.g. `.github/skills/`, `~/.config/Code/User/prompts/`, or any equivalent) at the installed directory, or copy the folders into the location your agent expects.
 
 ## Testing API
 

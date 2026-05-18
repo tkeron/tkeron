@@ -3,6 +3,7 @@ import { getCommands } from "@tkeron/commands";
 import { buildWrapper } from "./src/buildWrapper";
 import { develop } from "./src/develop";
 import { initWrapper } from "./src/initWrapper";
+import { skillsWrapper } from "./src/skillsWrapper";
 import { showBanner } from "./src/banner";
 import packageJson from "./package.json";
 
@@ -35,6 +36,20 @@ getCommands("tkeron", packageJson.version)
   .addPositionedArgument("projectName")
   .addOption("force")
   .setCallback(initWrapper)
+
+  .commands()
+
+  .addCommand("skills")
+  .addDescription("Install AI agent skills into the current project")
+  .addPositionedArgument("target")
+  .addOption("force")
+  .addOption({
+    name: "dryRun",
+    aliases: ["dry-run"],
+    type: "boolean",
+    description: "Preview what would be installed without making changes",
+  })
+  .setCallback(skillsWrapper)
 
   .commands()
   .start();

@@ -1054,10 +1054,7 @@ describe("processCom - Component substitution", () => {
         const componentHtml = `<style>.foo { color: red; }</style><div class="foo">Hello</div>`;
 
         writeFileSync(join(TEST_DIR, "index.html"), indexHtml);
-        writeFileSync(
-          join(TEST_DIR, "styled-comp.com.html"),
-          componentHtml,
-        );
+        writeFileSync(join(TEST_DIR, "styled-comp.com.html"), componentHtml);
 
         await processCom(TEST_DIR);
 

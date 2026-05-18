@@ -9,8 +9,7 @@ import {
 } from "fs";
 import { join, resolve, basename } from "path";
 import type { Logger } from "@tkeron/tools";
-import { silentLogger } from "@tkeron/tools";
-import { promptUser } from "./promptUser";
+import { silentLogger, promptUser } from "@tkeron/tools";
 import { ensureTsconfig } from "./ensureTsconfig";
 
 export interface InitOptions {

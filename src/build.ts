@@ -8,11 +8,9 @@ import { processPost } from "./processPost";
 import { deduplicateComStyles } from "./deduplicateComStyles";
 import { rm, exists, mkdir, cp } from "fs/promises";
 import type { Logger } from "@tkeron/tools";
-import { silentLogger } from "@tkeron/tools";
-import {
-  cleanupOrphanedTempDirs,
-  TEMP_DIR_PREFIX,
-} from "./cleanupOrphanedTempDirs";
+import { silentLogger, cleanupOrphanedTempDirs } from "@tkeron/tools";
+
+export const TEMP_DIR_PREFIX = ".tktmp_build-";
 
 export interface BuildOptions {
   sourceDir?: string;
@@ -38,7 +36,7 @@ export const build = async (options: BuildOptions) => {
     `${TEMP_DIR_PREFIX}${crypto.randomUUID()}`,
   );
 
-  await cleanupOrphanedTempDirs(sourceParent, log);
+  await cleanupOrphanedTempDirs(sourceParent, TEMP_DIR_PREFIX, log);
 
   try {
     await mkdir(tempDir, { recursive: true });
