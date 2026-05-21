@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Docs — tkeron</title>
+    <styles-injector></styles-injector>
+  </head>
+  <body>
+    <site-header></site-header>
+    <main class="container">
+      <article class="page">
+        <h1>Docs</h1>
+        <p>Getting started with tkeron:</p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem">
+          <li><code>tk dev</code> — start the dev server on <code>:3000</code></li>
+          <li><code>tk build</code> — compile <code>websrc/</code> into <code>web/</code></li>
+          <li><code>tk init &lt;name&gt;</code> — scaffold a new project</li>
+        </ul>
+        <p style="margin-top: 1rem">
+          Components live under <code>websrc/components/</code> grouped by domain:
+          <code>layout/</code>, <code>ui/</code>, <code>content/</code>.
+        </p>
+        <p>
+          Pages at the root of <code>websrc/</code> map directly to URLs —
+          <code>about.html</code> → <code>/about</code>,
+          <code>docs.html</code> → <code>/docs</code>.
+        </p>
+      </article>
+    </main>
+    <site-footer></site-footer>
+  </body>
+</html>

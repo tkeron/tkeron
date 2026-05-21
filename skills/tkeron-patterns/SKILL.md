@@ -211,25 +211,102 @@ if (!isProd) {
 }
 ```
 
-### CSS classes, not repeated inline styles
+### CSS via components (NEVER `<link rel="stylesheet">`)
 
-```css
-/* styles/components.css */
-:root {
-  --primary: #3b82f6;
-  --spacing: 1rem;
-}
+**Rule**: CSS in tkeron lives inside `<style>` blocks emitted by components. Pages MUST NOT use `<link rel="stylesheet">`. This unlocks three properties:
 
-.card {
-  padding: var(--spacing);
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-}
+1. **Auto-dedup**: tkeron keeps a single `<style data-tk-com="...">` in `<head>` no matter how many times the component is used.
+2. **Tree-shaking**: if a component is not used on a page, its CSS does not ship to that page.
+3. **Zero extra requests**: CSS travels inside the HTML download → first paint without waiting for another request.
+
+#### Per-component CSS — in `.com.html`
+
+```html
+<!-- card.com.html -->
+<style>
+  .card { padding: 1rem; border: 1px solid #e5e7eb; border-radius: 8px; }
+</style>
+<div class="card"></div>
 ```
 
 ```typescript
-// card.com.ts
-com.innerHTML = `<div class="card">${content}</div>`;
+// card.com.ts (optional — only if logic is needed)
+const body = com.querySelector(".card");
+if (body) body.textContent = com.getAttribute("text") || "";
+```
+
+> If a `.com.html` exists next to a `.com.ts`, the HTML is loaded into `com.innerHTML` **before** the `.com.ts` runs. The `<style>` is preserved and dedup applies. Do NOT re-emit the `<style>` from `.com.ts`.
+
+**Build output — dedup in action.** Component used 6 times → `<head>` receives exactly **one** `<style data-tk-com="tag-chip">` block:
+
+```html
+<!-- websrc/index.html — source has 6 <tag-chip> uses -->
+<tag-chip label="TypeScript"></tag-chip>
+<tag-chip label="HTML"></tag-chip>
+<tag-chip label="CSS"></tag-chip>
+<tag-chip label="Bun"></tag-chip>
+<tag-chip label="tkeron"></tag-chip>
+<tag-chip label="zero deps"></tag-chip>
+```
+
+```html
+<!-- web/index.html — tkeron output -->
+<head>
+  <!-- ONE style block, regardless of how many times the component was used -->
+  <style data-tk-com="tag-chip">
+    .tag-chip { display: inline-block; background: ...; color: white; ... }
+  </style>
+</head>
+<body>
+  <span class="tag-chip">TypeScript</span>
+  <span class="tag-chip">HTML</span>
+  <span class="tag-chip">CSS</span>
+  <span class="tag-chip">Bun</span>
+  <span class="tag-chip">tkeron</span>
+  <span class="tag-chip">zero deps</span>
+</body>
+```
+
+#### Global CSS — keep `.css` file, inline via a component
+
+For truly shared CSS (resets, tokens, body typography) you can keep a real `.css` file in source (so the editor gives you CSS tooling). Do **not** import it with `<link>`. Inline it through a build-time component — a `.com.ts` is the natural fit because it can read files at build time:
+
+```typescript
+// any-name.com.ts (e.g. global-styles.com.ts, site-css.com.ts — name is free,
+// just respect the custom-element hyphen rule)
+import { join } from "path";
+const css = await Bun.file(join(__dirname, "main.css")).text();
+com.innerHTML = `<style>${css}</style>`;
+```
+
+```html
+<!-- any page -->
+<head>
+  <global-styles></global-styles>
+</head>
+```
+
+The `.css` file can live wherever the user prefers (root of `websrc/`, next to the component, in a `styles/` folder — free choice). What matters is that the page references the **component**, not the `.css` file. Keep the global CSS **small**: it ships on every page. Anything component-specific belongs in that component's `.com.html`.
+
+**Build output — `<link>` vs component.** Both source patterns compile, but the output is fundamentally different:
+
+```html
+<!-- ❌ websrc/page.html uses <link rel="stylesheet" href="./styles.css"> -->
+<!-- web/page.html output: -->
+<link rel="stylesheet" href="./page.css" />
+<!-- + a separate page.css file is emitted next to page.html -->
+<!-- = 1 extra HTTP request, blocks first paint -->
+```
+
+```html
+<!-- ✅ websrc/page.html uses <global-styles></global-styles> -->
+<!-- web/page.html output: -->
+<style>
+  /* full content of styles.css inlined — zero extra files, zero extra requests */
+  :root { --accent: #38bdf8; }
+  body { margin: 0; font-family: system-ui; }
+</style>
+<!-- no .css file emitted alongside page.html -->
 ```
 
 ---
@@ -297,6 +374,20 @@ Tkeron serves the output from a subdirectory. Absolute paths (`/assets/...`) poi
 ```
 
 Applies to **every `href`, `src` and `url()`** pointing to local assets in `websrc/`.
+
+### ❌ `<link rel="stylesheet">` in HTML
+
+Generates an extra HTTP request, blocks first paint, and bypasses tkeron's per-component dedup and tree-shaking.
+
+```html
+<!-- ❌ BAD — extra request, no dedup, no tree-shaking -->
+<link rel="stylesheet" href="./styles.css" />
+
+<!-- ✅ GOOD — inlined at build time via a component -->
+<global-styles></global-styles>
+```
+
+See "CSS via components" above for the `global-styles.com.ts` pattern.
 
 ### ❌ Event listeners in `.com.ts`
 
@@ -470,9 +561,10 @@ if (isNaN(count) || count < 0 || count > 100) {
 
 ### Output size
 
-- CSS classes instead of inline styles
+- CSS classes instead of repeated inline `style="..."`
 - Lean components (little HTML per component)
-- Shared external CSS (`components.css`)
+- CSS lives in `<style>` inside `.com.html` → auto-dedup + tree-shaking
+- Global CSS via `<global-styles>` component (inlined), NEVER `<link rel="stylesheet">`
 - CSS variables for colors/spacing
 
 ---
@@ -487,7 +579,7 @@ When creating/editing a tkeron project:
 4. ✅ Browser code → `.ts`. Build code → `.com.ts` / `.pre.ts` / `.post.ts`
 5. ✅ Build-time fetch → always with AbortController + timeout
 6. ✅ Escape dynamic content (`escapeHtml`)
-7. ✅ CSS classes, not repeated inline styles
+7. ✅ CSS via components (`<style>` in `.com.html`), never `<link rel="stylesheet">`
 8. ✅ **Maximum pre-render**: HTML structure in `.html` / components, JS only fills data
 9. ✅ npm packages only at build time, CDN for the browser
 10. ✅ `tk build` after every edit, then verify `web/`. NEVER `tk dev` synchronously in agent sessions

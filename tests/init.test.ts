@@ -30,12 +30,16 @@ describe("init", () => {
       expect(existsSync(join(projectPath, "websrc", "index.pre.ts"))).toBe(
         true,
       );
-      expect(
-        existsSync(join(projectPath, "websrc", "info-card.com.html")),
-      ).toBe(true);
-      expect(existsSync(join(projectPath, "websrc", "user-badge.com.ts"))).toBe(
+      expect(existsSync(join(projectPath, "websrc", "index.post.ts"))).toBe(
         true,
       );
+      expect(existsSync(join(projectPath, "websrc", "about.html"))).toBe(true);
+      expect(existsSync(join(projectPath, "websrc", "docs.html"))).toBe(true);
+      expect(
+        existsSync(
+          join(projectPath, "websrc", "components", "ui", "user-badge.com.ts"),
+        ),
+      ).toBe(true);
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -87,21 +91,62 @@ describe("init", () => {
       });
 
       expect(
-        existsSync(join(projectPath, "websrc", "hero-section.com.html")),
-      ).toBe(true);
-      expect(
-        existsSync(join(projectPath, "websrc", "pre-render-card.com.html")),
-      ).toBe(true);
-      expect(
         existsSync(
-          join(projectPath, "websrc", "html-components-card.com.html"),
+          join(
+            projectPath,
+            "websrc",
+            "components",
+            "layout",
+            "site-header.com.html",
+          ),
         ),
       ).toBe(true);
       expect(
-        existsSync(join(projectPath, "websrc", "ts-components-card.com.html")),
+        existsSync(
+          join(
+            projectPath,
+            "websrc",
+            "components",
+            "layout",
+            "site-footer.com.html",
+          ),
+        ),
       ).toBe(true);
       expect(
-        existsSync(join(projectPath, "websrc", "counter-card.com.html")),
+        existsSync(
+          join(
+            projectPath,
+            "websrc",
+            "components",
+            "ui",
+            "styles-injector.com.ts",
+          ),
+        ),
+      ).toBe(true);
+      expect(
+        existsSync(
+          join(
+            projectPath,
+            "websrc",
+            "components",
+            "ui",
+            "counter-button.com.html",
+          ),
+        ),
+      ).toBe(true);
+      expect(
+        existsSync(
+          join(
+            projectPath,
+            "websrc",
+            "components",
+            "content",
+            "about-intro.com.md",
+          ),
+        ),
+      ).toBe(true);
+      expect(
+        existsSync(join(projectPath, "websrc", "styles", "main.css")),
       ).toBe(true);
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });
@@ -133,8 +178,10 @@ describe("init", () => {
         join(projectPath, "websrc", "index.html"),
         "utf-8",
       );
-      expect(indexHtml).toContain("<hero-section>");
-      expect(indexHtml).toContain("<counter-card>");
+      expect(indexHtml).toContain("<site-header>");
+      expect(indexHtml).toContain("<counter-button>");
+      expect(indexHtml).toContain("<styles-injector>");
+      expect(indexHtml).toContain("<user-badge");
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });
     }
@@ -154,12 +201,14 @@ describe("init", () => {
         logger: silentLogger,
       });
 
-      expect(existsSync(join(projectPath, "websrc", "api-service.ts"))).toBe(
-        true,
-      );
+      expect(
+        existsSync(
+          join(projectPath, "websrc", "utils", "api-service.ts"),
+        ),
+      ).toBe(true);
 
       const apiServiceContent = readFileSync(
-        join(projectPath, "websrc", "api-service.ts"),
+        join(projectPath, "websrc", "utils", "api-service.ts"),
         "utf-8",
       );
       expect(apiServiceContent).toContain("getRandomQuote");
@@ -167,13 +216,14 @@ describe("init", () => {
       expect(apiServiceContent).toContain(
         "https://dummyjson.com/quotes/random",
       );
+      expect(apiServiceContent).toContain("AbortController");
 
       const indexPreTs = readFileSync(
         join(projectPath, "websrc", "index.pre.ts"),
         "utf-8",
       );
       expect(indexPreTs).toContain("import");
-      expect(indexPreTs).toContain("./api-service");
+      expect(indexPreTs).toContain("./utils/api-service");
       expect(indexPreTs).toContain("getRandomQuote");
     } finally {
       rmSync(TEST_DIR, { recursive: true, force: true });

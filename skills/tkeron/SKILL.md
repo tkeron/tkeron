@@ -181,7 +181,7 @@ Limits: max **10 iterations**, max **50 nesting levels**, no circular dependenci
   <head>
     <meta charset="UTF-8" />
     <title>My Site</title>
-    <link rel="stylesheet" href="./styles.css" />
+    <global-styles></global-styles>
   </head>
   <body>
     <site-header></site-header>
@@ -191,10 +191,11 @@ Limits: max **10 iterations**, max **50 nesting levels**, no circular dependenci
 </html>
 ```
 
-**Two non-negotiable rules**:
+**Three non-negotiable rules**:
 
 1. **`src="index.ts"` with `type="module"`**, NEVER `.js`. Tkeron compiles and rewrites the reference.
-2. **Relative paths only** (`./`, `../`). NEVER absolute (`/styles.css`) — Bun cannot resolve them at build time. Applies to `.html`, `.com.html`, and `url()` in CSS.
+2. **Relative paths only** (`./`, `../`). NEVER absolute (`/file.ext`) — Bun cannot resolve them at build time. Applies to `.html`, `.com.html`, and `url()` in CSS.
+3. **CSS via components, never `<link rel="stylesheet">`**. A `<global-styles>` component reads the `.css` file at build time and inlines it as `<style>` — no extra request, dedup-friendly. See `tkeron-patterns` → "CSS via components".
 
 ---
 

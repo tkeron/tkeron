@@ -1,0 +1,48 @@
+<style>
+  .counter-button-wrap {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .counter-button-wrap button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 0.75rem 2rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition:
+      transform 0.1s,
+      box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  .counter-button-wrap button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  .counter-button-wrap button:active {
+    transform: scale(0.98);
+  }
+  .counter-button-wrap .count {
+    font-size: 2rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-top: 1rem;
+  }
+</style>
+<section class="counter-card">
+  <h2>🎯 Client-side TypeScript</h2>
+  <p style="margin-bottom: 0.75rem">Interactive features in the browser:</p>
+  <div class="counter-button-wrap">
+    <button id="increment">Click me!</button>
+    <div class="count">Clicks: <span id="count">0</span></div>
+  </div>
+  <p style="font-size: 0.85rem; color: #666; margin-top: 0.75rem">
+    ✓ Event handling &amp; DOM manipulation<br />✓ Regular TypeScript for
+    interactivity
+  </p>
+</section>

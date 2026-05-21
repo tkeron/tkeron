@@ -1,48 +1,46 @@
-// External API service - can be imported in .pre.ts files
-// Demonstrates that pre-rendering can use any TypeScript module
-
 export interface Quote {
   id: number;
   quote: string;
   author: string;
 }
 
-/**
- * Fetches a random quote from a public API
- * This runs at build time during pre-rendering
- */
-export async function getRandomQuote(): Promise<Quote> {
-  try {
-    const response = await fetch("https://dummyjson.com/quotes/random");
+export const escapeHtml = (str: string): string =>
+  str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 
+export const getRandomQuote = async (): Promise<Quote> => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch("https://dummyjson.com/quotes/random", {
+      signal: controller.signal,
+    });
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
     const data = await response.json();
     return data as Quote;
-  } catch (error) {
-    // Fallback quote if API fails
-    console.warn("API call failed, using fallback quote");
+  } catch {
     return {
       id: 0,
       quote: "The only way to do great work is to love what you do.",
       author: "Steve Jobs",
     };
+  } finally {
+    clearTimeout(timeout);
   }
-}
+};
 
-/**
- * Gets build metadata
- */
-export async function getBuildMetadata() {
-  return {
-    timestamp: new Date().toLocaleString(),
-    runtime: `Bun ${Bun.version}`,
-    tkeron: process.env.TKERON_VERSION || "unknown",
-    platform: process.platform,
-  };
-}
+export const getBuildMetadata = () => ({
+  timestamp: new Date().toLocaleString(),
+  runtime: `Bun ${Bun.version}`,
+  tkeron: process.env.TKERON_VERSION || "unknown",
+  platform: process.platform,
+});
 
 export interface CryptoPrice {
   id: string;
@@ -52,25 +50,20 @@ export interface CryptoPrice {
   price_change_percentage_24h: number;
 }
 
-/**
- * Fetches cryptocurrency prices from CoinGecko API
- * This runs at build time during pre-rendering
- */
-export async function getCryptoPrices(): Promise<CryptoPrice[]> {
+export const getCryptoPrices = async (): Promise<CryptoPrice[]> => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
   try {
     const response = await fetch(
       "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=bitcoin,ethereum,solana&order=market_cap_desc&sparkline=false",
+      { signal: controller.signal },
     );
-
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
     const data = await response.json();
     return data as CryptoPrice[];
-  } catch (error) {
-    // Fallback data if API fails
-    console.warn("Crypto API call failed, using fallback data");
+  } catch {
     return [
       {
         id: "bitcoin",
@@ -94,5 +87,7 @@ export async function getCryptoPrices(): Promise<CryptoPrice[]> {
         price_change_percentage_24h: 5.8,
       },
     ];
+  } finally {
+    clearTimeout(timeout);
   }
-}
+};

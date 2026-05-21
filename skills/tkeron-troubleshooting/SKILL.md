@@ -35,13 +35,17 @@ Something is wrong
 
 ### `Cannot resolve "/styles.css"`
 
-**Cause**: absolute path. Bun resolves from the source file, not from the server root.
+**Cause**: absolute path in a `<link rel="stylesheet">`. Two problems: the path is absolute (Bun resolves from the source file, not the server root), and `<link rel="stylesheet">` is itself an anti-pattern in tkeron.
+
+**Fix**: replace the `<link>` with a `<global-styles>` component that inlines the CSS at build time. See `tkeron-patterns` → "CSS via components".
 
 ```html
-<!-- ❌ -->
+<!-- ❌ BAD -->
 <link rel="stylesheet" href="/styles.css" />
-<!-- ✅ -->
+<!-- ⚠️ Works but anti-pattern (extra request, no dedup) -->
 <link rel="stylesheet" href="./styles.css" />
+<!-- ✅ GOOD — inlined, no extra request, dedup-friendly -->
+<global-styles></global-styles>
 ```
 
 ### `Component name must contain hyphen`

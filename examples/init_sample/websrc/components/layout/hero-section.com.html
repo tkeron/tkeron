@@ -1,0 +1,88 @@
+<style>
+  .hero {
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    grid-row: span 2;
+  }
+  .hero .features {
+    margin-top: 1rem;
+    text-align: left;
+    width: 100%;
+  }
+  .hero .features li {
+    margin-bottom: 0.3rem;
+    padding-left: 0.5rem;
+    opacity: 0.9;
+    font-size: 0.85rem;
+  }
+  .hero .logo {
+    width: 200px;
+    height: 200px;
+    margin-bottom: 1rem;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+    animation: hero-float 3s ease-in-out infinite;
+  }
+  .hero .subtitle {
+    font-size: 0.9rem;
+    opacity: 0.95;
+  }
+  .hero .links {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+  }
+  .hero .links a {
+    flex: 1;
+    padding: 0.65rem;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.85rem;
+  }
+  .hero .links .npm {
+    background: rgba(203, 56, 55, 0.9);
+  }
+  .hero .links .github {
+    background: rgba(36, 41, 46, 0.9);
+  }
+  @keyframes hero-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+</style>
+<div class="hero">
+  <div>
+    <img src="./assets/profile.png" alt="tkeron logo" class="logo" />
+    <h1>tkeron</h1>
+    <p class="subtitle">Build-time TypeScript for modern web development</p>
+  </div>
+  <div class="features">
+    <ul style="list-style: none">
+      <li>⚡ Fast builds with Bun</li>
+      <li>🎯 Build-time HTML generation</li>
+      <li>🧩 HTML &amp; TypeScript components</li>
+      <li>🔧 Pure TypeScript &amp; HTML</li>
+    </ul>
+  </div>
+  <div class="links">
+    <a href="https://www.npmjs.com/package/tkeron" target="_blank" class="npm">📦 npm</a>
+    <a href="https://github.com/tkeron/tkeron" target="_blank" class="github">⭐ GitHub</a>
+  </div>
+</div>

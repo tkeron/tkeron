@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bad — link rel stylesheet</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <h1>Bad: <code>&lt;link rel="stylesheet"&gt;</code></h1>
+    <p>
+      The CSS is referenced via a <code>&lt;link&gt;</code> tag. tkeron bundles
+      it into a separate <code>.css</code> file — an extra HTTP request on every
+      page load.
+    </p>
+    <p>
+      Check <code>web/bad.html</code>: you will find a
+      <code>&lt;link rel="stylesheet" href="./bad.css"&gt;</code> and a
+      companion <code>bad.css</code> file next to it.
+    </p>
+    <a href="index.html">Back to index</a>
+  </body>
+</html>

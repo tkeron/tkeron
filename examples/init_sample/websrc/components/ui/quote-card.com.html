@@ -1,0 +1,32 @@
+<style>
+  .quote-card #pre-rendered-quote {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+  }
+  .quote-card #build-metadata {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #eee;
+    font-size: 0.75rem;
+    color: #999;
+  }
+  .quote-card blockquote p {
+    font-style: italic;
+  }
+  .quote-card blockquote footer {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    color: #666;
+  }
+</style>
+<section class="quote-card" style="grid-column: span 3">
+  <h2>💬 Quote of the Build</h2>
+  <p style="font-size: 0.85rem; margin-bottom: 0.75rem">
+    This content was fetched from an external API at build time:
+  </p>
+  <div id="pre-rendered-quote"></div>
+  <div id="build-metadata"></div>
+</section>

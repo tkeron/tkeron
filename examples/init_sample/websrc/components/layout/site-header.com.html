@@ -1,0 +1,44 @@
+<style>
+  .site-header {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: white;
+  }
+  .site-header .brand {
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-decoration: none;
+    color: white;
+  }
+  .site-header nav {
+    display: flex;
+    gap: 0.75rem;
+  }
+  .site-header nav a {
+    color: white;
+    text-decoration: none;
+    padding: 0.4rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.1);
+  }
+  .site-header nav a:hover {
+    background: rgba(255, 255, 255, 0.25);
+  }
+</style>
+<header class="site-header">
+  <a href="./index.html" class="brand">tkeron</a>
+  <nav>
+    <a href="./index.html">Home</a>
+    <a href="./about.html">About</a>
+    <a href="./docs.html">Docs</a>
+  </nav>
+</header>

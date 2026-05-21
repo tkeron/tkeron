@@ -3,260 +3,28 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
     <title>tkeron - Sample Project</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      body {
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-        line-height: 1.6;
-        color: #1a1a1a;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        min-height: 100vh;
-        padding: 1rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-      .container {
-        max-width: 1200px;
-        margin: 0 auto;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        grid-template-rows: repeat(2, 1fr);
-        gap: 1rem;
-      }
-      @media (max-width: 900px) {
-        .grid {
-          grid-template-columns: 1fr;
-          grid-template-rows: auto;
-        }
-      }
-      .hero {
-        text-align: center;
-        color: white;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.1);
-        backdrop-filter: blur(10px);
-        padding: 1.5rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        grid-row: span 2;
-      }
-      .hero .features {
-        margin-top: 1rem;
-        text-align: left;
-        width: 100%;
-      }
-      .hero .features li {
-        margin-bottom: 0.3rem;
-        padding-left: 0.5rem;
-        opacity: 0.9;
-        font-size: 0.85rem;
-      }
-      .logo {
-        width: 200px;
-        height: 200px;
-        margin-bottom: 1rem;
-        filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
-        animation: float 3s ease-in-out infinite;
-      }
-      @keyframes float {
-        0%,
-        100% {
-          transform: translateY(0);
-        }
-        50% {
-          transform: translateY(-10px);
-        }
-      }
-      h1 {
-        font-size: 2rem;
-        margin-bottom: 0.25rem;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-      .subtitle {
-        font-size: 0.9rem;
-        opacity: 0.95;
-      }
-      section {
-        background: white;
-        padding: 1.25rem;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-      }
-      section:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
-      }
-      h2 {
-        color: #667eea;
-        margin-bottom: 0.75rem;
-        font-size: 1.2rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-      }
-      section p {
-        font-size: 0.9rem;
-      }
-      .counter {
-        margin-top: 1rem;
-        text-align: center;
-      }
-      button {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border: none;
-        padding: 0.75rem 2rem;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 600;
-        transition:
-          transform 0.1s,
-          box-shadow 0.2s;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-      }
-      button:hover {
-        transform: scale(1.05);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      }
-      button:active {
-        transform: scale(0.98);
-      }
-      .count {
-        font-size: 2rem;
-        font-weight: bold;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        margin-top: 1rem;
-      }
-      code {
-        background: #f0f0f0;
-        padding: 0.2rem 0.4rem;
-        border-radius: 4px;
-        font-family: "Courier New", monospace;
-        font-size: 0.9em;
-      }
-      p {
-        margin-bottom: 0.5rem;
-      }
-      a {
-        transition:
-          transform 0.2s,
-          box-shadow 0.2s;
-      }
-      a:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      }
-      .crypto-prices-container {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-      }
-      .crypto-card {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        padding: 1.25rem;
-        border-radius: 12px;
-        color: white;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        transition: transform 0.2s;
-      }
-      .crypto-card:hover {
-        transform: translateY(-4px);
-      }
-      .crypto-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 0.75rem;
-      }
-      .crypto-name {
-        font-weight: 600;
-        font-size: 1rem;
-      }
-      .crypto-symbol {
-        background: rgba(255, 255, 255, 0.2);
-        padding: 0.25rem 0.5rem;
-        border-radius: 4px;
-        font-size: 0.75rem;
-        font-weight: 700;
-      }
-      .crypto-price {
-        font-size: 1.5rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-      }
-      .crypto-change {
-        font-size: 0.9rem;
-        font-weight: 600;
-      }
-    </style>
+    <meta id="build-stamp" name="build-stamp" content="" />
+    <styles-injector></styles-injector>
   </head>
   <body>
+    <site-header></site-header>
     <div class="container">
       <div class="grid">
         <hero-section></hero-section>
         <pre-render-card></pre-render-card>
         <html-components-card></html-components-card>
         <ts-components-card></ts-components-card>
-        <counter-card></counter-card>
-
-        <!-- Crypto Prices - fetched at build time -->
-        <section style="grid-column: span 3">
-          <h2>💰 Asset Prices (Build Time)</h2>
-          <p style="font-size: 0.85rem; margin-bottom: 0.75rem">
-            Real cryptocurrency prices fetched from CoinGecko API at build time:
-          </p>
-          <div id="crypto-prices" class="crypto-prices-container"></div>
+        <section class="counter-card-wrap">
+          <counter-button></counter-button>
         </section>
-
-        <!-- Pre-rendered content with external API data -->
-        <section style="grid-column: span 3">
-          <h2>💬 Quote of the Build</h2>
-          <p style="font-size: 0.85rem; margin-bottom: 0.75rem">
-            This content was fetched from an external API at build time:
-          </p>
-          <div
-            id="pre-rendered-quote"
-            style="
-              margin: 1rem 0;
-              padding: 0.75rem;
-              background: #f8f9fa;
-              border-radius: 8px;
-              border-left: 4px solid #667eea;
-            "
-          ></div>
-          <div
-            id="build-metadata"
-            style="
-              margin-top: 1rem;
-              padding-top: 0.75rem;
-              border-top: 1px solid #eee;
-              font-size: 0.75rem;
-              color: #999;
-            "
-          ></div>
-        </section>
+        <markdown-card></markdown-card>
+        <crypto-prices-card></crypto-prices-card>
+        <quote-card></quote-card>
       </div>
+      <user-badge count="4"></user-badge>
     </div>
+    <site-footer></site-footer>
     <script type="module" src="./index.ts"></script>
   </body>
 </html>

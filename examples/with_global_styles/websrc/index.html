@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global Styles — Overview</title>
+  </head>
+  <body>
+    <h1>Global Styles Import</h1>
+    <p>
+      Two approaches for adding shared CSS to a tkeron page. Compare the
+      compiled output in <code>web/</code>.
+    </p>
+    <ul>
+      <li>
+        <a href="bad.html">Bad — <code>&lt;link rel="stylesheet"&gt;</code></a>:
+        CSS ends up in a separate file (extra HTTP request).
+      </li>
+      <li>
+        <a href="good.html">Good — <code>&lt;global-styles&gt;</code></a>:
+        CSS is inlined at build time (no extra request).
+      </li>
+    </ul>
+  </body>
+</html>

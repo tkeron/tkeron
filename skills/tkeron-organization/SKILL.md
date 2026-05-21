@@ -39,9 +39,10 @@ websrc/
 │       ├── hero-text.com.md
 │       └── about-section.com.md
 │
-├── styles/
-│   ├── main.css                # Global styles
-│   └── components.css          # Component styles
+├── styles/                     # OPTIONAL — .css source files (or place them
+│   │                              anywhere). Never loaded via <link>; a
+│   │                              .com.ts component reads and inlines them.
+│   └── main.css                 # Tokens + resets + body typography (small!)
 │
 └── utils/
     ├── format.ts               # Helpers (imported by .com.ts or .pre.ts)
@@ -164,7 +165,7 @@ thing.com.html                 → No clear purpose
 ✅ GOOD:
 index.html, about.html, blog-post.html
 api-service.ts, format-utils.ts
-main.css, components.css
+main.css, tokens.css
 
 ❌ BAD:
 Index.html                     → Always lowercase
@@ -198,7 +199,7 @@ websrc/assets/hero-image.png
 | Per-page `.pre.ts`/`.post.ts` | Same directory as the paired `.html`                           |
 | Shared components             | `websrc/components/<domain>/` (`layout/`, `ui/`, `content/`)   |
 | Local-override components     | Same directory as the page that uses them (wins by priority)   |
-| Global styles                 | `websrc/styles/`                                               |
+| Global styles                 | Free choice (root of `websrc/`, a `styles/` folder, next to the loader component). Source `.css` files are NOT loaded via `<link>`; a `.com.ts` reads them and inlines as `<style>` (see `tkeron-patterns` → "CSS via components"). Per-component CSS lives **inside** each `.com.html`. |
 | Build-time utils (Bun)        | `websrc/utils/` — imported by `.pre.ts`, `.post.ts`, `.com.ts` |
 | Static assets                 | `websrc/assets/` (or wherever — they are copied as-is)         |
 | Output                        | `web/` — **NEVER edit, always in `.gitignore`**                |

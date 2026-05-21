@@ -1,3 +1,21 @@
+# v6.0.1
+
+## Docs: CSS via components pattern
+
+- Skills updated to enforce "CSS via components, never `<link rel="stylesheet">`" as a non-negotiable rule (`tkeron`, `tkeron-patterns`, `tkeron-organization`, `tkeron-troubleshooting`)
+- `tkeron-patterns` adds a full "CSS via components" section covering per-component `<style>` in `.com.html` (auto-dedup, tree-shaking) and global CSS inlined through a `.com.ts` loader
+- New anti-pattern entry: `<link rel="stylesheet">` (extra request, no dedup, blocks first paint)
+- `tkeron-organization` clarifies that `styles/` is optional and `.css` files are free to live anywhere — always inlined via a component, never linked
+
+## Examples: rewrite `init_sample` + new style examples
+
+- `init_sample` reorganized into the canonical structure: multi-page (`index.html`, `about.html`, `docs.html`), shared components under `components/layout/`, `components/ui/`, `components/content/`, build utils under `utils/`, global CSS in `styles/main.css` inlined via `styles-injector.com.ts`
+- New example `with_global_styles/`: demonstrates the global-styles loader component pattern vs the `<link>` anti-pattern
+- New example `with_style_dedup/`: `tag-chip` component proving per-component `<style>` dedup in the build output
+- `tests/init.test.ts` updated to assert the new `init_sample` layout
+
+---
+
 # v6.0.0
 
 ## BREAKING: remove MCP server
